@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { Analytics } from '@vercel/analytics/react';
 import { ErrorBoundary } from './components/error-boundary';
 import Layout from './pages/Layout';
 import ClubDashboard from './lib/ClubDashboard';
@@ -177,6 +178,7 @@ const App: React.FC = () => {
             <Route path="/about-sbg" element={<AboutSBG onGoToLogin={() => { window.location.href = '/login'; }} />} />
             <Route path="*" element={<LandingPage onGoToLogin={() => { window.location.href = '/login'; }} />} />
           </Routes>
+          <Analytics />
         </BrowserRouter>
       </ErrorBoundary>
     );
@@ -207,6 +209,7 @@ const App: React.FC = () => {
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </Layout>
+        <Analytics />
       </BrowserRouter>
     </ErrorBoundary>
   );

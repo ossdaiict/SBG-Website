@@ -1,0 +1,40 @@
+Successfully installed and configured Vercel Web Analytics for the SBG-Website project.
+
+## Implementation Summary
+
+This project is built with React + Vite, and I followed the official Vercel Analytics documentation (https://vercel.com/docs/analytics/quickstart) to implement the analytics integration.
+
+## Changes Made
+
+### 1. Package Installation
+- Installed `@vercel/analytics` version 2.0.1
+- Added to dependencies in `package.json`
+- Updated `package-lock.json` with new dependencies
+
+### 2. Analytics Integration (src/App.tsx)
+- Imported `Analytics` component from `@vercel/analytics/react`
+- Added `<Analytics />` component to both application states:
+  - Logged-out state: Added inside `<BrowserRouter>` for public pages (Login, Landing, About, Clubs & Committees)
+  - Logged-in state: Added inside `<BrowserRouter>` for authenticated pages (Dashboard, Booking, Admin pages, etc.)
+- Component placement ensures analytics tracking works across all routes in the application
+
+## Framework-Specific Implementation
+Following Vercel's official documentation for React/Vite projects:
+- Used the React-specific package: `@vercel/analytics/react`
+- Added the `<Analytics />` component as per React best practices
+- No additional configuration required for Vite
+
+## Next Steps for Full Activation
+To complete the setup and start collecting analytics data:
+1. Deploy this updated code to Vercel
+2. In your Vercel dashboard, navigate to the Analytics section
+3. Select your project and click "Enable" to activate Web Analytics
+4. After deployment, verify analytics are working by checking the browser's Network tab for requests to the analytics endpoint
+
+## Verification
+- ✅ Build completed successfully with no errors
+- ✅ TypeScript compilation passed
+- ✅ All existing functionality preserved
+- ✅ Analytics component added to all routes (logged-in and logged-out)
+
+The implementation is production-ready and follows Vercel's official guidelines for React + Vite applications.
