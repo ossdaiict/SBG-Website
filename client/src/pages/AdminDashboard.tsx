@@ -702,7 +702,10 @@ const AdminDashboard: React.FC = () => {
                             {req.clubName}
                           </Badge>
                         </div>
-                        <h4 className="text-base sm:text-lg font-medium text-foreground">{req.eventName}</h4>
+                        <h4 className="text-base sm:text-lg font-medium text-foreground">{req.bookingName || req.eventName}</h4>
+                        {(req.bookingName && req.bookingName !== req.eventName) ? (
+                          <div className="text-xs text-textMuted mt-0.5 font-medium">Event: {req.eventName}</div>
+                        ): null}
                         <div className="mt-2 text-sm text-textMuted">
                           <div className="mb-2 flex items-center gap-1.5">
                             {/* <span className="font-medium mr-1 text-textPrimary">Booking Time:</span> */}

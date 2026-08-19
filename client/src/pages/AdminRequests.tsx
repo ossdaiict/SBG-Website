@@ -332,13 +332,16 @@ const AdminRequestRow: React.FC<AdminRequestRowProps> = ({ req, index, venues, h
             )}
             <div>
               <div className="font-semibold text-textPrimary flex items-center gap-2">
-                {req.eventName}
+                {req.bookingName || req.eventName}
                 {req.issueFlag && (
                   <div className="text-warning" title={req.issueFlag}>
                     <AlertTriangle size={14} />
                   </div>
                 )}
               </div>
+              {req.bookingName && req.bookingName !== req.eventName && (
+                <div className="text-xs text-textMuted mt-0.5 font-medium">Event: {req.eventName}</div>
+              )}
               <div className="text-xs text-textMuted mt-0.5">{req.clubName}</div>
               {req.permissionsLink && (
                 <div className="mt-3 mb-1">

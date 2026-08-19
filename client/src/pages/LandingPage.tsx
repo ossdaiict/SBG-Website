@@ -77,7 +77,7 @@ const LandingPage: React.FC = () => {
     });
     const [venues, setVenues] = useState<ApiVenue[]>([]);
     const [selectedEvent, setSelectedEvent] = useState<PublicEvent | null>(null);
-    const [selectedDayEvents, setSelectedDayEvents] = useState<PublicEvent[] | null>(null);
+    const [selectedDayInfo, setSelectedDayInfo] = useState<{ date: Date; events: PublicEvent[] } | null>(null);
     const [isMobile, setIsMobile] = useState(() => window.innerWidth < 640);
 
     useEffect(() => {
@@ -469,7 +469,7 @@ const LandingPage: React.FC = () => {
                                                     key={day.toISOString()}
                                                     onClick={() => {
                                                         if (dayEventsForCell.length > 0) {
-                                                            setSelectedDayEvents(dayEventsForCell.map(we => we.event));
+                                                            setSelectedDayInfo({ date: day, events: dayEventsForCell.map(we => we.event) });
                                                         }
                                                     }}
                                                     className={`
@@ -512,9 +512,10 @@ const LandingPage: React.FC = () => {
 
                                                     {overflow > 0 && (
                                                         <button
-                                                            onClick={() => {
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
                                                                 const dayEvents = week.events.filter(we => we.startCol <= dIdx + 1 && we.startCol + we.span - 1 >= dIdx + 1).map(we => we.event);
-                                                                setSelectedDayEvents(dayEvents);
+                                                                setSelectedDayInfo({ date: day, events: dayEvents });
                                                             }}
                                                             className="w-full text-left font-semibold text-brand hover:text-brandLink transition-colors z-20 cursor-pointer select-none truncate"
                                                             style={{
@@ -702,7 +703,7 @@ const LandingPage: React.FC = () => {
                                             <div>
                                                 <p className="text-sm font-semibold text-textPrimary">
                                                     <span className="truncate">
-                                                        {selectedEvent.startTime.toDateString() === selectedEvent.endTime.toDateString()
+                                                        {isSameDay(selectedEvent.startTime, selectedEvent.endTime)
                                                         ? formatISTDate(selectedEvent.startTime, {
                                                             month: 'short', day: 'numeric', year: 'numeric'
                                                         })
@@ -752,13 +753,13 @@ const LandingPage: React.FC = () => {
 
                 {/* ====== "Day view" Modal ====== */}
                 <AnimatePresence>
-                    {selectedDayEvents && (
+                    {selectedDayInfo && (
                         <motion.div
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
                             exit={{ opacity: 0 }}
                             className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/45 backdrop-blur-sm"
-                            onClick={() => setSelectedDayEvents(null)}
+                            onClick={() => setSelectedDayInfo(null)}
                         >
                             <motion.div
                                 initial={{ y: '20%', opacity: 0 }}
@@ -771,41 +772,50 @@ const LandingPage: React.FC = () => {
                                 <div className="p-5 sm:p-6">
                                     <div className="flex items-center justify-between mb-4">
                                         <h3 className="text-lg font-bold text-textPrimary">
-                                            {formatISTDate(selectedDayEvents[0]?.startTime, {
+                                            {formatISTDate(selectedDayInfo.date, {
                                                 weekday: 'long', month: 'short', day: 'numeric'
                                             })}
                                         </h3>
                                         <button
-                                            onClick={() => setSelectedDayEvents(null)}
+                                            onClick={() => setSelectedDayInfo(null)}
                                             className="p-2 rounded-xl hover:bg-hoverSoft transition-colors text-textMuted cursor-pointer"
                                         >
                                             <X size={18} />
                                         </button>
                                     </div>
                                     <div className="space-y-2 max-h-[60dvh] overflow-y-auto">
-                                        {[...selectedDayEvents].sort((a, b) => a.startTime.getTime() - b.startTime.getTime()).map(event => {
+                                        {[...selectedDayInfo.events].sort((a, b) => a.startTime.getTime() - b.startTime.getTime()).map(event => {
                                             const c = getColor(event.eventType);
+                                            const isMultiDay = !isSameDay(event.startTime, event.endTime);
                                             return (
                                                 <button
                                                     key={event.id}
                                                     onClick={() => {
-                                                        setSelectedDayEvents(null);
+                                                        setSelectedDayInfo(null);
                                                         setSelectedEvent(event);
                                                     }}
                                                     className={`w-full text-left rounded-xl p-3.5 border transition-all hover:shadow-md active:scale-[0.98] ${c.bg} ${c.border}`}
                                                 >
-                                                    <p className={`font-semibold text-sm ${c.text}`}>{event.eventName}</p>
+                                                    <div className="flex items-center justify-between gap-2">
+                                                        <p className={`font-semibold text-sm ${c.text}`}>{event.eventName}</p>
+                                                        {isMultiDay && (
+                                                            <span className="shrink-0 text-[9px] uppercase tracking-wider font-bold px-1.5 py-0.5 rounded bg-brand/10 text-brand border border-brand/20">Multi-Day</span>
+                                                        )}
+                                                    </div>
                                                     <p className="text-xs text-textSecondary mt-1">
-                                                        {formatTime(event.startTime)} – {formatTime(event.endTime)} · {event.venueName}
+                                                        {event.clubName} · {event.venueName}
                                                     </p>
-                                                    <p className="text-xs text-textMuted mt-0.5">{event.clubName}</p>
+                                                    <p className="text-xs text-textMuted mt-1">
+                                                        {isMultiDay
+                                                            ? `${formatISTDate(event.startTime, { month: 'short', day: 'numeric' })} ${formatTime(event.startTime)} – ${formatISTDate(event.endTime, { month: 'short', day: 'numeric' })} ${formatTime(event.endTime)}`
+                                                            : `${formatTime(event.startTime)} – ${formatTime(event.endTime)}`
+                                                        }
+                                                    </p>
                                                 </button>
                                             );
                                         })}
                                     </div>
                                 </div>
-
-                                <div className="pb-safe sm:pb-0" />
                             </motion.div>
                         </motion.div>
                     )}
