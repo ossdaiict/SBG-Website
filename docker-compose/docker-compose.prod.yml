@@ -1,0 +1,48 @@
+# Used on the VPS by GitHub Actions. Pulls a pre-built image from GHCR.
+# CI copies this file to /opt/sbg-website/docker-compose.prod.yml (flattened).
+# Secrets stay in a local .env next to that file — never baked into the image.
+
+name: sbg-website
+
+services:
+  app:
+    image: ${APP_IMAGE:-ghcr.io/vaishcodescape/sbg-website:latest}
+    container_name: sbg-website
+    ports:
+      - "${HOST_PORT:-127.0.0.1:3005}:3005"
+    env_file:
+      - .env
+    environment:
+      NODE_ENV: production
+      PORT: "3005"
+      CLIENT_DIST_DIR: /app/client
+      RUN_MIGRATIONS: ${RUN_MIGRATIONS:-false}
+    restart: unless-stopped
+    stop_grace_period: 15s
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "node",
+          "-e",
+          "require('http').get('http://127.0.0.1:3005/api/health',r=>{r.resume();process.exit(r.statusCode===200?0:1)}).on('error',()=>process.exit(1))",
+        ]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 25s
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  migrate:
+    profiles: ["migrate"]
+    image: ${APP_IMAGE:-ghcr.io/vaishcodescape/sbg-website:latest}
+    env_file:
+      - .env
+    environment:
+      NODE_ENV: production
+    entrypoint: ["node", "/app/server/migrate.js"]
+    restart: "no"

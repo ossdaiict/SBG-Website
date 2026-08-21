@@ -1,49 +1,34 @@
-# Dependencies
-node_modules
-package-lock.json
+**/node_modules
+**/dist
+**/build
+**/.vite
+**/.cache
 
-# Build outputs
-dist
-build
-.next
-out
-
-# Git
 .git
 .gitignore
 .github
-
-# Documentation
-*.md
-LICENSE
-
-# Environment files
-.env
-.env.local
-.env.*.local
-!.env.example
-
-# Logs
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-*.log
-
-# OS files
-.DS_Store
-Thumbs.db
+.cursor
 .vscode
 .idea
 
-# Misc
-.cache
-.eslintcache
-.prettierignore
-.prettierrc
-tsconfig.tsbuildinfo
+*.md
+LICENSE
+!client/public/**
 
-# Testing
-.nyc_output
+.env
+.env.*
+!.env.example
+**/.env
+!**/.env.example
+
+*.log
+npm-debug.log*
+.DS_Store
+Thumbs.db
 coverage
-test-group.js
-.vade-report
+.nyc_output
+*.tsbuildinfo
+
+docker-compose
+docker-compose.override.yml
+deploy

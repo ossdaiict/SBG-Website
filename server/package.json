@@ -6,7 +6,9 @@
   "scripts": {
     "dev": "ts-node-dev --respawn --transpile-only src/server.ts",
     "build": "tsc -p .",
-    "start": "node dist/server.js"
+    "start": "node dist/server.js",
+    "typecheck": "tsc -p . --noEmit",
+    "migrate": "ts-node migrate.ts"
   },
   "dependencies": {
     "@acpr/rate-limit-postgresql": "^1.4.1",

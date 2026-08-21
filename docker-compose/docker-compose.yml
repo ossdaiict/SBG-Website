@@ -1,0 +1,68 @@
+# Local production-like stack (single container; Express serves the SPA).
+# From the repo root:
+#   docker compose -f docker-compose/docker-compose.yml up --build
+# Paths below are relative to this file.
+
+name: sbg-website
+
+services:
+  app:
+    build:
+      context: ..
+      dockerfile: Dockerfile
+      args:
+        BUILD_ID: ${BUILD_ID:-local}
+    image: ${APP_IMAGE:-sbg-website:local}
+    container_name: sbg-website
+    ports:
+      - "${HOST_PORT:-3005}:3005"
+    env_file:
+      - ../server/.env
+    environment:
+      NODE_ENV: production
+      PORT: "3005"
+      CLIENT_DIST_DIR: /app/client
+      CORS_ORIGIN: ${CORS_ORIGIN:-http://localhost:3005}
+      RUN_MIGRATIONS: ${RUN_MIGRATIONS:-false}
+    restart: unless-stopped
+    stop_grace_period: 15s
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "node",
+          "-e",
+          "require('http').get('http://127.0.0.1:3005/api/health',r=>{r.resume();process.exit(r.statusCode===200?0:1)}).on('error',()=>process.exit(1))",
+        ]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 25s
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+    networks:
+      - sbg-network
+
+  migrate:
+    profiles: ["migrate"]
+    build:
+      context: ..
+      dockerfile: Dockerfile
+      args:
+        BUILD_ID: ${BUILD_ID:-local}
+    image: ${APP_IMAGE:-sbg-website:local}
+    env_file:
+      - ../server/.env
+    environment:
+      NODE_ENV: production
+    entrypoint: ["node", "/app/server/migrate.js"]
+    restart: "no"
+    networks:
+      - sbg-network
+
+networks:
+  sbg-network:
+    driver: bridge
