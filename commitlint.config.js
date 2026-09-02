@@ -11,6 +11,8 @@ module.exports = {
     'subject-full-stop': [0],
     // Enforce non-empty type
     'type-empty': [2, 'never'],
+    // Increase header max length to 125
+    'header-max-length': [2, 'always', 125],
     // Allow these types only
     'type-enum': [
       2,

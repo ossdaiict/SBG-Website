@@ -1,20 +1,20 @@
-name: Lint Commits
+name: Lint PR Title
 
 on:
   pull_request:
+    types: [opened, synchronize, reopened, edited]
     branches: [main]
 
 permissions:
   contents: read
+  pull-requests: read
 
 jobs:
   commitlint:
-    name: Lint Commit Messages
+    name: Lint PR Title
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
-        with:
-          fetch-depth: 0
 
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         with:
@@ -23,10 +23,7 @@ jobs:
 
       - run: npm ci --ignore-scripts
 
-      - name: Validate commits
-        # Pass SHA values as env vars — never interpolate ${{ }} directly into run: scripts
-        # as those expressions are evaluated before shell escaping (injection vector).
+      - name: Validate PR Title
         env:
-          FROM_SHA: ${{ github.event.pull_request.base.sha }}
-          TO_SHA: ${{ github.event.pull_request.head.sha }}
-        run: npx commitlint --from "$FROM_SHA" --to "$TO_SHA" --verbose
+          PR_TITLE: ${{ github.event.pull_request.title }}
+        run: echo "$PR_TITLE" | npx commitlint --verbose

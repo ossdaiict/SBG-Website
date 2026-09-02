@@ -209,14 +209,14 @@ Contributions are welcome! This project uses **[Conventional Commits](https://ww
 
 1. Fork the repository
 2. Create a feature branch (`git checkout -b feat/my-feature`)
-3. Make your changes
-4. Commit using Conventional Commits format (see below)
-5. Push to your branch (`git push origin feat/my-feature`)
-6. Open a Pull Request — CI will validate your commit messages automatically
+3. Make your changes (individual commit messages do not need to be strictly formatted)
+4. Push to your branch (`git push origin feat/my-feature`)
+5. Open a Pull Request. **Important:** CI will validate your **Pull Request Title** (not individual commits) to ensure it follows the Conventional Commits format. 
+6. When your PR is approved, it must be merged using **Squash and Merge**.
 
-### Commit Message Format
+### Pull Request Title Format
 
-Every commit must follow this format:
+Your **Pull Request Title** (and the resulting squashed commit) must follow this format:
 
 ```
 <type>(<optional scope>): <description>
@@ -254,11 +254,11 @@ git commit -m "docs: update deployment instructions"
 
 ### How Auto-Versioning Works
 
-1. You write commits with `feat:` / `fix:` prefixes
-2. CI validates commit messages on every PR
-3. When your PR merges to `main`, [release-please](https://github.com/googleapis/release-please) opens a **Release PR** with the bumped version and updated CHANGELOG
-4. When the Release PR is merged, a GitHub Release and git tag are created automatically
-5. CI builds and deploys the Docker image tagged with the new version
+1. You create a PR with a `feat:` / `fix:` prefix in the **PR Title**.
+2. CI validates the PR Title automatically.
+3. Upon **Squash and Merge** into `main`, [release-please](https://github.com/googleapis/release-please) (running only on the upstream `ossdaiict` repository) opens a **Release PR** with the bumped version and updated CHANGELOG.
+4. When the Release PR is merged, a GitHub Release and git tag are created automatically.
+5. CI builds and deploys the Docker image to production. *(Note: Image builds, versioning, and deployments are restricted to the official repository and will not run on personal forks).*
 
 *Note: By contributing to this repository, you agree that your contributions will be licensed under its proprietary license.*
 
