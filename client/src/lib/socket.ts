@@ -142,4 +142,19 @@ export const reconnectSocket = () => {
     socketService.reconnect();
 };
 
+// Re-establish socket when the browser restores the page from the
+// Back-Forward Cache (BFCache). In that case the old WebSocket is already
+// closed by the browser, so we must disconnect cleanly and reconnect.
+if (typeof window !== 'undefined') {
+    window.addEventListener('pageshow', (event) => {
+        if (event.persisted) {
+            console.log('[Socket.io] Page restored from BFCache — reconnecting…');
+            socketService.disconnect();
+            void socketService.connect().catch((error) => {
+                console.warn('[Socket.io] BFCache reconnect failed:', error);
+            });
+        }
+    });
+}
+
 export { SOCKET_EVENTS };

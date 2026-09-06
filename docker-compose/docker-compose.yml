@@ -15,12 +15,12 @@ services:
     image: ${APP_IMAGE:-sbg-website:local}
     container_name: sbg-website
     ports:
-      - "${HOST_PORT:-3005}:3005"
+      - "${HOST_PORT:-4000}:4000"
     env_file:
       - ../server/.env
     environment:
       NODE_ENV: production
-      PORT: "3005"
+      PORT: "4000"
       CLIENT_DIST_DIR: /app/client
       CORS_ORIGIN: ${CORS_ORIGIN:-http://localhost:3005}
       RUN_MIGRATIONS: ${RUN_MIGRATIONS:-false}
@@ -32,7 +32,7 @@ services:
           "CMD",
           "node",
           "-e",
-          "require('http').get('http://127.0.0.1:3005/api/health',r=>{r.resume();process.exit(r.statusCode===200?0:1)}).on('error',()=>process.exit(1))",
+          "require('http').get('http://127.0.0.1:4000/api/health',r=>{r.resume();process.exit(r.statusCode===200?0:1)}).on('error',()=>process.exit(1))",
         ]
       interval: 30s
       timeout: 5s
@@ -58,6 +58,7 @@ services:
       - ../server/.env
     environment:
       NODE_ENV: production
+      NODE_TLS_REJECT_UNAUTHORIZED: "0"
     entrypoint: ["node", "/app/server/migrate.js"]
     restart: "no"
     networks:

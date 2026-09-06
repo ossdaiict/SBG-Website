@@ -68,30 +68,33 @@ const ScheduleCalendarCard = ({
 
   return (
     <Card className="rounded-xl h-full">
-      <CardHeader className="border-b border-borderSoft p-4 sm:p-6">
+      <CardHeader className="border-b border-borderSoft p-2 sm:p-3">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <CardTitle className="text-lg sm:text-xl">{title}</CardTitle>
           {headerAction}
         </div>
       </CardHeader>
 
-      <CardContent className="p-4 sm:p-6">
-        <div className="grid gap-6 xl:grid-cols-[minmax(420px,520px)_minmax(0,1fr)] xl:items-start">
-          <div className="flex justify-center overflow-x-auto p-1 -m-1 xl:justify-start">
-            <Calendar
-              mode="single"
-              selected={selectedDate}
-              onSelect={onSelectDate}
-              events={calendarEvents}
-              modifiers={{ hasEvents: eventDates }}
-              modifiersClassNames={{
-                hasEvents: "relative after:absolute after:bottom-1 after:left-1/2 after:-translate-x-1/2 after:w-1.5 after:h-1.5 after:rounded-full after:bg-primary"
-              }}
-              className="rounded-2xl"
-            />
+      <CardContent className="p-2 sm:p-3">
+        <div className="grid gap-6 lg:grid-cols-[auto_minmax(0,1fr)]">
+          <div className="w-full min-w-0">
+            <div className="w-full min-w-0 max-w-[380px] mx-auto overflow-x-auto">
+              <Calendar
+                mode="single"
+                selected={selectedDate}
+                onSelect={onSelectDate}
+                events={calendarEvents}
+                modifiers={{ hasEvents: eventDates }}
+                modifiersClassNames={{
+                  hasEvents:
+                    "relative after:absolute after:bottom-[8%] after:left-1/2 after:-translate-x-1/2 after:w-1.5 after:h-1.5 after:rounded-full after:bg-primary",
+                }}
+                className="rounded-2xl mx-auto xl:mx-0"
+              />
+            </div>
           </div>
 
-          <div className="min-w-0 border-t border-borderSoft pt-5 xl:min-h-[460px] xl:border-l xl:border-t-0 xl:pl-6 xl:pt-1">
+          <div className="flex w-full min-w-0 flex-1 flex-col border-t border-borderSoft pt-5 xl:border-l xl:border-t-0 xl:pl-6 xl:pt-1">
             <h4 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-4">
               {selectedDate ? selectedDate.toLocaleDateString('en-US', {
                 timeZone: 'Asia/Kolkata',
@@ -99,7 +102,7 @@ const ScheduleCalendarCard = ({
               }) : 'Select a date'}
             </h4>
 
-            <div className="space-y-3 max-h-[360px] overflow-y-auto pr-1 xl:max-h-[410px]">
+            <div className="space-y-3 max-h-[280px] overflow-y-auto pr-1 xl:max-h-[320px]">
               {selectedDate ? (
                 (() => {
                   return selectedDateEvents.length > 0 ? (
@@ -486,7 +489,7 @@ const ClubDashboard: React.FC<ClubDashboardProps> = ({ user }) => {
         </div>
       </motion.div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_340px] xl:grid-cols-[minmax(0,1fr)_360px] gap-6 sm:gap-8">
+      <div className="grid grid-cols-1 xl:grid-cols-[minmax(0,1fr)_360px] gap-4 sm:gap-6">
         {/* Schedule Calendar */}
         <motion.div
           initial={{ opacity: 0, x: -20 }}
@@ -527,10 +530,10 @@ const ClubDashboard: React.FC<ClubDashboardProps> = ({ user }) => {
         >
           {/* Card 1: My Club Bookings */}
           <Card className="border border-borderSoft rounded-xl">
-            <CardHeader className="border-b border-borderSoft">
+            <CardHeader className="border-b border-borderSoft p-3.5">
               <div className="flex items-center justify-between">
                 <CardTitle className="text-lg">My {entityType} Bookings</CardTitle>
-                <Button variant="ghost" size="sm" className="hover:bg-brand/10" asChild>
+                <Button variant="outline" size="sm" className="border-brand/20 hover:bg-brand/5" asChild>
                   <Link to="/my-bookings" className="text-xs text-brand font-semibold hover:text-brand/80">View All</Link>
                 </Button>
               </div>
@@ -546,7 +549,7 @@ const ClubDashboard: React.FC<ClubDashboardProps> = ({ user }) => {
                     initial={{ opacity: 0, x: 20 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ duration: 0.3, delay: index * 0.1 }}
-                    className="p-4 hover:bg-hoverSoft transition-colors"
+                    className="p-2 hover:bg-hoverSoft transition-colors"
                   >
                     <div className="font-semibold text-foreground text-sm"><span className="text-xs text-muted-foreground font-normal mr-1.5">Booking Name:</span>{event.bookingName}</div>
                     {event.eventName && event.eventName !== event.bookingName && (
@@ -591,7 +594,7 @@ const ClubDashboard: React.FC<ClubDashboardProps> = ({ user }) => {
                   </motion.div>
                 ))}
                 {myEvents.length === 0 && (
-                  <div className="p-6 text-center text-muted-foreground text-sm">No upcoming bookings.</div>
+                  <div className="p-2 text-center text-muted-foreground text-sm">No upcoming bookings.</div>
                 )}
               </div>
             </CardContent>
@@ -599,11 +602,11 @@ const ClubDashboard: React.FC<ClubDashboardProps> = ({ user }) => {
 
           {/* Card 2: Registered Events */}
           <Card className="border border-borderSoft rounded-xl">
-            <CardHeader className="border-b border-borderSoft">
+            <CardHeader className="border-b border-borderSoft p-3.5">
               <div className="flex items-center justify-between">
                 <CardTitle className="text-lg">Registered {entityType} Events</CardTitle>
-                <Button variant="ghost" size="sm" className="hover:bg-brand/10" asChild>
-                  <Link to="/manage-events" className="text-xs text-brand font-semibold hover:text-brand/80">View All & Register</Link>
+                <Button variant="outline" size="sm" className="border-brand/20 hover:bg-brand/5" asChild>
+                  <Link to="/manage-events" className="text-xs text-brand font-semibold hover:text-brand/80">View All</Link>
                 </Button>
               </div>
             </CardHeader>
@@ -658,7 +661,7 @@ const ClubDashboard: React.FC<ClubDashboardProps> = ({ user }) => {
                   </motion.div>
                 ))}
                 {registeredEvents.length === 0 && (
-                  <div className="p-6 text-center text-muted-foreground text-sm">
+                  <div className="p-2 text-center text-muted-foreground text-sm">
                     No registered events yet.
                   </div>
                 )}
@@ -683,7 +686,7 @@ const ClubDashboard: React.FC<ClubDashboardProps> = ({ user }) => {
               </div>
             </div>
           </CardHeader>
-          <CardContent className="p-4 sm:p-6">
+          <CardContent className="p-2 sm:p-3">
             {upcomingEvents.length > 0 ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 {upcomingEvents.map((event, index) => {

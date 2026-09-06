@@ -3,6 +3,7 @@ import * as xlsx from 'xlsx';
 import { db } from '../db';
 import authMiddleware from '../middleware/auth';
 import { getClubForUser } from '../utils/clubAuth';
+import { syncSingleReport, syncAllReports } from '../services/googleSheetService';
 
 const router = express.Router();
 
@@ -42,7 +43,6 @@ router.post('/', authMiddleware, async (req, res) => {
     const {
       event_id,
       level,
-      level_description,
       report_doc_link,
       participants_sheet_link,
       photos_drive_link,
@@ -112,11 +112,16 @@ router.post('/', authMiddleware, async (req, res) => {
 
     // Insert report
     const { rows } = await db.query(
-      `INSERT INTO event_reports (club_id, event_id, level, level_description, report_doc_link, participants_sheet_link, photos_drive_link, awards_doc_link)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+      `INSERT INTO event_reports (club_id, event_id, level, report_doc_link, participants_sheet_link, photos_drive_link, awards_doc_link)
+       VALUES ($1, $2, $3, $4, $5, $6, $7)
        RETURNING *`,
-      [club.id, event_id, level, level_description, report_doc_link, participants_sheet_link, photos_drive_link, awards_doc_link]
+      [club.id, event_id, level, report_doc_link, participants_sheet_link, photos_drive_link, awards_doc_link]
     );
+
+    // Asynchronously sync to Google Sheet (non-blocking)
+    syncSingleReport(rows[0].id).catch(err => {
+      console.error('Failed to sync new report to Google Sheet in background:', err);
+    });
 
     return res.status(201).json(rows[0]);
   } catch (error: any) {
@@ -137,7 +142,6 @@ router.put('/:id', authMiddleware, async (req, res) => {
     const { id } = req.params;
     const {
       level,
-      level_description,
       report_doc_link,
       participants_sheet_link,
       photos_drive_link,
@@ -191,12 +195,17 @@ router.put('/:id', authMiddleware, async (req, res) => {
 
     const { rows } = await db.query(
       `UPDATE event_reports 
-       SET level = $1, level_description = $2, report_doc_link = $3, 
-           participants_sheet_link = $4, photos_drive_link = $5, awards_doc_link = $6
-       WHERE id = $7 AND club_id = $8
+       SET level = $1, report_doc_link = $2, 
+           participants_sheet_link = $3, photos_drive_link = $4, awards_doc_link = $5
+       WHERE id = $6 AND club_id = $7
        RETURNING *`,
-      [level, level_description, report_doc_link, participants_sheet_link, photos_drive_link, awards_doc_link, id, club.id]
+      [level, report_doc_link, participants_sheet_link, photos_drive_link, awards_doc_link, id, club.id]
     );
+
+    // Asynchronously sync update to Google Sheet (non-blocking)
+    syncSingleReport(id).catch(err => {
+      console.error('Failed to sync updated report to Google Sheet in background:', err);
+    });
 
     return res.json(rows[0]);
   } catch (error: any) {
@@ -270,15 +279,15 @@ router.get('/export', authMiddleware, async (req, res) => {
 
     const { rows } = await db.query(`
       SELECT c.name as "Club/Committee Name", e.name as "Event Name", 
-             e.date as "Start Date", e.end_date as "End Date", e.event_type as "Event Type",
-             er.level as "Level", er.level_description as "Level Description",
+             e.date as "Start Date", e.end_date as "End Date",
              er.report_doc_link as "Report Doc Link", er.participants_sheet_link as "Participants Link",
+             er.level as "Level", e.event_type as "Event Type",
              er.photos_drive_link as "Photos Link", er.awards_doc_link as "Awards Link",
              er.created_at as "Submitted At"
       FROM event_reports er
       JOIN events e ON er.event_id = e.id
       JOIN clubs c ON er.club_id = c.id
-      ORDER BY er.created_at DESC
+      ORDER BY e.date ASC, e.end_date ASC
     `);
 
     const ws = xlsx.utils.json_to_sheet(rows);
@@ -318,6 +327,26 @@ router.get('/all-past-events', authMiddleware, async (req, res) => {
     return res.json(rows);
   } catch (error: any) {
     return res.status(500).json({ error: 'Failed to fetch past events' });
+  }
+});
+
+// Admin manually syncs all event reports to Google Sheet
+router.post('/sync-sheets', authMiddleware, async (req, res) => {
+  try {
+    if (req.user?.role !== 'admin') {
+      return res.status(403).json({ error: 'Forbidden' });
+    }
+
+    const { from_date, to_date } = req.body || {};
+    const result = await syncAllReports(from_date, to_date);
+    if (!result.success) {
+      return res.status(400).json({ error: result.message || result.error || 'Failed to sync to Google Sheet' });
+    }
+
+    return res.json({ success: true, count: result.count, message: result.message });
+  } catch (error: any) {
+    console.error('Manual sheet sync error:', error);
+    return res.status(500).json({ error: 'Failed to sync to Google Sheet' });
   }
 });
 

@@ -10,6 +10,31 @@ function sha256(content: string): string {
   return crypto.createHash('sha256').update(content, 'utf8').digest('hex');
 }
 
+// ── Resync checksums (e.g. after line-ending normalization) ──────────
+async function resyncChecksums() {
+  const client = createClient();
+  await client.connect();
+  try {
+    await ensureMigrationsTable(client);
+    const { rows } = await client.query('SELECT version FROM schema_migrations');
+    const appliedVersions = new Set(rows.map((r: any) => r.version));
+    const migrationsDir = path.join(__dirname, 'migrations');
+    const files = fs.readdirSync(migrationsDir).filter((f) => f.endsWith('.sql')).sort();
+    let updated = 0;
+    for (const file of files) {
+      if (!appliedVersions.has(file)) continue;
+      const sql = fs.readFileSync(path.join(migrationsDir, file), 'utf8');
+      const checksum = sha256(sql);
+      await client.query('UPDATE schema_migrations SET checksum = $1 WHERE version = $2', [checksum, file]);
+      console.log(`  ✓ Resynced: ${file}`);
+      updated++;
+    }
+    console.log(`\nResynced ${updated} checksum(s). Run migrations normally now.`);
+  } finally {
+    await client.end();
+  }
+}
+
 function createClient(): Client {
   const connectionString = process.env.DATABASE_URL;
   if (!connectionString) {
@@ -90,8 +115,9 @@ async function migrate() {
         `\nABORTING: ${tamperedFiles.length} applied migration(s) have been modified on disk.\n` +
         `   This may indicate tampering, accidental edits, or an incomplete merge.\n` +
         `   Affected: ${tamperedFiles.join(', ')}\n` +
-        `   If the change is intentional, update the checksum in schema_migrations:\n` +
-        `     UPDATE schema_migrations SET checksum = '<new_hash>' WHERE version = '<filename>';`
+        `   If the change is intentional (e.g. line-ending normalization), run:\n` +
+        `     docker compose -f docker-compose/docker-compose.yml --profile migrate run --rm migrate node migrate.js --resync-checksums\n` +
+        `   Then re-run migrations normally.`
       );
       process.exit(1);
     }
@@ -129,7 +155,16 @@ async function migrate() {
   }
 }
 
-migrate().catch((err) => {
-  console.error('Migration failed:', err);
-  process.exit(1);
-});
+// ── Entrypoint ──────────────────────────────────────────────────────
+const args = process.argv.slice(2);
+if (args.includes('--resync-checksums')) {
+  resyncChecksums().catch((err) => {
+    console.error('Resync failed:', err);
+    process.exit(1);
+  });
+} else {
+  migrate().catch((err) => {
+    console.error('Migration failed:', err);
+    process.exit(1);
+  });
+}

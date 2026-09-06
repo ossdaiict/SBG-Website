@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { CheckCircle2, Edit2, MapPin, Plus, Trash2, Users, XCircle } from 'lucide-react';
+import { CheckCircle2, ChevronLeft, ChevronRight, Edit2, MapPin, Plus, Trash2, Users, XCircle } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 import { Button } from '../components/ui/button';
 import {
@@ -22,6 +22,9 @@ const AdminVenues: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingVenue, setEditingVenue] = useState<ApiVenue | null>(null);
+  
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
   
   const [formData, setFormData] = useState({
     name: '',
@@ -149,6 +152,10 @@ const AdminVenues: React.FC = () => {
     }
   };
 
+  const totalPages = Math.ceil(venues.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const paginatedVenues = venues.slice(startIndex, startIndex + itemsPerPage);
+
   return (
     <div className="space-y-6 px-4">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -163,38 +170,38 @@ const AdminVenues: React.FC = () => {
 
       <div className="bg-card border border-borderSoft rounded-2xl shadow-sm overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="w-full min-w-[650px] sm:min-w-0 text-left text-sm">
-            <thead className="bg-bgMain border-b border-borderSoft text-textSecondary uppercase text-xs font-semibold">
+          <table className="w-full min-w-[1000px] text-left text-sm">
+            <thead className="bg-hoverSoft border-b border-borderSoft uppercase tracking-wider text-xs font-semibold text-textMuted text-left">
               <tr>
-                <th className="px-6 py-4">Venue Name</th>
-                <th className="px-6 py-4">Status</th>
-                <th className="px-6 py-4">Category</th>
-                <th className="px-6 py-4">Capacity</th>
-                <th className="px-6 py-4">Location</th>
-                <th className="px-6 py-4 text-right">Actions</th>
+                <th className="px-3 py-2 sm:py-4 w-[25%] text-left">Venue Name</th>
+                <th className="px-3 py-2 sm:py-4 w-[15%] text-left">Status</th>
+                <th className="px-3 py-2 sm:py-4 w-[20%] text-left">Category</th>
+                <th className="px-3 py-2 sm:py-4 w-[10%] text-left">Capacity</th>
+                <th className="px-3 py-2 sm:py-4 w-[20%] text-left">Location</th>
+                <th className="px-3 py-2 sm:py-4 w-[10%] text-left">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-borderSoft">
               {isLoading ? (
                 Array.from({ length: 5 }).map((_, i) => (
                   <tr key={i}>
-                    <td className="px-6 py-4"><Skeleton className="h-5 w-32" /></td>
-                    <td className="px-6 py-4"><Skeleton className="h-5 w-20" /></td>
-                    <td className="px-6 py-4"><Skeleton className="h-5 w-24" /></td>
-                    <td className="px-6 py-4"><Skeleton className="h-5 w-16" /></td>
-                    <td className="px-6 py-4"><Skeleton className="h-5 w-24" /></td>
-                    <td className="px-6 py-4 text-right"><Skeleton className="h-8 w-16 ml-auto" /></td>
+                    <td className="px-3 py-2 sm:py-4"><Skeleton className="h-5 w-32" /></td>
+                    <td className="px-3 py-2 sm:py-4"><Skeleton className="h-5 w-20" /></td>
+                    <td className="px-3 py-2 sm:py-4"><Skeleton className="h-5 w-24" /></td>
+                    <td className="px-3 py-2 sm:py-4"><Skeleton className="h-5 w-16" /></td>
+                    <td className="px-3 py-2 sm:py-4"><Skeleton className="h-5 w-24" /></td>
+                    <td className="px-3 py-2 sm:py-4"><Skeleton className="h-8 w-16" /></td>
                   </tr>
                 ))
               ) : venues.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="px-6 py-8 text-center text-textMuted">
+                  <td colSpan={6} className="px-3 py-2 sm:py-8 text-center text-textMuted">
                     <MapPin size={32} className="mx-auto mb-2 opacity-50" />
                     No venues found.
                   </td>
                 </tr>
               ) : (
-                venues.map(venue => {
+                paginatedVenues.map(venue => {
                   const isActive = venue.is_active !== false;
                   return (
                     <motion.tr 
@@ -203,13 +210,13 @@ const AdminVenues: React.FC = () => {
                       animate={{ opacity: 1 }}
                       className={`hover:bg-hoverSoft/30 transition-colors group ${!isActive ? 'opacity-60 bg-muted/20' : ''}`}
                     >
-                      <td className="px-6 py-4">
+                      <td className="px-3 py-2 sm:py-4">
                         <span className="font-semibold text-textPrimary">{venue.name}</span>
                         {!isActive && (
                           <span className="ml-2 text-xs text-muted-foreground italic">(Unavailable for new bookings)</span>
                         )}
                       </td>
-                      <td className="px-6 py-4">
+                      <td className="px-3 py-2 sm:py-4">
                         <button
                           type="button"
                           onClick={() => handleToggleActive(venue)}
@@ -233,19 +240,19 @@ const AdminVenues: React.FC = () => {
                           )}
                         </button>
                       </td>
-                      <td className="px-6 py-4">
+                      <td className="px-3 py-2 sm:py-4">
                         <span className="px-2.5 py-1 text-xs rounded-full bg-brand/10 text-brand font-medium">
                           {venue.category.replace('_', ' ')}
                         </span>
                       </td>
-                      <td className="px-6 py-4 text-textSecondary flex items-center gap-1.5 mt-2.5">
+                      <td className="px-3 py-2 sm:py-4 text-textSecondary flex items-center gap-1.5 mt-2.5">
                         <Users size={14} /> {venue.capacity || 'N/A'}
                       </td>
-                      <td className="px-6 py-4 text-textSecondary">
+                      <td className="px-3 py-2 sm:py-4 text-textSecondary">
                         {venue.location || 'N/A'}
                       </td>
-                      <td className="px-6 py-4 text-right">
-                        <div className="flex justify-end gap-2">
+                      <td className="px-3 py-2 sm:py-4">
+                        <div className="flex items-center justify-start gap-1">
                           <Button 
                             variant="ghost" 
                             size="icon" 
@@ -273,6 +280,33 @@ const AdminVenues: React.FC = () => {
             </tbody>
           </table>
         </div>
+        {venues.length > 0 && totalPages > 1 && (
+          <div className="flex flex-col sm:flex-row items-center justify-between px-4 py-3 sm:px-6 border-t border-borderSoft bg-card gap-4">
+            <div className="flex items-center text-sm text-textMuted">
+              Showing <span className="font-medium mx-1">{startIndex + 1}</span> to <span className="font-medium mx-1">{Math.min(startIndex + itemsPerPage, venues.length)}</span> of <span className="font-medium mx-1">{venues.length}</span> results
+            </div>
+            <div className="flex gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                disabled={currentPage === 1}
+              >
+                <ChevronLeft size={16} className="mr-1" />
+                Previous
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                disabled={currentPage === totalPages}
+              >
+                Next
+                <ChevronRight size={16} className="ml-1" />
+              </Button>
+            </div>
+          </div>
+        )}
       </div>
 
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
@@ -282,8 +316,9 @@ const AdminVenues: React.FC = () => {
           </DialogHeader>
           <div className="space-y-4 py-4">
             <div className="space-y-2">
-              <Label>Venue Name <span className="text-error">*</span></Label>
+              <Label htmlFor="venue-name">Venue Name <span className="text-error">*</span></Label>
               <Input 
+                id="venue-name"
                 value={formData.name} 
                 onChange={e => setFormData({ ...formData, name: e.target.value })} 
                 placeholder="e.g. CEP 108, OAT"
@@ -291,9 +326,9 @@ const AdminVenues: React.FC = () => {
             </div>
             
             <div className="space-y-2">
-              <Label>Category <span className="text-error">*</span></Label>
+              <Label htmlFor="venue-category">Category <span className="text-error">*</span></Label>
               <Select value={formData.category} onValueChange={v => setFormData({ ...formData, category: v })}>
-                <SelectTrigger>
+                <SelectTrigger id="venue-category">
                   <SelectValue placeholder="Select a category" />
                 </SelectTrigger>
                 <SelectContent>
@@ -304,8 +339,9 @@ const AdminVenues: React.FC = () => {
             </div>
 
             <div className="space-y-2">
-              <Label>Capacity</Label>
+              <Label htmlFor="venue-capacity">Capacity</Label>
               <Input 
+                id="venue-capacity"
                 type="number"
                 value={formData.capacity} 
                 onChange={e => setFormData({ ...formData, capacity: e.target.value })} 
@@ -314,8 +350,9 @@ const AdminVenues: React.FC = () => {
             </div>
 
             <div className="space-y-2">
-              <Label>Location</Label>
+              <Label htmlFor="venue-location">Location</Label>
               <Input 
+                id="venue-location"
                 value={formData.location} 
                 onChange={e => setFormData({ ...formData, location: e.target.value })} 
                 placeholder="e.g. CEP Building, 1st Floor"

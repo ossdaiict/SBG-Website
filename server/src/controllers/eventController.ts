@@ -256,8 +256,8 @@ export const deleteEvent = async (req: Request, res: Response) => {
       `, [id]);
 
       await client.query(`
-        INSERT INTO archived_event_reports (id, club_id, event_id, level, level_description, report_doc_link, participants_sheet_link, photos_drive_link, awards_doc_link, created_at, updated_at)
-        SELECT id, club_id, event_id, level, level_description, report_doc_link, participants_sheet_link, photos_drive_link, awards_doc_link, created_at, updated_at
+        INSERT INTO archived_event_reports (id, club_id, event_id, level, report_doc_link, participants_sheet_link, photos_drive_link, awards_doc_link, created_at, updated_at)
+        SELECT id, club_id, event_id, level, report_doc_link, participants_sheet_link, photos_drive_link, awards_doc_link, created_at, updated_at
         FROM event_reports WHERE event_id = $1
       `, [id]);
 
@@ -279,7 +279,7 @@ export const getPublicEvents = async (_req: Request, res: Response) => {
   try {
     const { rows } = await db.query(`
       SELECT e.id, e.name, e.date, e.venue, e.end_date, e.event_type, e.status, 
-             json_build_object('name', c.name) AS clubs
+             jsonb_build_object('name', c.name) AS clubs
       FROM events e
       LEFT JOIN clubs c ON e.club_id = c.id
       WHERE e.event_type IN ('open_all', 'co_curricular')

@@ -14,9 +14,10 @@ interface TimePickerProps {
     onChange: (time: string) => void;
     className?: string;
     hideIcon?: boolean;
+    id?: string;
 }
 
-export function TimePicker({ value, onChange, className, hideIcon = false }: TimePickerProps) {
+export function TimePicker({ value, onChange, className, hideIcon = false, id }: TimePickerProps) {
     const [hour, setHour] = React.useState<string>("12");
     const [minute, setMinute] = React.useState<string>("00");
     const [period, setPeriod] = React.useState<string>("PM");
@@ -52,7 +53,7 @@ export function TimePicker({ value, onChange, className, hideIcon = false }: Tim
     const minuteOptions = Array.from({ length: 12 }, (_, i) => (i * 5).toString().padStart(2, '0'));
 
     return (
-        <div className={cn("flex items-center", className)}>
+        <div id={id} className={cn("flex items-center", className)}>
             <div className={cn(
                 "flex items-center w-full h-10 rounded-md border border-borderSoft bg-white/90 dark:bg-white/5 backdrop-blur-sm hover:border-brand/50 transition-colors focus-within:border-brand focus-within:ring-2 focus-within:ring-brand/20",
                 hideIcon ? "px-1 sm:px-2" : "px-2 sm:px-3"

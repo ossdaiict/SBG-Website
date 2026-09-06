@@ -112,23 +112,23 @@ const EditTimingsDialog: React.FC<EditTimingsDialogProps> = ({ open, onOpenChang
           
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label>Start Date</Label>
-              <DatePicker date={startDate} setDate={setStartDate} />
+              <Label htmlFor="timing-start-date">Start Date</Label>
+              <DatePicker id="timing-start-date" date={startDate} setDate={setStartDate} />
             </div>
             <div className="space-y-2">
-              <Label>Start Time</Label>
-              <TimePicker value={startTime} onChange={setStartTime} />
+              <Label htmlFor="timing-start-time">Start Time</Label>
+              <TimePicker id="timing-start-time" value={startTime} onChange={setStartTime} />
             </div>
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label>End Date</Label>
-              <DatePicker date={endDate} setDate={setEndDate} />
+              <Label htmlFor="timing-end-date">End Date</Label>
+              <DatePicker id="timing-end-date" date={endDate} setDate={setEndDate} />
             </div>
             <div className="space-y-2">
-              <Label>End Time</Label>
-              <TimePicker value={endTime} onChange={setEndTime} />
+              <Label htmlFor="timing-end-time">End Time</Label>
+              <TimePicker id="timing-end-time" value={endTime} onChange={setEndTime} />
             </div>
           </div>
         </div>

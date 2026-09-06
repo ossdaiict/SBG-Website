@@ -16,15 +16,17 @@ interface DatePickerProps {
     setDate: (date?: Date) => void;
     minDate?: Date;
     className?: string;
+    id?: string;
 }
 
-export function DatePicker({ date, setDate, minDate, className }: DatePickerProps) {
+export function DatePicker({ date, setDate, minDate, className, id }: DatePickerProps) {
     const [open, setOpen] = React.useState(false);
 
     return (
         <Popover open={open} onOpenChange={setOpen} modal={true}>
             <PopoverTrigger asChild>
                 <Button
+                    id={id}
                     variant={"outline"}
                     className={cn(
                         "w-full h-7 sm:h-8 justify-start text-left font-normal border-borderSoft bg-white/90 dark:bg-white/5 backdrop-blur-sm hover:bg-hoverSoft transition-all text-textPrimary rounded-xl shadow-sm overflow-hidden",

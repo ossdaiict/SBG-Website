@@ -1,7 +1,7 @@
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { cn, formatISTDate, getISTParts } from '@/lib/utils';
 import { motion } from 'framer-motion';
-import { AlertTriangle, Calendar, Clock, MapPin, Plus, RefreshCw } from 'lucide-react';
+import { AlertTriangle, Calendar, ChevronLeft, ChevronRight, Clock, MapPin, Plus, RefreshCw } from 'lucide-react';
 import React, { useState } from 'react';
 import ExtraRoomDialog from '../components/ExtraRoomDialog';
 import EditTimingsDialog from '../components/EditTimingsDialog';
@@ -26,6 +26,8 @@ const MyBookings: React.FC<MyBookingsProps> = ({ currentUser }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [tab, setTab] = useState<'active' | 'past'>('active');
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
 
   const [isExtraRoomOpen, setIsExtraRoomOpen] = useState(false);
   const [selectedBookingForExtra, setSelectedBookingForExtra] = useState<GroupedBooking | null>(null);
@@ -141,7 +143,7 @@ const MyBookings: React.FC<MyBookingsProps> = ({ currentUser }) => {
 
       <div className="flex bg-card p-1 rounded-xl border border-borderSoft w-fit mt-4">
         <button
-          onClick={() => setTab('active')}
+          onClick={() => { setTab('active'); setCurrentPage(1); }}
           className={cn(
             "px-6 py-2.5 rounded-lg text-sm font-semibold transition-all",
             tab === 'active' ? "bg-brand text-white shadow-sm" : "text-textMuted hover:text-textPrimary hover:bg-hoverSoft cursor-pointer"
@@ -150,7 +152,7 @@ const MyBookings: React.FC<MyBookingsProps> = ({ currentUser }) => {
           Active Bookings
         </button>
         <button
-          onClick={() => setTab('past')}
+          onClick={() => { setTab('past'); setCurrentPage(1); }}
           className={cn(
             "px-6 py-2.5 rounded-lg text-sm font-semibold transition-all",
             tab === 'past' ? "bg-brand text-white shadow-sm" : "text-textMuted hover:text-textPrimary hover:bg-hoverSoft cursor-pointer"
@@ -187,7 +189,15 @@ const MyBookings: React.FC<MyBookingsProps> = ({ currentUser }) => {
         </Card>
       ) : (
         <div className="grid gap-6 pb-12">
-          {groupedBookings.filter(b => (tab === 'active' ? !isPastEvent(b) : isPastEvent(b))).map((booking, index) => {
+          {(() => {
+            const filteredBookings = groupedBookings.filter(b => (tab === 'active' ? !isPastEvent(b) : isPastEvent(b)));
+            const totalPages = Math.ceil(filteredBookings.length / itemsPerPage);
+            const startIndex = (currentPage - 1) * itemsPerPage;
+            const paginatedBookings = filteredBookings.slice(startIndex, startIndex + itemsPerPage);
+
+            return (
+              <>
+                {paginatedBookings.map((booking, index) => {
             const isPast = isPastEvent(booking);
             const approvedVenues = booking.bookings.filter(b => b.status === 'approved');
             const rejectedVenues = booking.bookings.filter(b => b.status === 'rejected');
@@ -281,7 +291,7 @@ const MyBookings: React.FC<MyBookingsProps> = ({ currentUser }) => {
                           </div>
                         </div>
 
-                        <div className="mt-6 pt-6 border-t border-borderSoft/50 flex flex-wrap gap-3">
+                        <div className="mt-6 pt-6 border-t border-borderSoft/50 flex flex-wrap items-center justify-start gap-1">
                           {(!isPast || currentUser?.role === 'admin') && (booking.status === 'approved' || booking.status === 'pending' || booking.status === 'partial') && (
                             <>
                               <Button variant="outline" size="sm" onClick={() => openEditTimingsDialog(booking)} className="gap-2 rounded-lg font-semibold bg-brand/5 text-brand border-brand/20 hover:bg-brand/10 shadow-sm">
@@ -310,6 +320,25 @@ const MyBookings: React.FC<MyBookingsProps> = ({ currentUser }) => {
               </motion.div>
             );
           })}
+          
+          {filteredBookings.length > 0 && totalPages > 1 && (
+            <div className="flex flex-col sm:flex-row items-center justify-between mt-8 pt-4 border-t border-borderSoft gap-4">
+              <div className="flex items-center text-sm text-textMuted">
+                Showing <span className="font-medium mx-1">{startIndex + 1}</span> to <span className="font-medium mx-1">{Math.min(startIndex + itemsPerPage, filteredBookings.length)}</span> of <span className="font-medium mx-1">{filteredBookings.length}</span> results
+              </div>
+              <div className="flex gap-2">
+                <Button variant="outline" size="sm" onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))} disabled={currentPage === 1}>
+                  <ChevronLeft size={16} className="mr-1" /> Previous
+                </Button>
+                <Button variant="outline" size="sm" onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))} disabled={currentPage === totalPages}>
+                  Next <ChevronRight size={16} className="ml-1" />
+                </Button>
+              </div>
+            </div>
+          )}
+          </>
+        )
+      })()}
         </div>
       )}
 

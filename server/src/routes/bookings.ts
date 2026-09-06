@@ -13,7 +13,7 @@ router.get('/venues', async (_req, res) => {
     const cachedVenues = cache.get(CACHE_KEYS.venues);
     if (cachedVenues) return res.json(cachedVenues);
 
-    const { rows } = await db.query('SELECT id, name, category, is_active FROM venues ORDER BY name ASC');
+    const { rows } = await db.query('SELECT id, name, category, capacity, location, is_active FROM venues ORDER BY name ASC');
     cache.set(CACHE_KEYS.venues, rows);
     return res.json(rows);
   } catch (error: any) {
@@ -176,8 +176,8 @@ router.get('/my-bookings', authMiddleware, async (req, res) => {
       SELECT b.id, b.club_id, b.venue_id, b.start_time, b.end_time, b.status, b.user_id, b.expected_attendees, b.batch_id, b.event_id, b.issue_flag, b.permissions_link, b.booking_name, b.created_at, b.updated_at,
              e.name AS event_name,
              COALESCE(e.event_type, 'closed_club') AS event_type,
-             json_build_object('name', c.name) AS clubs,
-             json_build_object('name', v.name) AS venues
+             jsonb_build_object('name', c.name) AS clubs,
+             jsonb_build_object('name', v.name) AS venues
       FROM bookings b
       LEFT JOIN clubs c ON b.club_id = c.id
       LEFT JOIN venues v ON b.venue_id = v.id
@@ -274,8 +274,8 @@ router.get('/public-bookings', async (_req, res) => {
       SELECT b.id, b.club_id, b.venue_id, b.start_time, b.end_time, b.status, b.user_id, b.expected_attendees, b.batch_id, b.event_id, b.issue_flag, b.permissions_link, b.booking_name, b.created_at, b.updated_at,
              e.name AS event_name,
              COALESCE(e.event_type, 'closed_club') AS event_type,
-             json_build_object('name', c.name) AS clubs,
-             json_build_object('name', v.name) AS venues
+             jsonb_build_object('name', c.name) AS clubs,
+             jsonb_build_object('name', v.name) AS venues
       FROM bookings b
       LEFT JOIN clubs c ON b.club_id = c.id
       LEFT JOIN venues v ON b.venue_id = v.id
@@ -296,18 +296,32 @@ router.get('/public-bookings', async (_req, res) => {
 router.get('/campus-bookings', authMiddleware, async (_req, res) => {
   try {
     const { rows } = await db.query(`
-      SELECT b.id, b.club_id, b.venue_id, b.start_time, b.end_time, b.status, b.user_id, b.expected_attendees, b.batch_id, b.event_id, b.issue_flag, b.permissions_link, b.booking_name, b.created_at, b.updated_at,
-             e.name AS event_name,
-             COALESCE(e.event_type, 'closed_club') AS event_type,
-             json_build_object('name', c.name) AS clubs,
-             json_build_object('name', v.name) AS venues
-      FROM bookings b
-      LEFT JOIN clubs c ON b.club_id = c.id
-      LEFT JOIN venues v ON b.venue_id = v.id
-      LEFT JOIN events e ON b.event_id = e.id
-      WHERE b.status IN ('approved', 'pending')
-        AND (b.status = 'pending' OR b.end_time >= NOW() - INTERVAL '90 days')
-      ORDER BY b.start_time ASC
+      SELECT * FROM (
+        SELECT b.id, b.club_id, b.venue_id, b.start_time, b.end_time, b.status, b.user_id, b.expected_attendees, b.batch_id, b.event_id, b.issue_flag, b.permissions_link, b.booking_name, b.created_at, b.updated_at,
+               e.name AS event_name,
+               COALESCE(e.event_type, 'closed_club') AS event_type,
+               jsonb_build_object('name', c.name) AS clubs,
+               jsonb_build_object('name', v.name) AS venues
+        FROM bookings b
+        LEFT JOIN clubs c ON b.club_id = c.id
+        LEFT JOIN venues v ON b.venue_id = v.id
+        LEFT JOIN events e ON b.event_id = e.id
+        WHERE b.status = 'pending'
+        
+        UNION
+        
+        SELECT b.id, b.club_id, b.venue_id, b.start_time, b.end_time, b.status, b.user_id, b.expected_attendees, b.batch_id, b.event_id, b.issue_flag, b.permissions_link, b.booking_name, b.created_at, b.updated_at,
+               e.name AS event_name,
+               COALESCE(e.event_type, 'closed_club') AS event_type,
+               jsonb_build_object('name', c.name) AS clubs,
+               jsonb_build_object('name', v.name) AS venues
+        FROM bookings b
+        LEFT JOIN clubs c ON b.club_id = c.id
+        LEFT JOIN venues v ON b.venue_id = v.id
+        LEFT JOIN events e ON b.event_id = e.id
+        WHERE b.status = 'approved' AND b.end_time >= NOW() - INTERVAL '90 days'
+      ) AS combined
+      ORDER BY start_time ASC
     `);
 
     return res.json(rows);

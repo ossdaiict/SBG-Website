@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { CalendarDays, Download, Edit2, Plus, Search, Trash2, Users } from 'lucide-react';
+import { CalendarDays, ChevronLeft, ChevronRight, Download, Edit2, Plus, Search, Trash2, Users } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Badge } from '../components/ui/badge';
@@ -31,6 +31,9 @@ const AdminClubs: React.FC = () => {
     const [clubs, setClubs] = useState<ApiClub[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [searchQuery, setSearchQuery] = useState('');
+    
+    const [currentPage, setCurrentPage] = useState(1);
+    const itemsPerPage = 10;
 
     // Edit State
     const [editDialogOpen, setEditDialogOpen] = useState(false);
@@ -101,8 +104,6 @@ const AdminClubs: React.FC = () => {
     useEffect(() => {
         fetchClubs();
     }, []);
-
-
 
     const saveAdd = async () => {
         if (!addFormData.name.trim() || !addFormData.email.trim() || !addFormData.password.trim()) {
@@ -215,6 +216,14 @@ const AdminClubs: React.FC = () => {
         c.email.toLowerCase().includes(searchQuery.toLowerCase())
     );
 
+    useEffect(() => {
+        setCurrentPage(1);
+    }, [searchQuery]);
+
+    const totalPages = Math.ceil(filteredClubs.length / itemsPerPage);
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const paginatedClubs = filteredClubs.slice(startIndex, startIndex + itemsPerPage);
+
     return (
         <motion.div
             initial={{ opacity: 0 }}
@@ -249,7 +258,7 @@ const AdminClubs: React.FC = () => {
 
             <Card className="border border-borderSoft rounded-lg overflow-hidden bg-card shadow-sm">
                 <div className="p-4 border-b border-borderSoft flex flex-col sm:flex-row sm:items-center bg-card/50">
-                    <div className="relative w-full sm:max-w-sm">
+                    <div className="relative w-full sm:flex-1 sm:max-w-sm">
                         <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-textMuted h-4 w-4 pointer-events-none z-10" />
                         <Input
                             placeholder="Search clubs by name or email..."
@@ -261,48 +270,48 @@ const AdminClubs: React.FC = () => {
                 </div>
 
                 <div className="overflow-x-auto">
-                    <table className="w-full min-w-[600px] sm:min-w-0 text-left text-sm">
-                        <thead className="bg-hoverSoft/50 border-b border-borderSoft text-textSecondary font-semibold">
+                    <table className="w-full min-w-[1000px] text-left text-sm">
+                        <thead className="bg-hoverSoft border-b border-borderSoft uppercase tracking-wider text-xs font-semibold text-textMuted text-left">
                             <tr>
-                                <th className="px-6 py-4">Club Name</th>
-                                <th className="px-6 py-4">Email</th>
-                                <th className="px-6 py-4">Category</th>
-                                <th className="px-6 py-4 text-right">Actions</th>
+                                <th className="px-3 py-2 sm:py-4 w-[25%] text-left">Club Name</th>
+                                <th className="px-3 py-2 sm:py-4 w-[25%] text-left">Email</th>
+                                <th className="px-3 py-2 sm:py-4 w-[15%] text-left">Category</th>
+                                <th className="px-3 py-2 sm:py-4 w-[35%] text-left">Actions</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-borderSoft">
                             {isLoading ? (
                                 Array.from({ length: 3 }).map((_, i) => (
                                     <tr key={i}>
-                                        <td className="px-6 py-4"><Skeleton className="h-4 w-32" /></td>
-                                        <td className="px-6 py-4"><Skeleton className="h-4 w-40" /></td>
-                                        <td className="px-6 py-4"><Skeleton className="h-4 w-16" /></td>
-                                        <td className="px-6 py-4 text-right"><Skeleton className="h-8 w-40 ml-auto" /></td>
+                                        <td className="px-3 py-2 sm:py-4"><Skeleton className="h-4 w-32" /></td>
+                                        <td className="px-3 py-2 sm:py-4"><Skeleton className="h-4 w-40" /></td>
+                                        <td className="px-3 py-2 sm:py-4"><Skeleton className="h-4 w-16" /></td>
+                                        <td className="px-3 py-2 sm:py-4"><Skeleton className="h-8 w-40" /></td>
                                     </tr>
                                 ))
                             ) : filteredClubs.length === 0 ? (
                                 <tr>
-                                    <td colSpan={4} className="px-6 py-12 text-center text-textMuted">
+                                    <td colSpan={4} className="px-3 py-2 sm:py-12 text-center text-textMuted">
                                         No clubs found.
                                     </td>
                                 </tr>
                             ) : (
-                                filteredClubs.map(club => (
+                                paginatedClubs.map(club => (
                                     <motion.tr
                                         key={club.id}
                                         initial={{ opacity: 0, y: 10 }}
                                         animate={{ opacity: 1, y: 0 }}
                                         className="hover:bg-hoverSoft/30 transition-colors group"
                                     >
-                                        <td className="px-6 py-4 font-medium text-textPrimary">{club.name}</td>
-                                        <td className="px-6 py-4 text-textSecondary">{club.email}</td>
-                                        <td className="px-6 py-4">
+                                        <td className="px-3 py-2 sm:py-4 font-medium text-textPrimary">{club.name}</td>
+                                        <td className="px-3 py-2 sm:py-4 text-textSecondary">{club.email}</td>
+                                        <td className="px-3 py-2 sm:py-4">
                                             <Badge variant="secondary" className="bg-brand/10 text-brand border-brand/20">
                                                 Group {club.group_category || 'A'}
                                             </Badge>
                                         </td>
-                                        <td className="px-6 py-4 text-right">
-                                            <div className="flex items-center justify-end gap-2">
+                                        <td className="px-3 py-2 sm:py-4">
+                                            <div className="flex items-center justify-start gap-1">
                                                 <Button
                                                     variant="ghost"
                                                     size="sm"
@@ -362,6 +371,33 @@ const AdminClubs: React.FC = () => {
                         </tbody>
                     </table>
                 </div>
+                {filteredClubs.length > 0 && totalPages > 1 && (
+                    <div className="flex flex-col sm:flex-row items-center justify-between px-4 py-3 sm:px-6 border-t border-borderSoft bg-card gap-4">
+                        <div className="flex items-center text-sm text-textMuted">
+                            Showing <span className="font-medium mx-1">{startIndex + 1}</span> to <span className="font-medium mx-1">{Math.min(startIndex + itemsPerPage, filteredClubs.length)}</span> of <span className="font-medium mx-1">{filteredClubs.length}</span> results
+                        </div>
+                        <div className="flex gap-2">
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                                disabled={currentPage === 1}
+                            >
+                                <ChevronLeft size={16} className="mr-1" />
+                                Previous
+                            </Button>
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                                disabled={currentPage === totalPages}
+                            >
+                                Next
+                                <ChevronRight size={16} className="ml-1" />
+                            </Button>
+                        </div>
+                    </div>
+                )}
             </Card>
 
             {/* Add Dialog */}
@@ -595,7 +631,7 @@ const AdminClubs: React.FC = () => {
                                             <div className="grid grid-cols-2 gap-2 text-sm mt-3">
                                                 <div>
                                                     <span className="text-textMuted text-xs block uppercase tracking-wider mb-0.5">Date</span>
-                                                    <div className="font-medium text-textSecondary">{new Date(event.date).toLocaleDateString('en-US', { timeZone: 'Asia/Kolkata' })}</div>
+                                                    <div className="font-medium text-textSecondary">{new Date(event.date).toLocaleDateString('en-GB', { timeZone: 'Asia/Kolkata' })}</div>
                                                 </div>
                                                 <div>
                                                     <span className="text-textMuted text-xs block uppercase tracking-wider mb-0.5">Venue</span>

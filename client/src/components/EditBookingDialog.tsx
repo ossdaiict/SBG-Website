@@ -114,23 +114,23 @@ const EditBookingDialog: React.FC<EditBookingDialogProps> = ({ open, onOpenChang
         <div className="space-y-4 py-2">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label>Start Date</Label>
-              <DatePicker date={startDate} setDate={setStartDate} />
+              <Label htmlFor="booking-start-date">Start Date</Label>
+              <DatePicker id="booking-start-date" date={startDate} setDate={setStartDate} />
             </div>
             <div className="space-y-2">
-              <Label>Start Time</Label>
-              <TimePicker value={startTime} onChange={setStartTime} />
+              <Label htmlFor="booking-start-time">Start Time</Label>
+              <TimePicker id="booking-start-time" value={startTime} onChange={setStartTime} />
             </div>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label>End Date</Label>
-              <DatePicker date={endDate} setDate={setEndDate} />
+              <Label htmlFor="booking-end-date">End Date</Label>
+              <DatePicker id="booking-end-date" date={endDate} setDate={setEndDate} />
             </div>
             <div className="space-y-2">
-              <Label>End Time</Label>
-              <TimePicker value={endTime} onChange={setEndTime} />
+              <Label htmlFor="booking-end-time">End Time</Label>
+              <TimePicker id="booking-end-time" value={endTime} onChange={setEndTime} />
             </div>
           </div>
         </div>

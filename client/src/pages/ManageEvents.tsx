@@ -305,30 +305,32 @@ const ManageEvents: React.FC<ManageEventsProps> = ({ currentUser }) => {
           </DialogHeader>
           <div className="grid gap-4 py-4">
             <div className="grid gap-2">
-              <Label>Event Name</Label>
-              <Input
-                value={editForm.name}
-                onChange={e => setEditForm({ ...editForm, name: e.target.value })}
-                className="rounded-xl"
-              />
+                <Label htmlFor="event-name" className="text-sm font-medium">Event Name</Label>
+                <Input
+                  id="event-name"
+                  value={editForm.name}
+                  onChange={e => setEditForm({ ...editForm, name: e.target.value })}
+                  className="rounded-xl"
+                />
             </div>
             <div className="grid gap-2">
-              <Label>Event Type *</Label>
-              <Select value={editForm.event_type} onValueChange={val => setEditForm({ ...editForm, event_type: val })}>
-                <SelectTrigger className="rounded-xl">
-                  <SelectValue placeholder="Select event type" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="open_all">Open for All</SelectItem>
-                  <SelectItem value="co_curricular">Co-Curricular Activity</SelectItem>
-                  <SelectItem value="closed_club">Closed Club Event</SelectItem>
-                </SelectContent>
-              </Select>
+                <Label htmlFor="event-type" className="text-sm font-medium">Event Type *</Label>
+                <Select value={editForm.event_type} onValueChange={val => setEditForm({ ...editForm, event_type: val })}>
+                  <SelectTrigger className="rounded-xl">
+                    <SelectValue placeholder="Select event type" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="open_all">Open for All</SelectItem>
+                    <SelectItem value="co_curricular">Co-Curricular Activity</SelectItem>
+                    <SelectItem value="closed_club">Closed Club Event</SelectItem>
+                  </SelectContent>
+                </Select>
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div className="grid gap-2">
-                <Label>Start Date</Label>
+                <Label htmlFor="start-date" className="text-sm font-medium">Start Date</Label>
                 <DatePicker
+                  id="start-date"
                   date={editForm.date ? parseISO(editForm.date) : undefined}
                   setDate={d => {
                     const newStartDate = d ? format(d, 'yyyy-MM-dd') : '';
@@ -343,8 +345,9 @@ const ManageEvents: React.FC<ManageEventsProps> = ({ currentUser }) => {
                 />
               </div>
               <div className="grid gap-2">
-                <Label>Start Time</Label>
+                <Label htmlFor="start-time" className="text-sm font-medium">Start Time</Label>
                 <TimePicker
+                  id="start-time"
                   value={editForm.startTime}
                   onChange={v => setEditForm({ ...editForm, startTime: v })}
                   className="h-10 rounded-xl"
@@ -354,8 +357,9 @@ const ManageEvents: React.FC<ManageEventsProps> = ({ currentUser }) => {
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div className="grid gap-2">
-                <Label>End Date</Label>
+                <Label htmlFor="end-date" className="text-sm font-medium">End Date</Label>
                 <DatePicker
+                  id="end-date"
                   date={editForm.endDate ? parseISO(editForm.endDate) : undefined}
                   setDate={d => setEditForm({ ...editForm, endDate: d ? format(d, 'yyyy-MM-dd') : '' })}
                   minDate={editForm.date ? parseISO(editForm.date) : (currentUser?.role === 'admin' ? undefined : new Date(todayStr))}
@@ -363,8 +367,9 @@ const ManageEvents: React.FC<ManageEventsProps> = ({ currentUser }) => {
                 />
               </div>
               <div className="grid gap-2">
-                <Label>End Time</Label>
+                <Label htmlFor="end-time" className="text-sm font-medium">End Time</Label>
                 <TimePicker
+                  id="end-time"
                   value={editForm.endTime}
                   onChange={v => setEditForm({ ...editForm, endTime: v })}
                   className="h-10 rounded-xl"
@@ -373,7 +378,7 @@ const ManageEvents: React.FC<ManageEventsProps> = ({ currentUser }) => {
               </div>
             </div>
             <div className="grid gap-2">
-              <Label className="text-textSecondary">Venues * (Select one or more)</Label>
+              <Label htmlFor="venues" className="text-textSecondary font-medium">Venues * (Select one or more)</Label>
               <div className="flex flex-wrap gap-2 max-h-32 overflow-y-auto p-2 border border-borderSoft rounded-xl bg-white/90 dark:bg-white/5 backdrop-blur-sm">
                 {[{ id: 'online', name: 'Online' }, ...venues].map(v => {
                   const isSelected = editForm.venue.includes(v.name);

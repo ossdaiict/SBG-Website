@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { Archive as ArchiveIcon, Calendar, Download, MapPin, RefreshCw, Trash2 } from 'lucide-react';
+import { Archive as ArchiveIcon, Calendar, ChevronLeft, ChevronRight, Download, MapPin, RefreshCw, Trash2 } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 import { Alert, AlertDescription, AlertTitle } from '../components/ui/alert';
 import { Badge } from '../components/ui/badge';
@@ -61,6 +61,9 @@ const Archives: React.FC = () => {
   const userStr = localStorage.getItem('user');
   const user = userStr ? JSON.parse(userStr) : null;
   const isAdmin = user?.role === 'admin';
+
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
 
   const fetchArchives = React.useCallback(async () => {
     setIsLoading(true);
@@ -167,8 +170,15 @@ const Archives: React.FC = () => {
       )}
 
       <div className="grid grid-cols-1 gap-6">
-        {archives.map((event, i) => (
-          <motion.div
+        {(() => {
+          const totalPages = Math.ceil(archives.length / itemsPerPage);
+          const startIndex = (currentPage - 1) * itemsPerPage;
+          const paginatedArchives = archives.slice(startIndex, startIndex + itemsPerPage);
+
+          return (
+            <>
+              {paginatedArchives.map((event, i) => (
+                <motion.div
             key={event.id}
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
@@ -240,6 +250,28 @@ const Archives: React.FC = () => {
             </Card>
           </motion.div>
         ))}
+        </>
+      );
+    })()}
+        {archives.length > 0 && Math.ceil(archives.length / itemsPerPage) > 1 && (() => {
+          const totalPages = Math.ceil(archives.length / itemsPerPage);
+          const startIndex = (currentPage - 1) * itemsPerPage;
+          return (
+            <div className="flex flex-col sm:flex-row items-center justify-between mt-8 pt-4 border-t border-borderSoft gap-4">
+              <div className="flex items-center text-sm text-textMuted">
+                Showing <span className="font-medium mx-1">{startIndex + 1}</span> to <span className="font-medium mx-1">{Math.min(startIndex + itemsPerPage, archives.length)}</span> of <span className="font-medium mx-1">{archives.length}</span> results
+              </div>
+              <div className="flex gap-2">
+                <Button variant="outline" size="sm" onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))} disabled={currentPage === 1}>
+                  <ChevronLeft size={16} className="mr-1" /> Previous
+                </Button>
+                <Button variant="outline" size="sm" onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))} disabled={currentPage === totalPages}>
+                  Next <ChevronRight size={16} className="ml-1" />
+                </Button>
+              </div>
+            </div>
+          );
+        })()}
       </div>
 
       <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>

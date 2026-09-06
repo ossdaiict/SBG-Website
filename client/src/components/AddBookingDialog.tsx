@@ -273,9 +273,9 @@ const AddBookingDialog: React.FC<Props> = ({ open, onOpenChange, onCreated }) =>
                 <div className="grid gap-4 py-2">
                     {/* Club Selection */}
                     <div className="grid gap-2">
-                        <Label>Organizing Club</Label>
+                        <Label htmlFor="organizing-club">Organizing Club</Label>
                         <Select value={selectedClubId || ''} onValueChange={setSelectedClubId}>
-                            <SelectTrigger className="bg-card border-borderSoft">
+                            <SelectTrigger id="organizing-club" className="bg-card border-borderSoft">
                                 <SelectValue placeholder="Select club..." />
                             </SelectTrigger>
                             <SelectContent>
@@ -289,9 +289,9 @@ const AddBookingDialog: React.FC<Props> = ({ open, onOpenChange, onCreated }) =>
                     </div>
 
                     <div className="grid gap-2">
-                        <Label>Select Event</Label>
+                        <Label htmlFor="select-event">Select Event</Label>
                         <Select value={selectedEventId} onValueChange={setSelectedEventId} disabled={isMeeting}>
-                            <SelectTrigger className="bg-card">
+                            <SelectTrigger id="select-event" className="bg-card">
                                 <SelectValue placeholder="Select an event" />
                             </SelectTrigger>
                             <SelectContent>
@@ -369,8 +369,9 @@ const AddBookingDialog: React.FC<Props> = ({ open, onOpenChange, onCreated }) =>
                     </div>
 
                     <div className="grid gap-2">
-                        <Label>Booking Name</Label>
+                        <Label htmlFor="booking-name">Booking Name</Label>
                         <Input
+                            id="booking-name"
                             placeholder="e.g. Event Name / Committee Meet"
                             value={bookingName}
                             onChange={(e) => setBookingName(e.target.value)}
@@ -380,7 +381,7 @@ const AddBookingDialog: React.FC<Props> = ({ open, onOpenChange, onCreated }) =>
 
                     {/* Venues */}
                     <div className="grid gap-2">
-                        <Label>Venues</Label>
+                        <Label htmlFor="booking-venues">Venues</Label>
                         <div className="max-h-36 overflow-y-auto rounded-md border border-borderSoft p-2 space-y-1 bg-card">
                             {venues.length === 0 ? (
                                 <p className="text-xs text-textMuted py-2 text-center">Loading venues...</p>
@@ -421,20 +422,22 @@ const AddBookingDialog: React.FC<Props> = ({ open, onOpenChange, onCreated }) =>
 
                     {/* Date / Time */}
                     <div className="grid gap-2">
-                        <Label>Schedule</Label>
+                        <Label htmlFor="booking-schedule">Schedule</Label>
                         <div className="grid gap-3 p-3 rounded-md border border-borderSoft bg-card">
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                                     <div className="space-y-1.5">
-                                        <Label className="text-xs text-textSecondary">Start Date</Label>
+                                        <Label htmlFor="add-booking-start-date" className="text-xs text-textSecondary">Start Date</Label>
                                         <DatePicker
+                                            id="add-booking-start-date"
                                             date={startDate}
                                             setDate={setStartDate}
                                             className="bg-card w-full"
                                         />
                                     </div>
                                     <div className="space-y-1.5">
-                                        <Label className="text-xs text-textSecondary">End Date</Label>
+                                        <Label htmlFor="add-booking-end-date" className="text-xs text-textSecondary">End Date</Label>
                                         <DatePicker
+                                            id="add-booking-end-date"
                                             date={endDate}
                                             setDate={setEndDate}
                                             className="bg-card w-full"
@@ -444,16 +447,18 @@ const AddBookingDialog: React.FC<Props> = ({ open, onOpenChange, onCreated }) =>
 
                             <div className="grid grid-cols-2 gap-3">
                                 <div className="space-y-1.5">
-                                    <Label className="text-xs text-textSecondary">Start Time</Label>
+                                    <Label htmlFor="add-booking-start-time" className="text-xs text-textSecondary">Start Time</Label>
                                     <TimePicker
+                                        id="add-booking-start-time"
                                         value={startTime}
                                         onChange={setStartTime}
                                         className="h-10 rounded-md"
                                     />
                                 </div>
                                 <div className="space-y-1.5">
-                                    <Label className="text-xs text-textSecondary">End Time</Label>
+                                    <Label htmlFor="add-booking-end-time" className="text-xs text-textSecondary">End Time</Label>
                                     <TimePicker
+                                        id="add-booking-end-time"
                                         value={endTime}
                                         onChange={setEndTime}
                                         className="h-10 rounded-md"

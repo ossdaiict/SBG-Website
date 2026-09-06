@@ -52,6 +52,7 @@ webhook-server.log
 # Scripts & Archives
 *.tar.gz
 *.ps1
+*.sh
 *.psm1
 *.psd1
 

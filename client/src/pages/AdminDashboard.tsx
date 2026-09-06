@@ -355,8 +355,13 @@ const AdminDashboard: React.FC = () => {
           className="flex flex-col sm:flex-row sm:items-center justify-between gap-4"
         >
           <div>
-            <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-foreground tracking-tighter leading-tight">Admin Dashboard</h1>
-            <p className="text-textSecondary mt-2 sm:mt-3 text-sm sm:text-base font-medium max-w-2xl">Monitor venue bookings, manage approvals, and track system performance.</p>
+            <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-foreground tracking-tighter leading-tight">
+              Admin Dashboard
+            </h1>
+            <p className="text-textSecondary mt-2 sm:mt-3 text-sm sm:text-base font-medium max-w-2xl">
+              Monitor venue bookings, manage approvals, and track system
+              performance.
+            </p>
           </div>
           <div className="flex gap-2 items-center w-full sm:w-auto mt-2 sm:mt-0">
             <DropdownMenu>
@@ -365,21 +370,39 @@ const AdminDashboard: React.FC = () => {
                   Quick Actions <ChevronDown size={16} />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-[var(--radix-dropdown-menu-trigger-width)] min-w-56 rounded-xl">
+              <DropdownMenuContent
+                align="end"
+                className="w-[var(--radix-dropdown-menu-trigger-width)] min-w-56 rounded-xl"
+              >
                 <DropdownMenuLabel>Manage Platform</DropdownMenuLabel>
-                <DropdownMenuItem onClick={() => setAddDialogOpen(true)} className="gap-2 cursor-pointer font-medium">
+                <DropdownMenuItem
+                  onClick={() => setAddDialogOpen(true)}
+                  className="gap-2 cursor-pointer font-medium"
+                >
                   <CalendarIcon size={16} className="text-brand" /> Book Venues
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setRegisterDialogOpen(true)} className="gap-2 cursor-pointer font-medium">
+                <DropdownMenuItem
+                  onClick={() => setRegisterDialogOpen(true)}
+                  className="gap-2 cursor-pointer font-medium"
+                >
                   <Plus size={16} className="text-brand" /> Register Event
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuLabel>Data & Settings</DropdownMenuLabel>
-                <DropdownMenuItem onClick={exportAllEvents} disabled={isLoading} className="gap-2 cursor-pointer font-medium">
-                  <Download size={16} className="text-textSecondary" /> Export Events Excel
+                <DropdownMenuItem
+                  onClick={exportAllEvents}
+                  disabled={isLoading}
+                  className="gap-2 cursor-pointer font-medium"
+                >
+                  <Download size={16} className="text-textSecondary" /> Export
+                  Events Excel
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setSbgSettingsOpen(true)} className="gap-2 cursor-pointer font-medium">
-                  <Settings size={16} className="text-textSecondary" /> SBG Settings
+                <DropdownMenuItem
+                  onClick={() => setSbgSettingsOpen(true)}
+                  className="gap-2 cursor-pointer font-medium"
+                >
+                  <Settings size={16} className="text-textSecondary" /> SBG
+                  Settings
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -395,26 +418,40 @@ const AdminDashboard: React.FC = () => {
         className="px-1 sm:px-4"
       >
         <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-4 gap-2 sm:gap-3 w-full">
-          <Link to="/admin/requests?status=pending" className="block focus-visible:ring-2 focus-visible:ring-warning rounded-xl outline-none cursor-pointer">
+          <Link
+            to="/admin/requests?status=pending"
+            className="block focus-visible:ring-2 focus-visible:ring-warning rounded-xl outline-none cursor-pointer"
+          >
             <div className="flex items-center gap-2 sm:gap-3 p-2.5 sm:p-3 bg-card/60 backdrop-blur-sm border border-borderSoft rounded-xl shadow-sm hover:border-warning/40 hover:bg-warning/5 transition-all group">
               <div className="p-1.5 sm:p-2 bg-warning/10 text-warning rounded-lg shrink-0 group-hover:scale-110 transition-transform">
                 <AlertCircle className="w-4 h-4 sm:w-5 sm:h-5" />
               </div>
               <div className="min-w-0">
-                <div className="text-[10px] sm:text-xs text-textMuted font-bold uppercase tracking-wider truncate">Pending Bookings</div>
-                <div className="text-base sm:text-lg font-extrabold text-textPrimary leading-none mt-0.5">{stats.pendingBookings}</div>
+                <div className="text-[10px] sm:text-xs text-textMuted font-bold uppercase tracking-wider truncate">
+                  Pending Bookings
+                </div>
+                <div className="text-base sm:text-lg font-extrabold text-textPrimary leading-none mt-0.5">
+                  {stats.pendingBookings}
+                </div>
               </div>
             </div>
           </Link>
 
-          <Link to="/admin/event-requests?status=pending" className="block focus-visible:ring-2 focus-visible:ring-warning rounded-xl outline-none cursor-pointer">
+          <Link
+            to="/admin/event-requests?status=pending"
+            className="block focus-visible:ring-2 focus-visible:ring-warning rounded-xl outline-none cursor-pointer"
+          >
             <div className="flex items-center gap-2 sm:gap-3 p-2.5 sm:p-3 bg-card/60 backdrop-blur-sm border border-borderSoft rounded-xl shadow-sm hover:border-warning/40 hover:bg-warning/5 transition-all group">
               <div className="p-1.5 sm:p-2 bg-warning/10 text-warning rounded-lg shrink-0 group-hover:scale-110 transition-transform">
                 <CalendarIcon className="w-4 h-4 sm:w-5 sm:h-5" />
               </div>
               <div className="min-w-0">
-                <div className="text-[10px] sm:text-xs text-textMuted font-bold uppercase tracking-wider truncate">Pending Events</div>
-                <div className="text-base sm:text-lg font-extrabold text-textPrimary leading-none mt-0.5">{stats.pendingEvents}</div>
+                <div className="text-[10px] sm:text-xs text-textMuted font-bold uppercase tracking-wider truncate">
+                  Pending Events
+                </div>
+                <div className="text-base sm:text-lg font-extrabold text-textPrimary leading-none mt-0.5">
+                  {stats.pendingEvents}
+                </div>
               </div>
             </div>
           </Link>
@@ -424,8 +461,12 @@ const AdminDashboard: React.FC = () => {
               <CalendarIcon className="w-4 h-4 sm:w-5 sm:h-5" />
             </div>
             <div className="min-w-0">
-              <div className="text-[10px] sm:text-xs text-textMuted font-bold uppercase tracking-wider truncate">Scheduled Bookings</div>
-              <div className="text-base sm:text-lg font-extrabold text-textPrimary leading-none mt-0.5">{stats.scheduledBookings}</div>
+              <div className="text-[10px] sm:text-xs text-textMuted font-bold uppercase tracking-wider truncate">
+                Scheduled Bookings
+              </div>
+              <div className="text-base sm:text-lg font-extrabold text-textPrimary leading-none mt-0.5">
+                {stats.scheduledBookings}
+              </div>
             </div>
           </div>
 
@@ -434,8 +475,12 @@ const AdminDashboard: React.FC = () => {
               <CalendarIcon className="w-4 h-4 sm:w-5 sm:h-5" />
             </div>
             <div className="min-w-0">
-              <div className="text-[10px] sm:text-xs text-textMuted font-bold uppercase tracking-wider truncate">Scheduled Events</div>
-              <div className="text-base sm:text-lg font-extrabold text-textPrimary leading-none mt-0.5">{stats.scheduledEvents}</div>
+              <div className="text-[10px] sm:text-xs text-textMuted font-bold uppercase tracking-wider truncate">
+                Scheduled Events
+              </div>
+              <div className="text-base sm:text-lg font-extrabold text-textPrimary leading-none mt-0.5">
+                {stats.scheduledEvents}
+              </div>
             </div>
           </div>
         </div>
@@ -446,84 +491,153 @@ const AdminDashboard: React.FC = () => {
         initial={{ opacity: 0, x: -20 }}
         animate={{ opacity: 1, x: 0 }}
         transition={{ duration: 0.5, delay: 0.2 }}
+        className="w-full min-w-0"
       >
-        <Card className="border border-borderSoft rounded-xl">
+        <Card className="w-full min-w-0 border border-borderSoft rounded-xl overflow-hidden">
           <CardHeader className="border-b border-borderSoft">
-            <CardTitle className="text-lg sm:text-xl">Master Booking Calendar</CardTitle>
+            <CardTitle className="text-lg sm:text-xl">
+              Master Booking Calendar
+            </CardTitle>
           </CardHeader>
 
-          <CardContent className="p-4 sm:p-6">
-            <div className="flex flex-col lg:flex-row gap-6 sm:gap-8">
-              {/* Calendar container - centered but spanning more width */}
-              <div className="flex-1 flex justify-center lg:justify-start overflow-x-auto p-1 -m-1">
-                <Calendar
-                  mode="single"
-                  selected={selectedDate}
-                  onSelect={setSelectedDate}
-                  events={calendarEventsWithVenue}
-                  modifiers={{ hasEvents: eventDates }}
-                  modifiersClassNames={{
-                    hasEvents: "relative after:absolute after:bottom-1 after:left-1/2 after:-translate-x-1/2 after:w-1.5 after:h-1.5 after:rounded-full after:bg-primary"
-                  }}
-                  className="rounded-2xl"
-                />
+          <CardContent className="w-full min-w-0 overflow-hidden p-2 sm:p-4">
+            <div className="flex w-full min-w-0 flex-col gap-6 sm:gap-8 lg:flex-row">
+              <div className="w-full min-w-0 lg:w-auto lg:shrink-0">
+                <div className="w-full min-w-0 max-w-[380px] mx-auto overflow-x-scroll">
+                  <Calendar
+                    mode="single"
+                    selected={selectedDate}
+                    onSelect={setSelectedDate}
+                    events={calendarEventsWithVenue}
+                    modifiers={{ hasEvents: eventDates }}
+                    modifiersClassNames={{
+                      hasEvents:
+                        "relative after:absolute after:bottom-[8%] after:left-1/2 after:-translate-x-1/2 after:w-1.5 after:h-1.5 after:rounded-full after:bg-primary",
+                    }}
+                    className="rounded-2xl"
+                  />
+                </div>
               </div>
 
-              {/* Selected Date Details - filling the remaining space */}
-              <div className="flex-1 border-t lg:border-t-0 lg:border-l border-borderSoft lg:pl-6 pt-4 lg:pt-0 flex flex-col min-w-0">
-                <h4 className="text-sm font-semibold text-textMuted uppercase tracking-wider mb-4">
-                  {selectedDate ? selectedDate.toLocaleDateString('en-US', {
-                    timeZone: 'Asia/Kolkata',
-                    weekday: 'long', month: 'short', day: 'numeric'
-                  }) : 'Select a date'}
+              <div className="flex w-full min-w-0 flex-1 flex-col border-t border-borderSoft pt-4 lg:border-l lg:border-t-0 lg:pl-6 lg:pt-0">
+                <h4 className="mb-4 text-sm font-semibold uppercase tracking-wider text-textMuted">
+                  {selectedDate
+                    ? selectedDate.toLocaleDateString("en-US", {
+                        timeZone: "Asia/Kolkata",
+                        weekday: "long",
+                        month: "short",
+                        day: "numeric",
+                      })
+                    : "Select a date"}
                 </h4>
 
-                <div className="flex-1 overflow-y-auto space-y-3 max-h-[350px]">
+                <div className="max-h-[280px] min-w-0 flex-1 space-y-3 overflow-y-auto">
                   {selectedDateEvents.length > 0 ? (
                     selectedDateEvents.map((event, index) => (
                       <motion.div
-                        key={event.ids.join('-')}
-                        initial={{ opacity: 0, scale: 0.9 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        transition={{ duration: 0.2, delay: index * 0.05 }}
+                        key={event.ids.join("-")}
+                        initial={{
+                          opacity: 0,
+                          scale: 0.9,
+                        }}
+                        animate={{
+                          opacity: 1,
+                          scale: 1,
+                        }}
+                        transition={{
+                          duration: 0.2,
+                          delay: index * 0.05,
+                        }}
+                        className="w-full min-w-0"
                       >
-                        <Card className="rounded-xl hover:border-brand/30 transition-colors">
+                        <Card className="w-full min-w-0 rounded-xl transition-colors">
                           <CardContent className="p-3">
-                            <div className="flex justify-between items-start">
-                              <div className="font-semibold text-textPrimary text-sm mb-1">{event.bookingName}</div>
-                              {event.eventName && event.eventName !== event.bookingName && (
-                                <div className="text-xs text-textMuted font-medium mb-1.5">Linked Event: {event.eventName}</div>
-                              )}
-                              <Badge variant={event.status === 'approved' ? 'success' : event.status === 'pending' ? 'pending' : 'destructive'} className="text-[10px] px-1.5 py-0 h-5">
+                            <div className="flex min-w-0 items-start justify-between gap-2">
+                              <div className="min-w-0 flex-1">
+                                <div className="mb-1 break-words text-sm font-semibold text-textPrimary">
+                                  {event.bookingName}
+                                </div>
+
+                                {event.eventName &&
+                                  event.eventName !== event.bookingName && (
+                                    <div className="mb-1.5 break-words text-xs font-medium text-textMuted">
+                                      Linked Event: {event.eventName}
+                                    </div>
+                                  )}
+                              </div>
+
+                              <Badge
+                                variant={
+                                  event.status === "approved"
+                                    ? "success"
+                                    : event.status === "pending"
+                                      ? "pending"
+                                      : "destructive"
+                                }
+                                className="h-5 shrink-0 px-1.5 py-0 text-[10px]"
+                              >
                                 {event.status}
                               </Badge>
                             </div>
-                            <div className="text-xs text-brand font-medium mt-0.5 mb-2">{event.clubName}</div>
+
+                            {/* Club */}
+                            <div className="mb-2 mt-0.5 text-xs font-medium text-brand">
+                              {event.clubName}
+                            </div>
+
+                            {/* Permissions */}
                             {event.permissionsLink && (
-                              <div className="mt-2 mb-3">
+                              <div className="mb-3 mt-2">
                                 <a
-                                  href={event.permissionsLink.match(/^https?:\/\//) ? event.permissionsLink : `https://${event.permissionsLink}`}
+                                  href={
+                                    event.permissionsLink.match(/^https?:\/\//)
+                                      ? event.permissionsLink
+                                      : `https://${event.permissionsLink}`
+                                  }
                                   target="_blank"
                                   rel="noopener noreferrer"
-                                  className="inline-flex items-center justify-center gap-1 sm:gap-1.5 p-[1px] rounded-[2rem] border border-brand/30 bg-transparent text-[11px] sm:text-[13px] font-medium text-brand hover:bg-brand/10 transition-colors w-fit"
+                                  className="
+                              inline-flex
+                              w-fit
+                              items-center
+                              justify-center
+                              gap-1
+                              rounded-[2rem]
+                              border
+                              border-brand/30
+                              px-2
+                              text-[11px]
+                              font-medium
+                              text-brand
+                              transition-colors
+                              hover:bg-brand/10
+                              sm:gap-1.5
+                              sm:text-[13px]
+                            "
                                 >
-                                  <ExternalLink className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
+                                  <ExternalLink className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
                                   View Permissions
                                 </a>
                               </div>
                             )}
+
+                            {/* Time */}
                             <div className="mt-2 text-xs text-textMuted">
                               {event.startTime} - {event.endTime}
                             </div>
-                            <div className="mt-1 text-xs text-textMuted">
-                              {event.venueName}
-                            </div>
+
+                            {/* Venue */}
+                            {event.venueName && (
+                              <div className="mt-1 break-words text-xs text-textMuted">
+                                {event.venueName}
+                              </div>
+                            )}
                           </CardContent>
                         </Card>
                       </motion.div>
                     ))
                   ) : (
-                    <div className="text-center py-8 text-textMuted text-sm">
+                    <div className="py-8 text-center text-sm text-textMuted">
                       No events found for this day.
                     </div>
                   )}
@@ -666,17 +780,32 @@ const AdminDashboard: React.FC = () => {
           <CardHeader className="border-b border-borderSoft">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div>
-                <CardTitle className="text-lg sm:text-xl">Pending Requests</CardTitle>
-                <CardDescription className="mt-1">Requests requiring immediate attention (Category B or Conflicts)</CardDescription>
+                <CardTitle className="text-lg sm:text-xl">
+                  Pending Requests
+                </CardTitle>
+                <CardDescription className="mt-1">
+                  Requests requiring immediate attention (Category B or
+                  Conflicts)
+                </CardDescription>
               </div>
               <div className="flex gap-2">
-                <Button variant="outline" size="sm" asChild className="hidden sm:flex whitespace-nowrap border-[1.5px]">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  asChild
+                  className="hidden sm:flex whitespace-nowrap border-[1.5px]"
+                >
                   <Link to="/admin/requests?status=pending">View All</Link>
                 </Button>
               </div>
             </div>
             <div className="sm:hidden px-4 pt-4 pb-2">
-              <Button variant="outline" size="sm" asChild className="w-full border-[1.5px]">
+              <Button
+                variant="outline"
+                size="sm"
+                asChild
+                className="w-full border-[1.5px]"
+              >
                 <Link to="/admin/requests?status=pending">View All</Link>
               </Button>
             </div>
@@ -685,7 +814,7 @@ const AdminDashboard: React.FC = () => {
           <CardContent className="p-0">
             <div className="divide-y divide-border/40">
               {isLoading ? (
-                <div className="p-4 sm:p-6">
+                <div className="p-3">
                   <Skeleton className="h-20 w-full" />
                 </div>
               ) : pendingRequests.length === 0 ? (
@@ -695,11 +824,11 @@ const AdminDashboard: React.FC = () => {
               ) : (
                 pendingRequests.slice(0, 5).map((req, index) => (
                   <motion.div
-                    key={req.ids?.join('-') || index}
+                    key={req.ids?.join("-") || index}
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ duration: 0.3, delay: index * 0.1 }}
-                    className="p-4 sm:p-6 hover:bg-hoverSoft transition-colors"
+                    className="p-3 hover:bg-hoverSoft transition-colors"
                   >
                     <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 sm:gap-6">
                       <div className="flex-1">
@@ -708,35 +837,72 @@ const AdminDashboard: React.FC = () => {
                             {req.clubName}
                           </Badge>
                         </div>
-                        <h4 className="text-base sm:text-lg font-medium text-foreground">{req.bookingName || req.eventName}</h4>
-                        {(req.bookingName && req.bookingName !== req.eventName) ? (
-                          <div className="text-xs text-textMuted mt-0.5 font-medium">Event: {req.eventName}</div>
-                        ): null}
+                        <h4 className="text-base sm:text-lg font-medium text-foreground">
+                          {req.bookingName || req.eventName}
+                        </h4>
+                        {req.bookingName &&
+                        req.bookingName !== req.eventName ? (
+                          <div className="text-xs text-textMuted mt-0.5 font-medium">
+                            Event: {req.eventName}
+                          </div>
+                        ) : null}
                         <div className="mt-2 text-sm text-textMuted">
                           <div className="mb-2 flex items-center gap-1.5">
                             {/* <span className="font-medium mr-1 text-textPrimary">Booking Time:</span> */}
-                            <CalendarIcon size={14} className="text-textMuted shrink-0" />
-                            <span>{new Date(req.date).toLocaleDateString('en-US', { timeZone: 'Asia/Kolkata', month: 'short', day: 'numeric', year: 'numeric' })} {req.startTime}</span>
+                            <CalendarIcon
+                              size={14}
+                              className="text-textMuted shrink-0"
+                            />
+                            <span>
+                              {new Date(req.date).toLocaleDateString("en-US", {
+                                timeZone: "Asia/Kolkata",
+                                month: "short",
+                                day: "numeric",
+                                year: "numeric",
+                              })}{" "}
+                              {req.startTime}
+                            </span>
                             <span className="text-[10px] mx-1">to</span>
-                            <span>{new Date(req.endDate || req.date).toLocaleDateString('en-US', { timeZone: 'Asia/Kolkata', month: 'short', day: 'numeric', year: 'numeric' })} {req.endTime}</span>
+                            <span>
+                              {new Date(
+                                req.endDate || req.date,
+                              ).toLocaleDateString("en-US", {
+                                timeZone: "Asia/Kolkata",
+                                month: "short",
+                                day: "numeric",
+                                year: "numeric",
+                              })}{" "}
+                              {req.endTime}
+                            </span>
                           </div>
                           <div className="flex flex-col gap-2">
-                            {req.bookings.map(booking => (
-                              <div key={booking.id} className="flex items-center justify-between bg-background border border-borderSoft rounded-md p-2 text-sm">
-                                <span className="font-medium text-foreground">{getVenueName(booking.venueId)}</span>
+                            {req.bookings.map((booking) => (
+                              <div
+                                key={booking.id}
+                                className="flex items-center justify-between bg-background border border-borderSoft rounded-md p-2 text-sm"
+                              >
+                                <span className="font-medium text-foreground">
+                                  {getVenueName(booking.venueId)}
+                                </span>
                                 <div className="flex items-center gap-2 sm:gap-3">
-                                  {booking.status !== 'rejected' && req.bookings.length > 1 && (
-                                    <Button
-                                      variant="ghost"
-                                      size="sm"
-                                      className="h-8 w-8 sm:h-7 sm:w-7 p-0 text-textMuted hover:text-error"
-                                      onClick={() => handleAction([booking.id], 'rejected')}
-                                      title="Reject this venue"
-                                      disabled={isProcessingAction}
-                                    >
-                                      <X size={16} className="sm:w-3.5 sm:h-3.5" />
-                                    </Button>
-                                  )}
+                                  {booking.status !== "rejected" &&
+                                    req.bookings.length > 1 && (
+                                      <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        className="h-8 w-8 sm:h-7 sm:w-7 p-0 text-textMuted hover:text-error"
+                                        onClick={() =>
+                                          handleAction([booking.id], "rejected")
+                                        }
+                                        title="Reject this venue"
+                                        disabled={isProcessingAction}
+                                      >
+                                        <X
+                                          size={16}
+                                          className="sm:w-3.5 sm:h-3.5"
+                                        />
+                                      </Button>
+                                    )}
                                   <Button
                                     variant="ghost"
                                     size="sm"
@@ -748,20 +914,29 @@ const AdminDashboard: React.FC = () => {
                                     title="Edit booking timings"
                                     disabled={isProcessingAction}
                                   >
-                                    <Pencil size={14} className="sm:w-3.5 sm:h-3.5" />
+                                    <Pencil
+                                      size={14}
+                                      className="sm:w-3.5 sm:h-3.5"
+                                    />
                                   </Button>
-                                  {booking.status !== 'approved' && req.bookings.length > 1 && (
-                                    <Button
-                                      variant="ghost"
-                                      size="sm"
-                                      className="h-8 w-8 sm:h-7 sm:w-7 p-0 text-primary hover:text-primary/80"
-                                      onClick={() => handleAction([booking.id], 'approved')}
-                                      title="Approve this venue"
-                                      disabled={isProcessingAction}
-                                    >
-                                      <Check size={16} className="sm:w-3.5 sm:h-3.5" />
-                                    </Button>
-                                  )}
+                                  {booking.status !== "approved" &&
+                                    req.bookings.length > 1 && (
+                                      <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        className="h-8 w-8 sm:h-7 sm:w-7 p-0 text-primary hover:text-primary/80"
+                                        onClick={() =>
+                                          handleAction([booking.id], "approved")
+                                        }
+                                        title="Approve this venue"
+                                        disabled={isProcessingAction}
+                                      >
+                                        <Check
+                                          size={16}
+                                          className="sm:w-3.5 sm:h-3.5"
+                                        />
+                                      </Button>
+                                    )}
                                 </div>
                               </div>
                             ))}
@@ -770,7 +945,11 @@ const AdminDashboard: React.FC = () => {
                         {req.permissionsLink && (
                           <div className="mt-3">
                             <a
-                              href={req.permissionsLink.match(/^https?:\/\//) ? req.permissionsLink : `https://${req.permissionsLink}`}
+                              href={
+                                req.permissionsLink.match(/^https?:\/\//)
+                                  ? req.permissionsLink
+                                  : `https://${req.permissionsLink}`
+                              }
                               target="_blank"
                               rel="noopener noreferrer"
                               className="inline-flex items-center justify-center gap-1 sm:gap-1.5 p-[1px] px-1.5 rounded-[2rem] border border-brand/30 bg-transparent text-[11px] sm:text-[13px] font-medium text-brand hover:bg-brand/10 transition-colors w-fit"
@@ -782,9 +961,13 @@ const AdminDashboard: React.FC = () => {
                         )}
                         {req.issueFlag && (
                           <div className="mt-2 text-sm bg-warning/10 text-warning border border-warning/20 p-2 rounded-md flex items-start gap-2">
-                            <AlertCircle size={16} className="mt-0.5 shrink-0" />
+                            <AlertCircle
+                              size={16}
+                              className="mt-0.5 shrink-0"
+                            />
                             <span>
-                              <strong>Requires Admin Approval:</strong> {req.issueFlag}
+                              <strong>Requires Admin Approval:</strong>{" "}
+                              {req.issueFlag}
                             </span>
                           </div>
                         )}
@@ -795,30 +978,51 @@ const AdminDashboard: React.FC = () => {
                           variant="outline"
                           size="sm"
                           className="flex items-center gap-2"
-                          onClick={() => handleSendEmail(req.batchId, undefined)} // For dashboard pending requests we only have batchId easily available in req
+                          onClick={() =>
+                            handleSendEmail(req.batchId, undefined)
+                          } // For dashboard pending requests we only have batchId easily available in req
                           title="Send an email to the club with the current status of all venues in this booking"
                         >
-                          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="20" height="16" x="2" y="4" rx="2" /><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" /></svg>
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="14"
+                            height="14"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          >
+                            <rect width="20" height="16" x="2" y="4" rx="2" />
+                            <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
+                          </svg>
                           <span className="hidden sm:inline">Send Mail</span>
                         </Button>
                         <Button
                           variant="destructive"
                           size="sm"
                           className="flex items-center gap-2"
-                          onClick={() => handleAction(req.ids, 'rejected')}
+                          onClick={() => handleAction(req.ids, "rejected")}
                           disabled={isProcessingAction}
                         >
                           <XCircle size={16} />
-                          <span className="hidden sm:inline">{req.bookings.length > 1 ? 'Reject All' : 'Reject'}</span>
+                          <span className="hidden sm:inline">
+                            {req.bookings.length > 1 ? "Reject All" : "Reject"}
+                          </span>
                         </Button>
                         <Button
                           size="sm"
                           className="flex items-center gap-2"
-                          onClick={() => handleAction(req.ids, 'approved')}
+                          onClick={() => handleAction(req.ids, "approved")}
                           disabled={isProcessingAction}
                         >
                           <CheckCircle size={16} />
-                          <span className="hidden sm:inline">{req.bookings.length > 1 ? 'Approve All' : 'Approve'}</span>
+                          <span className="hidden sm:inline">
+                            {req.bookings.length > 1
+                              ? "Approve All"
+                              : "Approve"}
+                          </span>
                         </Button>
                       </div>
                     </div>
@@ -830,7 +1034,6 @@ const AdminDashboard: React.FC = () => {
         </Card>
       </motion.div>
 
-
       {/* Pending Events Section */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
@@ -841,17 +1044,33 @@ const AdminDashboard: React.FC = () => {
           <CardHeader className="border-b border-borderSoft">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div>
-                <CardTitle className="text-lg sm:text-xl">Pending Event Registrations</CardTitle>
-                <CardDescription className="mt-1">Event requests requiring admin approval</CardDescription>
+                <CardTitle className="text-lg sm:text-xl">
+                  Pending Event Registrations
+                </CardTitle>
+                <CardDescription className="mt-1">
+                  Event requests requiring admin approval
+                </CardDescription>
               </div>
               <div className="flex gap-2">
-                <Button variant="outline" size="sm" asChild className="hidden sm:flex whitespace-nowrap border-[1.5px]">
-                  <Link to="/admin/event-requests?status=pending">View All</Link>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  asChild
+                  className="hidden sm:flex whitespace-nowrap border-[1.5px]"
+                >
+                  <Link to="/admin/event-requests?status=pending">
+                    View All
+                  </Link>
                 </Button>
               </div>
             </div>
             <div className="sm:hidden px-4 pt-4 pb-2">
-              <Button variant="outline" size="sm" asChild className="w-full border-[1.5px]">
+              <Button
+                variant="outline"
+                size="sm"
+                asChild
+                className="w-full border-[1.5px]"
+              >
                 <Link to="/admin/event-requests?status=pending">View All</Link>
               </Button>
             </div>
@@ -860,12 +1079,14 @@ const AdminDashboard: React.FC = () => {
           <CardContent className="p-0">
             <div className="divide-y divide-border/40">
               {isLoading ? (
-                <div className="p-4 sm:p-6">
+                <div className="p-3">
                   <Skeleton className="h-20 w-full" />
                 </div>
               ) : pendingEvents.length === 0 ? (
                 <div className="p-12 text-center">
-                  <p className="text-textMuted">No pending event registrations.</p>
+                  <p className="text-textMuted">
+                    No pending event registrations.
+                  </p>
                 </div>
               ) : (
                 pendingEvents.slice(0, 5).map((evt, index) => (
@@ -874,7 +1095,7 @@ const AdminDashboard: React.FC = () => {
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ duration: 0.3, delay: index * 0.1 }}
-                    className="p-4 sm:p-6 hover:bg-hoverSoft transition-colors"
+                    className="p-3 hover:bg-hoverSoft transition-colors"
                   >
                     <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 sm:gap-6">
                       <div className="flex-1">
@@ -883,26 +1104,74 @@ const AdminDashboard: React.FC = () => {
                             {evt.clubName}
                           </Badge>
                         </div>
-                        <h4 className="text-base sm:text-lg font-medium text-foreground"><span className="text-sm text-textMuted font-normal mr-2">Event Name:</span>{evt.name}</h4>
+                        <h4 className="text-base sm:text-lg font-medium text-foreground">
+                          <span className="text-sm text-textMuted font-normal mr-2">
+                            Event Name:
+                          </span>
+                          {evt.name}
+                        </h4>
 
                         <div className="mt-2 flex flex-col gap-2 text-xs mb-2">
                           <div className="flex items-center gap-1.5 text-textMuted text-sm">
-                            <span className="font-medium mr-1 text-textPrimary">Event Time:</span>
-                            <CalendarIcon size={14} className="text-textMuted shrink-0" />
-                            <span>{new Date(evt.date).toLocaleDateString('en-US', { timeZone: 'Asia/Kolkata', month: 'short', day: 'numeric', year: 'numeric' })} {new Date(evt.date).toLocaleTimeString('en-US', { timeZone: 'Asia/Kolkata', hour: '2-digit', minute: '2-digit' })}</span>
+                            <span className="font-medium mr-1 text-textPrimary">
+                              Event Time:
+                            </span>
+                            <CalendarIcon
+                              size={14}
+                              className="text-textMuted shrink-0"
+                            />
+                            <span>
+                              {new Date(evt.date).toLocaleDateString("en-US", {
+                                timeZone: "Asia/Kolkata",
+                                month: "short",
+                                day: "numeric",
+                                year: "numeric",
+                              })}{" "}
+                              {new Date(evt.date).toLocaleTimeString("en-US", {
+                                timeZone: "Asia/Kolkata",
+                                hour: "2-digit",
+                                minute: "2-digit",
+                              })}
+                            </span>
                             {evt.dynamic_end_date && (
                               <>
                                 <span className="text-[10px] mx-1">to</span>
-                                <span>{new Date(evt.dynamic_end_date).toLocaleDateString('en-US', { timeZone: 'Asia/Kolkata', month: 'short', day: 'numeric', year: 'numeric' })} {new Date(evt.dynamic_end_date).toLocaleTimeString('en-US', { timeZone: 'Asia/Kolkata', hour: '2-digit', minute: '2-digit' })}</span>
+                                <span>
+                                  {new Date(
+                                    evt.dynamic_end_date,
+                                  ).toLocaleDateString("en-US", {
+                                    timeZone: "Asia/Kolkata",
+                                    month: "short",
+                                    day: "numeric",
+                                    year: "numeric",
+                                  })}{" "}
+                                  {new Date(
+                                    evt.dynamic_end_date,
+                                  ).toLocaleTimeString("en-US", {
+                                    timeZone: "Asia/Kolkata",
+                                    hour: "2-digit",
+                                    minute: "2-digit",
+                                  })}
+                                </span>
                               </>
                             )}
                           </div>
                           {evt.event_type ? (
-                            <Badge variant="outline" className="text-[10px] bg-brand/5 border-brand/20 text-brand">
-                              {evt.event_type.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                            <Badge
+                              variant="outline"
+                              className="text-[10px] bg-brand/5 border-brand/20 text-brand"
+                            >
+                              {evt.event_type
+                                .replace("_", " ")
+                                .replace(/\b\w/g, (l) => l.toUpperCase())}
                             </Badge>
                           ) : (
-                            <Badge variant="outline" className="text-[10px] bg-indigo-500/5 border-indigo-500/20 text-indigo-600">General</Badge>
+                            <Badge
+                              variant="outline"
+                              className="text-[10px] bg-indigo-500/5 border-indigo-500/20 text-indigo-600"
+                            >
+                              General
+                            </Badge>
                           )}
                         </div>
                       </div>
@@ -912,7 +1181,9 @@ const AdminDashboard: React.FC = () => {
                           variant="destructive"
                           size="sm"
                           className="flex items-center gap-2"
-                          onClick={() => handleEventAction([evt.id], 'rejected')}
+                          onClick={() =>
+                            handleEventAction([evt.id], "rejected")
+                          }
                           disabled={isProcessingAction}
                         >
                           <XCircle size={16} />
@@ -921,7 +1192,7 @@ const AdminDashboard: React.FC = () => {
                         <Button
                           size="sm"
                           className="flex items-center gap-2"
-                          onClick={() => handleEventAction([evt.id], 'active')}
+                          onClick={() => handleEventAction([evt.id], "active")}
                           disabled={isProcessingAction}
                         >
                           <CheckCircle size={16} />
@@ -945,7 +1216,7 @@ const AdminDashboard: React.FC = () => {
       <RegisterEventDialog
         isOpen={registerDialogOpen}
         onOpenChange={setRegisterDialogOpen}
-        currentUser={{ role: 'admin' } as any}
+        currentUser={{ role: "admin" } as any}
         onEventCreated={fetchData}
       />
 
@@ -954,31 +1225,48 @@ const AdminDashboard: React.FC = () => {
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle>SBG Settings</DialogTitle>
-            <DialogDescription>Manage public information shown on the About SBG page.</DialogDescription>
+            <DialogDescription>
+              Manage public information shown on the About SBG page.
+            </DialogDescription>
           </DialogHeader>
 
           <div className="space-y-4 py-4">
             <div className="space-y-2">
-              <Label>Constitution Link (URL)</Label>
+              <Label htmlFor="constitution-link">Constitution Link (URL)</Label>
               <Input
+                id="constitution-link"
                 value={sbgSettings.sbg_constitution_link}
-                onChange={e => setSbgSettings({ ...sbgSettings, sbg_constitution_link: e.target.value })}
+                onChange={(e) =>
+                  setSbgSettings({
+                    ...sbgSettings,
+                    sbg_constitution_link: e.target.value,
+                  })
+                }
                 placeholder="https://..."
               />
             </div>
             <div className="space-y-2">
-              <Label>SBG LinkedIn (URL)</Label>
+              <Label htmlFor="sbg-linkedin">SBG LinkedIn (URL)</Label>
               <Input
+                id="sbg-linkedin"
                 value={sbgSettings.sbg_linkedin}
-                onChange={e => setSbgSettings({ ...sbgSettings, sbg_linkedin: e.target.value })}
+                onChange={(e) =>
+                  setSbgSettings({
+                    ...sbgSettings,
+                    sbg_linkedin: e.target.value,
+                  })
+                }
                 placeholder="https://linkedin.com/..."
               />
             </div>
             <div className="space-y-2">
-              <Label>SBG Contact Email</Label>
+              <Label htmlFor="sbg-email">SBG Contact Email</Label>
               <Input
+                id="sbg-email"
                 value={sbgSettings.sbg_email}
-                onChange={e => setSbgSettings({ ...sbgSettings, sbg_email: e.target.value })}
+                onChange={(e) =>
+                  setSbgSettings({ ...sbgSettings, sbg_email: e.target.value })
+                }
                 placeholder="sbg@dau.ac.in"
                 type="email"
               />
@@ -986,13 +1274,15 @@ const AdminDashboard: React.FC = () => {
           </div>
 
           <DialogFooter>
-            <Button variant="outline" onClick={() => setSbgSettingsOpen(false)}>Cancel</Button>
+            <Button variant="outline" onClick={() => setSbgSettingsOpen(false)}>
+              Cancel
+            </Button>
             <Button
               className="bg-brand text-white hover:bg-brandLink"
               onClick={saveSbgSettings}
               disabled={isSavingSettings}
             >
-              {isSavingSettings ? 'Saving...' : 'Save Settings'}
+              {isSavingSettings ? "Saving..." : "Save Settings"}
             </Button>
           </DialogFooter>
         </DialogContent>

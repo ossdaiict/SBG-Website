@@ -34,9 +34,6 @@ const loginLimiter = rateLimit({
     legacyHeaders: false,
     skipSuccessfulRequests: true,
     store: new PostgresStore(dbConfig, 'rate_limits_login'),
-    keyGenerator: (req) => {
-        return req.ip || 'unknown';
-    },
 });
 
 const registerLimiter = rateLimit({
@@ -46,9 +43,6 @@ const registerLimiter = rateLimit({
     standardHeaders: true,
     legacyHeaders: false,
     store: new PostgresStore(dbConfig, 'rate_limits_register'),
-    keyGenerator: (req) => {
-        return req.ip || 'unknown';
-    },
 });
 
 const passwordResetLimiter = rateLimit({
@@ -58,9 +52,6 @@ const passwordResetLimiter = rateLimit({
     standardHeaders: true,
     legacyHeaders: false,
     store: new PostgresStore(dbConfig, 'rate_limits_reset'),
-    keyGenerator: (req) => {
-        return req.ip || 'unknown';
-    },
 });
 
 // Admin Route

@@ -47,7 +47,7 @@ const AdminRequests: React.FC = () => {
   const [bookingIdsToDelete, setBookingIdsToDelete] = useState<string[]>([]);
   const [isDeleting, setIsDeleting] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 25;
+  const itemsPerPage = 10;
 
   const fetchRequests = React.useCallback(async () => {
     setIsLoading(true);
@@ -164,7 +164,6 @@ const AdminRequests: React.FC = () => {
 
   const filteredRequests = requests.filter(req => {
     const safeBookings = req.bookings || [];
-    const isStarted = safeBookings[0]?.startTimeISO ? new Date(safeBookings[0].startTimeISO) <= new Date() : false;
     const isPending = req.status === 'pending' || (req.status === 'partial' && safeBookings.some(b => b.status === 'pending'));
     const matchesSearch = String(req.eventName || '').toLowerCase().includes(searchTerm.toLowerCase()) || String(req.bookingName || '').toLowerCase().includes(searchTerm.toLowerCase());
     const matchesClub = filterClub === 'all' || (req.clubName && req.clubName.toLowerCase() === filterClub.toLowerCase());
@@ -172,7 +171,7 @@ const AdminRequests: React.FC = () => {
 
     let matchesStatus = true;
     if (filterStatus === 'pending') {
-      matchesStatus = isPending && !isStarted;
+      matchesStatus = isPending;
     } else if (filterStatus !== 'all') {
       matchesStatus = req.status === filterStatus;
     }
@@ -203,7 +202,7 @@ const AdminRequests: React.FC = () => {
 
         <div className="flex flex-col sm:flex-row sm:flex-wrap items-center gap-3 w-full xl:w-auto mt-4 xl:mt-0">
           <Select value={filterClub} onValueChange={setFilterClub}>
-            <SelectTrigger className="w-full sm:w-[140px] rounded-xl">
+            <SelectTrigger className="w-full sm:flex-1 sm:min-w-[140px] rounded-xl">
               <SelectValue placeholder="All Clubs" />
             </SelectTrigger>
             <SelectContent>
@@ -215,7 +214,7 @@ const AdminRequests: React.FC = () => {
           </Select>
 
           <Select value={filterVenue} onValueChange={setFilterVenue}>
-            <SelectTrigger className="w-full sm:w-[140px] rounded-xl">
+            <SelectTrigger className="w-full sm:flex-1 sm:min-w-[140px] rounded-xl">
               <SelectValue placeholder="All Venues" />
             </SelectTrigger>
             <SelectContent>
@@ -227,7 +226,7 @@ const AdminRequests: React.FC = () => {
           </Select>
 
           <Select value={filterStatus} onValueChange={setFilterStatus}>
-            <SelectTrigger className="w-full sm:w-[140px] rounded-xl">
+            <SelectTrigger className="w-full sm:flex-1 sm:min-w-[140px] rounded-xl">
               <SelectValue placeholder="All Status" />
             </SelectTrigger>
             <SelectContent>
@@ -239,7 +238,7 @@ const AdminRequests: React.FC = () => {
             </SelectContent>
           </Select>
 
-          <div className="relative w-full sm:w-64 shrink-0">
+          <div className="relative w-full sm:flex-1 sm:min-w-[250px] xl:flex-none xl:w-64 shrink-0">
             <Search className="absolute left-3 top-2.5 text-textMuted pointer-events-none z-10" size={18} />
             <Input
               type="text"
@@ -273,14 +272,14 @@ const AdminRequests: React.FC = () => {
           </CardContent>
         ) : filteredRequests.length > 0 ? (
           <div className="overflow-x-auto w-full">
-            <table className="w-full min-w-[600px] sm:min-w-0 text-left text-sm">
-              <thead className="bg-hoverSoft border-b border-borderSoft uppercase tracking-wider text-xs font-semibold text-textMuted">
+            <table className="w-full min-w-[1000px] text-left text-sm">
+              <thead className="bg-hoverSoft border-b border-borderSoft uppercase tracking-wider text-xs font-semibold text-textMuted text-center">
                 <tr>
-                  <th className="px-4 sm:px-6 py-4 w-[40%] sm:w-[35%]">Booking</th>
-                  <th className="px-4 sm:px-6 py-4 w-[15%]">Venue</th>
-                  <th className="px-4 sm:px-6 py-4 w-[35%] sm:w-[25%]">Date & Time</th>
-                  <th className="px-4 sm:px-6 py-4 w-[10%]">Status</th>
-                  <th className="px-4 sm:px-6 py-4 text-right w-[15%]">Actions</th>
+                  <th className="px-3 py-2 sm:py-4 w-[39%] sm:w-[34%] text-center">Booking</th>
+                  <th className="px-3 py-2 sm:py-4 w-[34%] text-center">Venue</th>
+                  <th className="px-3 py-2 sm:py-4 w-[30%] sm:w-[20%] text-center">Date & Time</th>
+                  <th className="px-3 py-2 sm:py-4 w-[5%] text-center">Status</th>
+                  <th className="px-3 py-2 sm:py-4 w-[12%] text-center">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border/40">
@@ -294,7 +293,6 @@ const AdminRequests: React.FC = () => {
                     handleDelete={handleDeleteBooking}
                     handleSendEmail={handleSendEmail}
                     getVenueName={getVenueName}
-                    isHistoryTab={false}
                     isProcessingAction={isProcessingAction}
                     onEdit={(booking) => {
                       setEditingBooking(booking);
@@ -384,12 +382,11 @@ interface AdminRequestRowProps {
   handleDelete: (ids: string[]) => void;
   handleSendEmail: (batchId: string | undefined, eventId: string | undefined) => Promise<void>;
   getVenueName: (id: string) => string;
-  isHistoryTab: boolean;
   isProcessingAction: boolean;
   onEdit: (booking: Booking) => void;
 }
 
-const AdminRequestRow: React.FC<AdminRequestRowProps> = ({ req, index, venues, handleAction, handleDelete, handleSendEmail, getVenueName, isHistoryTab, isProcessingAction, onEdit }) => {
+const AdminRequestRow: React.FC<AdminRequestRowProps> = ({ req, index, venues, handleAction, handleDelete, handleSendEmail, getVenueName, isProcessingAction, onEdit }) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const safeBookings = req.bookings || [];
   const isMultiVenue = safeBookings.length > 1;
@@ -412,18 +409,21 @@ const AdminRequestRow: React.FC<AdminRequestRowProps> = ({ req, index, venues, h
         animate={{ opacity: 1, x: 0 }}
         transition={{ duration: 0.3, delay: index * 0.05 }}
         className={cn(
-          "hover:bg-hoverSoft transition-colors cursor-pointer",
+          "hover:bg-hoverSoft transition-colors",
           isExpanded && "bg-hoverSoft/50"
         )}
         onClick={() => isMultiVenue && setIsExpanded(!isExpanded)}
       >
-        <td className="px-4 sm:px-6 py-4">
-          <div className="flex items-center gap-2">
-            {isMultiVenue && (
-              <div className="text-textMuted">
-                {isExpanded ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
-              </div>
-            )}
+        <td className="px-3 py-2 sm:py-4">
+          <div className="flex items-start">
+            {/* Fixed-width slot for the expand arrow to ensure text aligns perfectly across all rows */}
+            <div className="w-7 shrink-0 pt-1 -ml-1">
+              {isMultiVenue && (
+                <div className="text-textMuted">
+                  {isExpanded ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
+                </div>
+              )}
+            </div>
             <div>
               <div className="font-semibold text-textPrimary text-base flex items-center gap-2">
                 {req.bookingName}
@@ -438,7 +438,7 @@ const AdminRequestRow: React.FC<AdminRequestRowProps> = ({ req, index, venues, h
               )}
               <div className="text-xs text-textMuted mt-0.5">{req.clubName}</div>
               {req.permissionsLink && (
-                <div className="mt-3 mb-1">
+                <div className="mt-4 mb-1">
                   <a
                     href={req.permissionsLink.match(/^https?:\/\//) ? req.permissionsLink : `https://${req.permissionsLink}`}
                     target="_blank"
@@ -454,160 +454,75 @@ const AdminRequestRow: React.FC<AdminRequestRowProps> = ({ req, index, venues, h
             </div>
           </div>
         </td>
-        <td className="px-4 sm:px-6 py-4">
+        <td className="px-3 py-2 sm:py-4">
           <div className="flex items-center gap-1.5 text-textPrimary">
             {req.venueName}
           </div>
         </td>
-        <td className="px-4 sm:px-6 py-4">
-          <div className="flex flex-col gap-1">
+        <td className="px-3 py-2 sm:py-4">
+          <div className="flex flex-col items-center gap-1">
             <div className="flex items-center gap-1.5">
               <Calendar size={14} className="text-textMuted shrink-0" />
-              <div className="flex flex-col text-xs space-y-0.5">
-                <span className="whitespace-nowrap">{new Date(req.date).toLocaleDateString('en-US', { timeZone: 'Asia/Kolkata', month: 'short', day: 'numeric', year: 'numeric' })} {req.startTime}</span>
+              <div className="flex flex-col text-xs space-y-0.5 items-center text-center">
+                <span className="whitespace-nowrap">{req?.date ? new Date(req.date).toLocaleDateString('en-US', { timeZone: 'Asia/Kolkata', month: 'short', day: 'numeric', year: 'numeric' }) : ''} {req?.startTime}</span>
                 <span className="text-textMuted text-[10px]">to</span>
-                <span className="whitespace-nowrap">{new Date(req.endDate || req.date).toLocaleDateString('en-US', { timeZone: 'Asia/Kolkata', month: 'short', day: 'numeric', year: 'numeric' })} {req.endTime}</span>
+                <span className="whitespace-nowrap">{req?.date ? new Date(req.endDate || req.date).toLocaleDateString('en-US', { timeZone: 'Asia/Kolkata', month: 'short', day: 'numeric', year: 'numeric' }) : ''} {req?.endTime}</span>
               </div>
             </div>
           </div>
         </td>
-        <td className="px-4 sm:px-6 py-4">
-          <Badge variant={getStatusVariant(safeStatus)}>
-            {safeStatus === 'partial' ? 'Partial' : String(safeStatus).charAt(0).toUpperCase() + String(safeStatus).slice(1)}
-          </Badge>
+        <td className="px-3 py-2 sm:py-4">
+          <div className="flex">
+            <Badge variant={getStatusVariant(safeStatus)}>
+              {safeStatus === 'partial' ? 'Partial' : String(safeStatus).charAt(0).toUpperCase() + String(safeStatus).slice(1)}
+            </Badge>
+          </div>
         </td>
-        <td className="px-4 sm:px-6 py-4 text-right">
-          <div className="flex items-center justify-end gap-2" onClick={(e) => e.stopPropagation()}>
+        <td className="px-3 items-center py-2 sm:py-4">
+          <div className="flex gap-4" onClick={(e) => e.stopPropagation()}>
             <Button
               variant="outline"
               size="sm"
               onClick={(e) => { e.stopPropagation(); handleSendEmail(req.batchId, safeBookings[0]?.event_id); }}
-              className="text-xs"
+              className="text-xs shrink-0 rounded-lg"
               title="Send an email to the club with the current status of all venues in this booking"
               disabled={isProcessingAction}
             >
-              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-1"><rect width="20" height="16" x="2" y="4" rx="2" /><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" /></svg>
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-1.5"><rect width="20" height="16" x="2" y="4" rx="2" /><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" /></svg>
               Send Mail
             </Button>
-            {/* Single-venue: show individual approve/reject directly on the row */}
-            {!isMultiVenue && safeBookings[0]?.status !== 'rejected' && (
-              <Button
-                variant="ghost"
-                size="icon"
-                aria-label="Reject venue"
-                onClick={(e) => { e.stopPropagation(); handleAction([safeBookings[0].id], 'rejected'); }}
-                className="text-textMuted hover:text-error"
-                title="Reject this venue"
-                disabled={isProcessingAction}
-              >
-                <XCircle size={18} />
-              </Button>
-            )}
-            {!isMultiVenue && (
-              <Button
-                variant="ghost"
-                size="icon"
-                aria-label="Edit booking"
-                onClick={(e) => { e.stopPropagation(); onEdit(safeBookings[0]); }}
-                className="text-textMuted hover:text-primary"
-                title="Edit booking timings"
-                disabled={isProcessingAction}
-              >
-                <Pencil size={16} />
-              </Button>
-            )}
-            {!isMultiVenue && safeBookings[0]?.status !== 'approved' && (
-              <Button
-                variant="ghost"
-                size="icon"
-                aria-label="Approve venue"
-                onClick={(e) => { e.stopPropagation(); handleAction([safeBookings[0].id], 'approved'); }}
-                className="text-primary hover:text-primary/80"
-                title="Approve this venue"
-                disabled={isProcessingAction}
-              >
-                <CheckCircle size={18} />
-              </Button>
-            )}
-            {!isMultiVenue && safeBookings[0]?.status !== 'pending' && (
-              <Button
-                variant="ghost"
-                size="icon"
-                aria-label="Move to pending"
-                onClick={(e) => { e.stopPropagation(); handleAction([safeBookings[0].id], 'pending'); }}
-                className="text-textMuted hover:text-warning"
-                title="Move to pending"
-                disabled={isProcessingAction}
-              >
-                <RotateCcw size={18} />
-              </Button>
-            )}
-            {!isMultiVenue && (
-              <Button
-                variant="ghost"
-                size="icon"
-                aria-label="Delete booking"
-                onClick={(e) => { e.stopPropagation(); handleDelete([safeBookings[0].id]); }}
-                className="text-textMuted hover:text-error"
-                title="Delete this booking permanently"
-                disabled={isProcessingAction}
-              >
-                <Trash2 size={16} />
-              </Button>
-            )}
-            {/* Multi-venue: show bulk Reject All / Approve All; individual controls are in the expanded panel */}
-            {isMultiVenue && req.status !== 'rejected' && (
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={(e) => { e.stopPropagation(); handleAction(req.ids, 'rejected'); }}
-                className="text-textMuted hover:text-error text-xs"
-                title="Reject all venues"
-                disabled={isProcessingAction}
-              >
-                <XCircle size={15} className="mr-1" />
-                <span className="hidden sm:inline">Reject All</span>
-              </Button>
-            )}
-            {isMultiVenue && req.status !== 'approved' && (
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={(e) => { e.stopPropagation(); handleAction(req.ids, 'approved'); }}
-                className="text-primary hover:text-primary/80 text-xs"
-                title="Approve all venues"
-                disabled={isProcessingAction}
-              >
-                <CheckCircle size={15} className="mr-1" />
-                <span className="hidden sm:inline">Approve All</span>
-              </Button>
-            )}
-            {isMultiVenue && req.status !== 'pending' && (
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={(e) => { e.stopPropagation(); handleAction(req.ids, 'pending'); }}
-                className="text-textMuted hover:text-warning text-xs"
-                title="Move all to pending"
-                disabled={isProcessingAction}
-              >
-                <RotateCcw size={15} className="mr-1" />
-                <span className="hidden sm:inline">Pending All</span>
-              </Button>
-            )}
-            {isMultiVenue && (
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={(e) => { e.stopPropagation(); handleDelete(req.ids); }}
-                className="text-textMuted hover:text-error text-xs"
-                title="Delete all venues in this booking"
-                disabled={isProcessingAction}
-              >
-                <Trash2 size={15} className="mr-1" />
-                <span className="hidden sm:inline">Delete All</span>
-              </Button>
-            )}
+            <div className="flex items-center justify-end gap-1 w-[140px]">
+              {!isMultiVenue && safeBookings[0]?.status !== 'rejected' && (
+                <Button variant="ghost" size="icon" onClick={(e) => { e.stopPropagation(); handleAction([safeBookings[0].id], 'rejected'); }} className="text-textMuted hover:text-error h-8 w-8 rounded-full" title="Reject this venue" disabled={isProcessingAction}><XCircle size={18} /></Button>
+              )}
+              {isMultiVenue && req.status !== 'rejected' && (
+                <Button variant="ghost" size="icon" onClick={(e) => { e.stopPropagation(); handleAction(req.ids, 'rejected'); }} className="text-textMuted hover:text-error h-8 w-8 rounded-full" title="Reject all venues" disabled={isProcessingAction}><XCircle size={18} /></Button>
+              )}
+
+              {!isMultiVenue && (
+                <Button variant="ghost" size="icon" onClick={(e) => { e.stopPropagation(); onEdit(safeBookings[0]); }} className="text-textMuted hover:text-primary h-8 w-8 rounded-full" title="Edit booking timings" disabled={isProcessingAction}><Pencil size={16} /></Button>
+              )}
+              {!isMultiVenue && safeBookings[0]?.status !== 'approved' && (
+                <Button variant="ghost" size="icon" onClick={(e) => { e.stopPropagation(); handleAction([safeBookings[0].id], 'approved'); }} className="text-primary hover:text-primary/80 h-8 w-8 rounded-full" title="Approve this venue" disabled={isProcessingAction}><CheckCircle size={18} /></Button>
+              )}
+              {isMultiVenue && req.status !== 'approved' && (
+                <Button variant="ghost" size="icon" onClick={(e) => { e.stopPropagation(); handleAction(req.ids, 'approved'); }} className="text-primary hover:text-primary/80 h-8 w-8 rounded-full" title="Approve all venues" disabled={isProcessingAction}><CheckCircle size={18} /></Button>
+              )}
+
+              {!isMultiVenue && safeBookings[0]?.status !== 'pending' && (
+                <Button variant="ghost" size="icon" onClick={(e) => { e.stopPropagation(); handleAction([safeBookings[0].id], 'pending'); }} className="text-textMuted hover:text-warning h-8 w-8 rounded-full" title="Move to pending" disabled={isProcessingAction}><RotateCcw size={18} /></Button>
+              )}
+              {isMultiVenue && req.status !== 'pending' && (
+                <Button variant="ghost" size="icon" onClick={(e) => { e.stopPropagation(); handleAction(req.ids, 'pending'); }} className="text-textMuted hover:text-warning h-8 w-8 rounded-full" title="Move all to pending" disabled={isProcessingAction}><RotateCcw size={18} /></Button>
+              )}
+
+              {!isMultiVenue && (
+                <Button variant="ghost" size="icon" onClick={(e) => { e.stopPropagation(); handleDelete([safeBookings[0].id]); }} className="text-textMuted hover:text-error h-8 w-8 rounded-full" title="Delete this booking permanently" disabled={isProcessingAction}><Trash2 size={16} /></Button>
+              )}
+              {isMultiVenue && (
+                <Button variant="ghost" size="icon" onClick={(e) => { e.stopPropagation(); handleDelete(req.ids); }} className="text-textMuted hover:text-error h-8 w-8 rounded-full" title="Delete all venues in this booking" disabled={isProcessingAction}><Trash2 size={16} /></Button>
+              )}
+            </div>
           </div>
         </td>
       </motion.tr>
@@ -621,7 +536,7 @@ const AdminRequestRow: React.FC<AdminRequestRowProps> = ({ req, index, venues, h
             exit={{ opacity: 0, height: 0 }}
             className="bg-primary/5"
           >
-            <td colSpan={5} className="px-6 py-4">
+            <td colSpan={5} className="px-3 py-2 sm:py-4">
               <div className="space-y-3">
                 <div className="text-xs font-bold text-textMuted uppercase tracking-wider mb-2">Individual Venue Statuses</div>
                 {safeBookings.map((booking) => (
@@ -630,9 +545,9 @@ const AdminRequestRow: React.FC<AdminRequestRowProps> = ({ req, index, venues, h
                       <div className="flex flex-col">
                         <span className="font-semibold text-sm">{getVenueName(booking.venueId)}</span>
                         <div className="flex flex-col text-xs text-textMuted mt-0.5 space-y-0.5">
-                          <span className="whitespace-nowrap">{new Date(booking.date).toLocaleDateString('en-US', { timeZone: 'Asia/Kolkata', month: 'short', day: 'numeric', year: 'numeric' })} {booking.startTime}</span>
+                          <span className="whitespace-nowrap">{booking?.date ? new Date(booking.date).toLocaleDateString('en-US', { timeZone: 'Asia/Kolkata', month: 'short', day: 'numeric', year: 'numeric' }) : ''} {booking?.startTime}</span>
                           <span className="text-[10px]">to</span>
-                          <span className="whitespace-nowrap">{new Date(booking.endDate || booking.date).toLocaleDateString('en-US', { timeZone: 'Asia/Kolkata', month: 'short', day: 'numeric', year: 'numeric' })} {booking.endTime}</span>
+                          <span className="whitespace-nowrap">{booking?.date ? new Date(booking.endDate || booking.date).toLocaleDateString('en-US', { timeZone: 'Asia/Kolkata', month: 'short', day: 'numeric', year: 'numeric' }) : ''} {booking?.endTime}</span>
                         </div>
                         {booking.issueFlag && (
                           <span className="text-[10px] font-medium text-warning mt-0.5 flex items-center gap-1">

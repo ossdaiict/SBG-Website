@@ -1,43 +1,56 @@
-import { AnimatePresence, motion } from "framer-motion"
+import { AnimatePresence, motion } from "framer-motion";
 import {
   ChevronDownIcon,
   ChevronLeftIcon,
   ChevronRightIcon,
   Clock,
   MapPin,
-} from "lucide-react"
-import * as React from "react"
-import { DayButton, DayPicker, getDefaultClassNames } from "react-day-picker"
-import { createPortal } from "react-dom"
+} from "lucide-react";
+import * as React from "react";
+import { DayButton, DayPicker, getDefaultClassNames } from "react-day-picker";
+import { createPortal } from "react-dom";
+import { Button, buttonVariants } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
-import { Button, buttonVariants } from "@/components/ui/button"
-import { cn } from "@/lib/utils"
+/* -------------------------------------------------------------------------- */
+/* Types                                                                      */
+/* -------------------------------------------------------------------------- */
 
 interface CalendarEvent {
-  eventName: string
-  bookingName?: string
-  clubName: string
-  date: string
-  startTime: string
-  endTime: string
-  startTimeISO?: string
-  venueName?: string
-  status?: string
-  eventType?: string
+  eventName: string;
+  bookingName?: string;
+  clubName: string;
+  date: string;
+  startTime: string;
+  endTime: string;
+  startTimeISO?: string;
+  venueName?: string;
+  status?: string;
+  eventType?: string;
 }
 
-type EventsByDateMap = Map<string, CalendarEvent[]>
+type EventsByDateMap = Map<string, CalendarEvent[]>;
 
-const CalendarEventsContext = React.createContext<EventsByDateMap>(new Map())
+/* -------------------------------------------------------------------------- */
+/* Helpers                                                                    */
+/* -------------------------------------------------------------------------- */
 
-function formatEventType(type?: string) {
-  if (!type) return ""
-  return type.replace(/_/g, " ").replace(/\b\w/g, (char) => char.toUpperCase())
+function makeDateKey(date: Date) {
+  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(
+    2,
+    "0",
+  )}-${String(date.getDate()).padStart(2, "0")}`;
 }
 
-function makeDateKey(d: Date) {
-  return `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`
-}
+/* -------------------------------------------------------------------------- */
+/* Context                                                                    */
+/* -------------------------------------------------------------------------- */
+
+const CalendarEventsContext = React.createContext<EventsByDateMap | null>(null);
+
+/* -------------------------------------------------------------------------- */
+/* Calendar Root                                                              */
+/* -------------------------------------------------------------------------- */
 
 const CalendarRoot = ({ className, rootRef, ...props }: any) => {
   return (
@@ -46,38 +59,374 @@ const CalendarRoot = ({ className, rootRef, ...props }: any) => {
       ref={rootRef}
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.4, ease: [0.25, 0.46, 0.45, 0.94] }}
-      className={cn(className)}
+      transition={{
+        duration: 0.4,
+        ease: [0.25, 0.46, 0.45, 0.94],
+      }}
+      className={cn("w-full min-w-0 max-w-full", className)}
       {...props}
     />
-  )
-}
+  );
+};
+/* -------------------------------------------------------------------------- */
+/* Chevron                                                                    */
+/* -------------------------------------------------------------------------- */
 
-const CalendarChevron = ({ className, orientation, ...props }: any) => {
-  const Icon = orientation === "left" ? ChevronLeftIcon
-    : orientation === "right" ? ChevronRightIcon
-      : ChevronDownIcon
+const CalendarChevron = ({
+  orientation,
+  className,
+  ...props
+}: React.SVGProps<SVGSVGElement> & {
+  orientation?: "left" | "right" | "up" | "down";
+}) => {
+  if (orientation === "left") {
+    return <ChevronLeftIcon className={cn("size-4", className)} {...props} />;
+  }
+
+  if (orientation === "right") {
+    return <ChevronRightIcon className={cn("size-4", className)} {...props} />;
+  }
+
+  return <ChevronDownIcon className={cn("size-4", className)} {...props} />;
+};
+
+/* -------------------------------------------------------------------------- */
+/* Day Button                                                                 */
+/* -------------------------------------------------------------------------- */
+
+function CalendarDayButton({
+  className,
+  day,
+  modifiers,
+  ...props
+}: React.ComponentProps<typeof DayButton>) {
+  const eventsByDate = React.useContext(CalendarEventsContext);
+
+  const dateKey = makeDateKey(day.date);
+  const dayEvents = eventsByDate?.get(dateKey) || [];
+
+  const hasEvents = dayEvents.length > 0;
+  const isDisabled = modifiers?.disabled;
+  const isSelected = modifiers?.selected;
+  const isToday = modifiers?.today;
+  const isOutside = modifiers?.outside;
+
   return (
-    <motion.span
-      whileHover={{ scale: 1.2 }}
-      whileTap={{ scale: 0.85 }}
-      transition={{ type: "spring", stiffness: 500, damping: 25 }}
-      className="inline-flex"
+    <motion.div
+      className={cn(
+        "w-full h-full min-w-0",
+        "flex items-center justify-center",
+        "rounded-full transition-shadow duration-300",
+        hasEvents &&
+          !isDisabled &&
+          "cursor-pointer hover:shadow-[0_0_0_1px_hsl(var(--primary)/0.35)]",
+      )}
+      whileTap={!isDisabled ? { scale: 0.96 } : undefined}
     >
-      <Icon className={cn("size-4", className)} {...props} />
-    </motion.span>
-  )
+      <DayButton
+        day={day}
+        modifiers={modifiers}
+        {...props}
+        className={cn(
+          className,
+          /* -------------------------------------------------------------- */
+          /* IMPORTANT: fluid date button                                  */
+          /* -------------------------------------------------------------- */
+
+          "w-[90%]",
+          "max-w-[var(--cell-size)]",
+          "aspect-square",
+          "h-auto",
+          "mx-auto",
+
+          "flex flex-col",
+          "justify-center",
+          "items-center",
+          "gap-0.5",
+
+          "font-medium",
+          "leading-none",
+          "rounded-full",
+          "transition-all",
+          "duration-200",
+          "relative",
+
+          "text-textPrimary",
+
+          /* Selected */
+          isSelected && "bg-brand text-white hover:bg-brand hover:text-white",
+
+          /* Today */
+          isToday && !isSelected && "ring-1 ring-brand/60 text-brand",
+
+          /* Outside days */
+          isOutside && "text-textMuted/40",
+
+          /* Disabled */
+          isDisabled && "text-textMuted/40 opacity-50 cursor-not-allowed",
+        )}
+      >
+        {props.children}
+
+        {/* Event indicator */}
+        {hasEvents && !isDisabled && (
+          <span
+            className={cn(
+              "absolute",
+              "bottom-[8%]",
+              "left-1/2",
+              "-translate-x-1/2",
+              "w-1.5",
+              "h-1.5",
+              "rounded-full",
+              isSelected ? "bg-white" : "bg-primary",
+            )}
+          />
+        )}
+      </DayButton>
+    </motion.div>
+  );
 }
 
-const CalendarWeekNumber = ({ children, ...props }: any) => {
+/* -------------------------------------------------------------------------- */
+/* Week Number                                                                */
+/* -------------------------------------------------------------------------- */
+
+const CalendarWeekNumber = ({
+  children,
+  ...props
+}: React.HTMLAttributes<HTMLTableCellElement>) => {
   return (
     <td {...props}>
       <div className="flex size-[--cell-size] items-center justify-center text-center">
         {children}
       </div>
     </td>
-  )
+  );
+};
+
+/* -------------------------------------------------------------------------- */
+/* Event Hover Card                                                           */
+/* -------------------------------------------------------------------------- */
+
+function EventHoverCard({
+  containerRef,
+  eventsByDate,
+}: {
+  containerRef: React.RefObject<HTMLDivElement | null>;
+  eventsByDate: EventsByDateMap;
+}) {
+  const [hoveredDate, setHoveredDate] = React.useState<string | null>(null);
+  const [position, setPosition] = React.useState<{
+    top?: number;
+    bottom?: number;
+    left: number;
+  } | null>(null);
+  const hideTimeoutRef = React.useRef<NodeJS.Timeout | null>(null);
+
+  React.useEffect(() => {
+    const container = containerRef.current;
+
+    if (!container) return;
+
+    const handleMouseOver = (event: MouseEvent) => {
+      if (window.matchMedia && window.matchMedia("(hover: none)").matches) return;
+
+      const target = event.target as HTMLElement;
+
+      const dayButton = target.closest("[data-day]") as HTMLElement | null;
+
+      if (!dayButton) return;
+
+      if (hideTimeoutRef.current) {
+        clearTimeout(hideTimeoutRef.current);
+      }
+
+      const dateValue = dayButton.getAttribute("data-day");
+
+      if (!dateValue) return;
+
+      let date: Date;
+
+      try {
+        date = new Date(dateValue);
+      } catch {
+        return;
+      }
+
+      if (Number.isNaN(date.getTime())) return;
+
+      const key = makeDateKey(date);
+      const events = eventsByDate.get(key);
+
+      if (!events || events.length === 0) {
+        setHoveredDate(null);
+        return;
+      }
+
+      const rect = dayButton.getBoundingClientRect();
+
+      const popupWidth = Math.min(300, window.innerWidth - 24);
+
+      let left = rect.left + rect.width / 2 - popupWidth / 2;
+
+      left = Math.max(12, Math.min(left, window.innerWidth - popupWidth - 12));
+
+      let top: number | undefined = rect.bottom + 8;
+      let bottom: number | undefined = undefined;
+
+      const estimatedHeight = events.length === 1 ? 140 : 240;
+
+      if (top + estimatedHeight > window.innerHeight - 12) {
+        top = undefined;
+        bottom = window.innerHeight - rect.top + 8;
+      }
+
+      setPosition({
+        top,
+        bottom,
+        left,
+      });
+
+      setHoveredDate(key);
+    };
+
+    const handleMouseOut = (event: MouseEvent) => {
+      hideTimeoutRef.current = setTimeout(() => {
+        setHoveredDate(null);
+        setPosition(null);
+      }, 150);
+    };
+
+    container.addEventListener("mouseover", handleMouseOver);
+
+    container.addEventListener("mouseout", handleMouseOut);
+
+    return () => {
+      container.removeEventListener("mouseover", handleMouseOver);
+
+      container.removeEventListener("mouseout", handleMouseOut);
+    };
+  }, [containerRef, eventsByDate]);
+
+  const events = hoveredDate ? eventsByDate.get(hoveredDate) || [] : [];
+
+  if (typeof document === "undefined" || !position || events.length === 0) {
+    return null;
+  }
+
+  const displayEvents = events.slice(0, 2);
+  const remainingCount = events.length - 2;
+
+  return createPortal(
+    <AnimatePresence>
+      <motion.div
+        initial={{
+          opacity: 0,
+          y: 4,
+          scale: 0.98,
+        }}
+        animate={{
+          opacity: 1,
+          y: 0,
+          scale: 1,
+        }}
+        exit={{
+          opacity: 0,
+          y: 4,
+          scale: 0.98,
+        }}
+        transition={{
+          duration: 0.15,
+        }}
+        className="fixed z-[9999]"
+        onMouseEnter={() => {
+          if (hideTimeoutRef.current) {
+            clearTimeout(hideTimeoutRef.current);
+          }
+        }}
+        onMouseLeave={() => {
+          hideTimeoutRef.current = setTimeout(() => {
+            setHoveredDate(null);
+            setPosition(null);
+          }, 150);
+        }}
+        style={{
+          top: position.top,
+          bottom: position.bottom,
+          left: position.left,
+          width: "min(300px, calc(100vw - 24px))",
+        }}
+      >
+        <div
+          className={cn(
+            "rounded-xl",
+            "border",
+            "border-borderSoft",
+            "bg-popover",
+            "shadow-[0_24px_80px_-16px_rgba(0,0,0,0.2),0_8px_20px_-4px_rgba(0,0,0,0.08)]",
+            "dark:shadow-[0_24px_80px_-16px_rgba(0,0,0,0.6),0_8px_20px_-4px_rgba(0,0,0,0.3)]",
+            "p-3",
+            "max-h-[420px]",
+            "overflow-y-auto",
+            "backdrop-blur-2xl",
+          )}
+        >
+          <div className="space-y-3">
+            {displayEvents.map((event, index) => (
+              <div
+                key={`${event.eventName}-${event.startTime}-${index}`}
+                className={cn(index > 0 && "border-t border-borderSoft pt-3")}
+              >
+                <div className="font-semibold text-sm text-textPrimary break-words">
+                  {event.bookingName || event.eventName}
+                </div>
+
+                {event.bookingName &&
+                  event.eventName &&
+                  event.bookingName !== event.eventName && (
+                    <div className="text-xs text-textMuted mt-0.5 break-words">
+                      {event.eventName}
+                    </div>
+                  )}
+
+                <div className="text-xs text-brand font-medium mt-1.5">
+                  {event.clubName}
+                </div>
+
+                <div className="flex items-center gap-1.5 text-xs text-textMuted mt-2">
+                  <Clock className="size-3 shrink-0" />
+                  <span>
+                    {event.startTime} - {event.endTime}
+                  </span>
+                </div>
+
+                {event.venueName && (
+                  <div className="flex items-start gap-1.5 text-xs text-textMuted mt-1">
+                    <MapPin className="size-3 shrink-0 mt-0.5" />
+                    <span className="break-words">{event.venueName}</span>
+                  </div>
+                )}
+              </div>
+            ))}
+
+            {remainingCount > 0 && (
+              <div className="pt-2 mt-2 border-t border-borderSoft text-xs text-textMuted text-center font-medium">
+                + {remainingCount} more{" "}
+                {remainingCount === 1 ? "event" : "events"}. Click date to view
+              </div>
+            )}
+          </div>
+        </div>
+      </motion.div>
+    </AnimatePresence>,
+    document.body,
+  );
 }
+
+/* -------------------------------------------------------------------------- */
+/* Calendar                                                                   */
+/* -------------------------------------------------------------------------- */
 
 function Calendar({
   className,
@@ -90,130 +439,367 @@ function Calendar({
   events,
   ...props
 }: React.ComponentProps<typeof DayPicker> & {
-  buttonVariant?: React.ComponentProps<typeof Button>["variant"]
-  events?: CalendarEvent[]
+  buttonVariant?: React.ComponentProps<typeof Button>["variant"];
+  events?: CalendarEvent[];
 }) {
-  const defaultClassNames = getDefaultClassNames()
-  const calendarRef = React.useRef<HTMLDivElement>(null)
+  const defaultClassNames = getDefaultClassNames();
+
+  const calendarRef = React.useRef<HTMLDivElement>(null);
+
+  /* ------------------------------------------------------------------------ */
+  /* Group events by date                                                     */
+  /* ------------------------------------------------------------------------ */
 
   const eventsByDate = React.useMemo(() => {
-    const map: EventsByDateMap = new Map()
+    const map: EventsByDateMap = new Map();
+
     for (const event of events || []) {
-      // Parse the date and normalize to local midnight so the key
-      // always matches the calendar cell, regardless of UTC offset.
-      const raw = new Date(event.date)
-      const d = new Date(raw.getFullYear(), raw.getMonth(), raw.getDate())
-      const key = makeDateKey(d)
-      const existing = map.get(key) || []
-      existing.push(event)
-      map.set(key, existing)
+      const raw = new Date(event.date);
+
+      if (Number.isNaN(raw.getTime())) {
+        continue;
+      }
+
+      const d = new Date(raw.getFullYear(), raw.getMonth(), raw.getDate());
+
+      const key = makeDateKey(d);
+
+      const existing = map.get(key) || [];
+
+      existing.push(event);
+
+      map.set(key, existing);
     }
-    return map
-  }, [events])
+
+    return map;
+  }, [events]);
+
+  /* ------------------------------------------------------------------------ */
+  /* Event dates                                                               */
+  /* ------------------------------------------------------------------------ */
+
+  const eventDates = React.useMemo(() => {
+    return Array.from(eventsByDate.keys()).map((key) => {
+      const [year, month, day] = key.split("-").map(Number);
+
+      return new Date(year, month - 1, day);
+    });
+  }, [eventsByDate]);
 
   return (
     <CalendarEventsContext.Provider value={eventsByDate}>
-      <div ref={calendarRef}>
+      <div
+        ref={calendarRef}
+        className={cn(
+          "w-full min-w-0 max-w-full",
+          /* -------------------------------------------------------------- */
+          /* Allow horizontal scrolling                                    */
+          /* -------------------------------------------------------------- */
+          "overflow-x-auto",
+        )}
+      >
         <DayPicker
           showOutsideDays={showOutsideDays}
+          modifiers={{
+            hasEvents: eventDates,
+          }}
           className={cn(
-            "group/calendar p-3 sm:p-6 rounded-xl [--cell-size:2.25rem] sm:[--cell-size:2.75rem] [[data-slot=card-content]_&]:bg-transparent [[data-slot=popover-content]_&]:bg-transparent",
-            String.raw`rtl:**:[.rdp-button\_next>svg]:rotate-180`,
-            String.raw`rtl:**:[.rdp-button\_previous>svg]:rotate-180`,
-            className
+            /* ------------------------------------------------------------ */
+            /* Base responsive width                                       */
+            /* ------------------------------------------------------------ */
+
+            "group/calendar",
+            "w-max",
+            "mx-auto",
+            "rounded-xl",
+
+            /* ------------------------------------------------------------ */
+            /* Calendar sizing                                             */
+            /* ------------------------------------------------------------ */
+
+            "mx-auto",
+            "[--cell-size:2.25rem]",
+            "sm:[--cell-size:2.5rem]",
+            "md:[--cell-size:2.75rem]",
+
+            /* ------------------------------------------------------------ */
+            /* IMPORTANT: only below 320px                                */
+            /* Give the calendar a usable minimum width and let the       */
+            /* outer wrapper scroll horizontally.                        */
+            /* ------------------------------------------------------------ */
+
+            "max-[319px]:min-w-[320px]",
+
+            "[[data-slot=card-content]_&]:bg-transparent",
+            "[[data-slot=popover-content]_&]:bg-transparent",
+
+            String.raw`rtl:**:[.rdp-button_next>svg]:rotate-180`,
+            String.raw`rtl:**:[.rdp-button_previous>svg]:rotate-180`,
+
+            className,
           )}
           captionLayout={captionLayout}
           formatters={{
             formatMonthDropdown: (date) =>
               date.toLocaleString("default", {
-                timeZone: 'Asia/Kolkata',
-                month: "short"
+                timeZone: "Asia/Kolkata",
+                month: "short",
               }),
             ...formatters,
           }}
           classNames={{
-            root: cn("w-fit", defaultClassNames.root),
+            /* ------------------------------------------------------------ */
+            /* Root                                                         */
+            /* ------------------------------------------------------------ */
+
+            root: cn("w-max mx-auto", defaultClassNames.root),
+
+            /* ------------------------------------------------------------ */
+            /* Months                                                       */
+            /* ------------------------------------------------------------ */
+
             months: cn(
-              "relative flex flex-col gap-4 md:flex-row",
-              defaultClassNames.months
+              "relative flex w-max mx-auto",
+              "flex-col gap-4 md:flex-row",
+              defaultClassNames.months,
             ),
-            month: cn("flex w-full flex-col gap-4", defaultClassNames.month),
+
+            month: cn(
+              "flex w-max mx-auto flex-col gap-4",
+              defaultClassNames.month,
+            ),
+
+            /* ------------------------------------------------------------ */
+            /* Navigation                                                    */
+            /* ------------------------------------------------------------ */
+
             nav: cn(
-              "absolute inset-x-0 top-0 flex w-full items-center justify-between gap-1",
-              defaultClassNames.nav
+              "absolute inset-x-0 top-0",
+              "flex w-full items-center justify-between gap-1",
+              defaultClassNames.nav,
             ),
+
             button_previous: cn(
-              buttonVariants({ variant: buttonVariant }),
-              "h-[--cell-size] w-[--cell-size] select-none p-0 rounded-lg text-textMuted hover:text-textPrimary hover:bg-hoverSoft aria-disabled:opacity-50",
-              defaultClassNames.button_previous
+              buttonVariants({
+                variant: buttonVariant,
+              }),
+              "h-[--cell-size]",
+              "w-[--cell-size]",
+              "select-none",
+              "p-0",
+              "rounded-lg",
+              "text-textMuted",
+              "hover:text-textPrimary",
+              "hover:bg-hoverSoft",
+              "aria-disabled:opacity-50",
+              defaultClassNames.button_previous,
             ),
+
             button_next: cn(
-              buttonVariants({ variant: buttonVariant }),
-              "h-[--cell-size] w-[--cell-size] select-none p-0 rounded-lg text-textMuted hover:text-textPrimary hover:bg-hoverSoft aria-disabled:opacity-50",
-              defaultClassNames.button_next
+              buttonVariants({
+                variant: buttonVariant,
+              }),
+              "h-[--cell-size]",
+              "w-[--cell-size]",
+              "select-none",
+              "p-0",
+              "rounded-lg",
+              "text-textMuted",
+              "hover:text-textPrimary",
+              "hover:bg-hoverSoft",
+              "aria-disabled:opacity-50",
+              defaultClassNames.button_next,
             ),
+
+            /* ------------------------------------------------------------ */
+            /* Caption                                                       */
+            /* ------------------------------------------------------------ */
+
             month_caption: cn(
-              "flex h-[--cell-size] w-full items-center justify-center px-[--cell-size]",
-              defaultClassNames.month_caption
+              "flex",
+              "h-[--cell-size]",
+              "w-full",
+              "items-center",
+              "justify-center",
+              "px-[--cell-size]",
+              defaultClassNames.month_caption,
             ),
+
             dropdowns: cn(
-              "flex h-[--cell-size] w-full items-center justify-center gap-1.5 text-sm font-medium",
-              defaultClassNames.dropdowns
+              "flex",
+              "h-[--cell-size]",
+              "w-full",
+              "items-center",
+              "justify-center",
+              "gap-1.5",
+              "text-sm",
+              "font-medium",
+              defaultClassNames.dropdowns,
             ),
+
             dropdown_root: cn(
-              "has-focus:border-brand border-borderSoft has-focus:ring-2 has-focus:ring-brand/30 relative rounded-lg",
-              defaultClassNames.dropdown_root
+              "has-focus:border-brand",
+              "border-borderSoft",
+              "has-focus:ring-2",
+              "has-focus:ring-brand/30",
+              "relative",
+              "rounded-lg",
+              defaultClassNames.dropdown_root,
             ),
+
             dropdown: cn(
-              "bg-popover absolute inset-0 opacity-0",
-              defaultClassNames.dropdown
+              "bg-popover",
+              "absolute",
+              "inset-0",
+              "opacity-0",
+              defaultClassNames.dropdown,
             ),
+
             caption_label: cn(
-              "select-none font-semibold text-textPrimary",
+              "select-none",
+              "font-semibold",
+              "text-textPrimary",
               captionLayout === "label"
                 ? "text-base"
                 : "[&>svg]:text-textMuted flex h-8 items-center gap-1 rounded-lg pl-2 pr-1 text-sm [&>svg]:size-3.5",
-              defaultClassNames.caption_label
+              defaultClassNames.caption_label,
             ),
-            table: "w-full border-collapse",
-            weekdays: cn("flex", defaultClassNames.weekdays),
+
+            /* ------------------------------------------------------------ */
+            /* IMPORTANT: react-day-picker v9                              */
+            /* Use month_grid, NOT table                                   */
+            /* ------------------------------------------------------------ */
+
+            month_grid: cn(
+              "w-max",
+              "mx-auto",
+              "border-collapse",
+              defaultClassNames.month_grid,
+            ),
+
+            /* ------------------------------------------------------------ */
+            /* Weekdays                                                      */
+            /* ------------------------------------------------------------ */
+
+            weekdays: cn(
+              "grid",
+              "grid-cols-7",
+              "w-full",
+              "min-w-0",
+              defaultClassNames.weekdays,
+            ),
+
             weekday: cn(
-              "text-textMuted flex-1 select-none rounded-lg text-xs font-medium uppercase tracking-wider",
-              defaultClassNames.weekday
+              "min-w-0",
+              "w-auto",
+              "text-center",
+              "text-textMuted",
+              "select-none",
+              "rounded-lg",
+              "text-xs",
+              "sm:text-sm",
+              "font-medium",
+              "uppercase",
+              "tracking-wider",
+              defaultClassNames.weekday,
             ),
-            week: cn("mt-2 flex w-full", defaultClassNames.week),
+
+            /* ------------------------------------------------------------ */
+            /* Week                                                          */
+            /* ------------------------------------------------------------ */
+
+            week: cn(
+              "mt-2",
+              "grid",
+              "grid-cols-7",
+              "w-full",
+              "min-w-0",
+              defaultClassNames.week,
+            ),
+
+            /* ------------------------------------------------------------ */
+            /* Week Number                                                    */
+            /* ------------------------------------------------------------ */
+
             week_number_header: cn(
-              "w-[--cell-size] select-none",
-              defaultClassNames.week_number_header
+              "w-[--cell-size]",
+              "select-none",
+              defaultClassNames.week_number_header,
             ),
+
             week_number: cn(
-              "text-textMuted select-none text-xs",
-              defaultClassNames.week_number
+              "text-textMuted",
+              "select-none",
+              "text-xs",
+              defaultClassNames.week_number,
             ),
+
+            /* ------------------------------------------------------------ */
+            /* Day Cell                                                       */
+            /* ------------------------------------------------------------ */
+
             day: cn(
-              "flex-1 group/day relative select-none p-0 text-center bg-transparent border border-borderSoft/20 hover:bg-transparent first:border-l-0 last:border-r-0",
-              defaultClassNames.day
-            ),
-            range_start: cn(
+              "relative",
+              "min-w-0",
+              "w-auto",
+              "p-0",
+              "text-center",
               "bg-transparent",
-              defaultClassNames.range_start
+              "border",
+              "border-borderSoft/20",
+              "hover:bg-transparent",
+              defaultClassNames.day,
             ),
-            range_middle: cn("bg-transparent", defaultClassNames.range_middle),
-            range_end: cn("bg-transparent", defaultClassNames.range_end),
-            today: cn(
-              "font-bold text-brand bg-transparent",
-              defaultClassNames.today
-            ),
-            outside: cn(
-              "text-textMuted/70 aria-selected:text-textMuted/70",
-              defaultClassNames.outside
-            ),
+
+            /* ------------------------------------------------------------ */
+            /* Range                                                         */
+            /* ------------------------------------------------------------ */
+
+            range_start: cn("rounded-l-full", defaultClassNames.range_start),
+
+            range_middle: cn("rounded-none", defaultClassNames.range_middle),
+
+            range_end: cn("rounded-r-full", defaultClassNames.range_end),
+
+            /* ------------------------------------------------------------ */
+            /* States                                                        */
+            /* ------------------------------------------------------------ */
+
+            today: cn("text-brand", "font-semibold", defaultClassNames.today),
+
+            outside: cn("text-textMuted/40", defaultClassNames.outside),
+
             disabled: cn(
-              "text-textMuted/50 opacity-60 cursor-not-allowed",
-              defaultClassNames.disabled
+              "text-textMuted/40",
+              "opacity-50",
+              defaultClassNames.disabled,
             ),
+
             hidden: cn("invisible", defaultClassNames.hidden),
-            ...classNames,
+
+            /* ------------------------------------------------------------ */
+            /* Day button                                                     */
+            /* ------------------------------------------------------------ */
+
+            day_button: cn(
+              "w-full",
+              "min-w-0",
+              "aspect-square",
+              "h-auto",
+              "max-w-none",
+              "mx-auto",
+              "flex",
+              "items-center",
+              "justify-center",
+              "rounded-full",
+              defaultClassNames.day_button,
+            ),
+
+            /* ------------------------------------------------------------ */
+            /* Chevron                                                        */
+            /* ------------------------------------------------------------ */
+
+            chevron: cn("size-4", "text-textMuted", defaultClassNames.chevron),
           }}
           components={{
             Root: CalendarRoot,
@@ -225,310 +811,11 @@ function Calendar({
           {...props}
         />
       </div>
+
       <EventHoverCard containerRef={calendarRef} eventsByDate={eventsByDate} />
     </CalendarEventsContext.Provider>
-  )
+  );
 }
 
-function CalendarDayButton({
-  className,
-  day,
-  modifiers,
-  ...props
-}: React.ComponentProps<typeof DayButton>) {
-  const defaultClassNames = getDefaultClassNames()
-  const eventsByDate = React.useContext(CalendarEventsContext)
-
-  const ref = React.useRef<HTMLButtonElement>(null)
-  React.useEffect(() => {
-    if (modifiers.focused) ref.current?.focus()
-  }, [modifiers.focused])
-
-  const isSelected = modifiers.selected &&
-    !modifiers.range_start &&
-    !modifiers.range_end &&
-    !modifiers.range_middle
-  const isRangeStart = modifiers.range_start
-  const isRangeEnd = modifiers.range_end
-  const isRangeMiddle = modifiers.range_middle
-  const isDisabled = modifiers.disabled || modifiers.outside
-  const isToday = modifiers.today
-
-  const key = makeDateKey(day.date)
-  const hasEvents = (eventsByDate.get(key) || []).length > 0
-  const canAnimate = !isDisabled && !isSelected && !isRangeStart && !isRangeEnd
-
-  return (
-    <motion.div
-      data-date-key={hasEvents ? key : undefined}
-      whileHover={canAnimate ? (
-        hasEvents ? {
-          scale: 1.15,
-          transition: { type: "spring", stiffness: 400, damping: 20, mass: 0.8 }
-        } : {
-          scale: 1.05,
-          transition: { duration: 0.15, ease: [0.4, 0, 0.2, 1] }
-        }
-      ) : {}}
-      whileTap={canAnimate ? {
-        scale: 0.93,
-        transition: { duration: 0.1 }
-      } : {}}
-      className={cn(
-        "w-full h-full flex items-center justify-center rounded-full transition-shadow duration-300",
-        hasEvents && !isDisabled && "cursor-pointer hover:shadow-[0_6px_24px_-4px_rgba(99,102,241,0.4)] dark:hover:shadow-[0_6px_24px_-4px_rgba(129,140,248,0.35)]"
-      )}
-    >
-      <Button
-        type="button"
-        ref={ref}
-        variant="ghost"
-        size="icon"
-        data-day={day.date.toLocaleDateString('en-US', { timeZone: 'Asia/Kolkata' })}
-        data-selected-single={isSelected}
-        data-range-start={isRangeStart}
-        data-range-end={isRangeEnd}
-        data-range-middle={isRangeMiddle}
-        className={cn(
-          "flex h-8 w-8 sm:h-10 sm:w-10 mx-auto flex-col justify-center items-center gap-0.5 font-medium leading-none rounded-full transition-all duration-200 relative text-textPrimary",
-          "data-[selected-single=true]:bg-brand data-[selected-single=true]:text-white data-[selected-single=true]:font-semibold data-[selected-single=true]:shadow-sm data-[selected-single=true]:border-transparent data-[selected-single=true]:rounded-full",
-          "data-[range-middle=true]:bg-brand/10 data-[range-middle=true]:text-brand data-[range-middle=true]:rounded-none",
-          "data-[range-start=true]:bg-brand data-[range-start=true]:text-white data-[range-start=true]:font-semibold data-[range-start=true]:rounded-l-full data-[range-start=true]:shadow-sm data-[range-start=true]:border-transparent",
-          "data-[range-end=true]:bg-brand data-[range-end=true]:text-white data-[range-end=true]:font-semibold data-[range-end=true]:rounded-r-full data-[range-end=true]:shadow-sm data-[range-end=true]:border-transparent",
-          "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/40 focus-visible:ring-offset-2 focus-visible:z-10",
-          !isSelected && !isRangeStart && !isRangeEnd && !isDisabled && "hover:bg-hoverSoft hover:rounded-full hover:text-textPrimary",
-          hasEvents && !isSelected && !isDisabled && "ring-1 ring-inset ring-brand/30 hover:ring-brand/50 hover:rounded-full",
-          isToday && !isSelected && "bg-brand/10 text-brand font-bold ring-2 ring-inset ring-brand/50 rounded-full",
-          isToday && isSelected && "bg-brand text-white font-bold rounded-full",
-          isDisabled && "opacity-50",
-          "[&>span]:text-[10px] [&>span]:opacity-80 data-[selected-single=true]:[&>span]:opacity-100 data-[selected-single=true]:[&>span]:font-semibold",
-          className
-        )}
-        {...props}
-      />
-    </motion.div>
-  )
-}
-
-function EventHoverCard({
-  containerRef,
-  eventsByDate,
-}: {
-  containerRef: React.RefObject<HTMLDivElement | null>
-  eventsByDate: EventsByDateMap
-}) {
-  const [card, setCard] = React.useState<{
-    dateKey: string
-    events: CalendarEvent[]
-    x: number
-    y: number
-    above: boolean
-    dateLabel: string
-  } | null>(null)
-
-  const showTimer = React.useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
-  const hideTimer = React.useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
-  const hoveredKey = React.useRef<string | null>(null)
-  const overPopup = React.useRef(false)
-
-  const hide = React.useCallback(() => {
-    clearTimeout(showTimer.current)
-    hideTimer.current = setTimeout(() => {
-      if (!overPopup.current) setCard(null)
-    }, 150)
-  }, [])
-
-  React.useEffect(() => {
-    const el = containerRef.current
-    if (!el) return
-
-    // sourcery skip: avoid-function-declarations-in-blocks
-    function onMove(e: PointerEvent) {
-      const hit = (e.target as HTMLElement).closest("[data-date-key]") as HTMLElement | null
-
-      if (!hit) {
-        if (hoveredKey.current) {
-          hoveredKey.current = null
-          clearTimeout(showTimer.current)
-          if (!overPopup.current) {
-            hideTimer.current = setTimeout(() => {
-              if (!overPopup.current) setCard(null)
-            }, 150)
-          }
-        }
-        return
-      }
-
-      const key = hit.getAttribute("data-date-key")!
-      if (key === hoveredKey.current) return
-
-      hoveredKey.current = key
-      clearTimeout(showTimer.current)
-      clearTimeout(hideTimer.current)
-
-      const events = eventsByDate.get(key) || []
-      if (events.length === 0) { setCard(null); return }
-
-      const sortedEvents = [...events].sort((a, b) => {
-        if (a.startTimeISO && b.startTimeISO) {
-          return new Date(a.startTimeISO).getTime() - new Date(b.startTimeISO).getTime()
-        }
-        const parseTime = (timeStr: string) => {
-          const parts = timeStr.split(',')
-          const t = parts[parts.length - 1].trim()
-          return new Date(`1970/01/01 ${t} GMT+0530`).getTime()
-        }
-        return parseTime(a.startTime) - parseTime(b.startTime)
-      })
-
-      showTimer.current = setTimeout(() => {
-        const rect = hit.getBoundingClientRect()
-        const above = rect.top > 280
-        const parts = key.split("-")
-        const date = new Date(+parts[0], +parts[1], +parts[2])
-
-        setCard({
-          dateKey: key,
-          events: sortedEvents,
-          x: Math.max(160, Math.min(window.innerWidth - 160, rect.left + rect.width / 2)),
-          y: above ? rect.top - 10 : rect.bottom + 10,
-          above,
-          dateLabel: date.toLocaleDateString("en-US", {
-            timeZone: 'Asia/Kolkata',
-            weekday: "long", month: "short", day: "numeric"
-          }),
-        })
-      }, 200)
-    }
-
-    function onLeave() {
-      hoveredKey.current = null
-      clearTimeout(showTimer.current)
-      if (!overPopup.current) {
-        hideTimer.current = setTimeout(() => {
-          if (!overPopup.current) setCard(null)
-        }, 150)
-      }
-    }
-
-    el.addEventListener("pointermove", onMove)
-    el.addEventListener("pointerleave", onLeave)
-    return () => {
-      el.removeEventListener("pointermove", onMove)
-      el.removeEventListener("pointerleave", onLeave)
-      clearTimeout(showTimer.current)
-      clearTimeout(hideTimer.current)
-    }
-  }, [containerRef, eventsByDate, hide])
-
-  return createPortal(
-    <AnimatePresence>
-      {card && (
-        <motion.div
-          key="event-hover-card"
-          initial={{ opacity: 0, y: card.above ? 10 : -10, scale: 0.92 }}
-          animate={{ opacity: 1, y: 0, scale: 1 }}
-          exit={{ opacity: 0, y: card.above ? 6 : -6, scale: 0.95 }}
-          transition={{ type: "spring", stiffness: 420, damping: 28, mass: 0.8 }}
-          style={{
-            position: "fixed",
-            left: card.x,
-            ...(card.above
-              ? { bottom: window.innerHeight - card.y }
-              : { top: card.y }),
-            zIndex: 9999,
-            x: "-50%",
-            transformOrigin: card.above ? "bottom center" : "top center",
-          }}
-          onPointerEnter={() => {
-            overPopup.current = true
-            clearTimeout(hideTimer.current)
-          }}
-          onPointerLeave={() => {
-            overPopup.current = false
-            hideTimer.current = setTimeout(() => setCard(null), 120)
-          }}
-        >
-          <div className="w-[300px] rounded-2xl border border-border/40 bg-popover backdrop-blur-2xl shadow-[0_24px_80px_-16px_rgba(0,0,0,0.2),0_8px_20px_-4px_rgba(0,0,0,0.08)] dark:shadow-[0_24px_80px_-16px_rgba(0,0,0,0.6),0_8px_20px_-4px_rgba(0,0,0,0.3)] overflow-hidden">
-            <div className="h-[3px] bg-gradient-to-r from-primary/80 via-primary to-primary/60" />
-
-            <div key={card.dateKey}>
-              <div className="px-4 pt-3 pb-2.5">
-                <div className="text-[13px] font-semibold text-foreground tracking-tight">
-                  {card.dateLabel}
-                </div>
-                <div className="text-[11px] text-muted-foreground mt-0.5 font-medium">
-                  {card.events.length} event{card.events.length !== 1 ? "s" : ""} scheduled
-                </div>
-              </div>
-
-              <div className="h-px bg-border/40 mx-3.5" />
-
-              <div className="p-2.5 space-y-1 max-h-[280px] overflow-y-auto">
-                {card.events.slice(0, 4).map((event, i) => (
-                  <motion.div
-                    key={i}
-                    initial={{ opacity: 0, x: -10 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 0.05 + i * 0.04, duration: 0.2, ease: [0.25, 0.46, 0.45, 0.94] }}
-                    className="flex gap-3 px-3 py-2.5 rounded-xl hover:bg-muted/60 transition-colors group"
-                  >
-                    <div className="w-[3px] shrink-0 rounded-full bg-primary my-0.5 group-hover:scale-y-110 transition-transform" />
-                    <div className="flex-1 min-w-0">
-                      <div className="font-semibold text-[13px] text-foreground leading-snug truncate">
-                        <span className="text-[11px] text-muted-foreground font-normal mr-1.5">Booking Name:</span>{event.bookingName}
-                      </div>
-                      {event.eventName && event.eventName !== event.bookingName && (
-                        <div className="text-[11px] text-muted-foreground mt-0.5 truncate">
-                          <span className="font-medium">Linked Event:</span> {event.eventName}
-                        </div>
-                      )}
-                      <div className="flex items-center gap-1.5 mt-1.5 text-[11px] text-muted-foreground">
-                        <Clock size={11} className="shrink-0 text-primary/50" />
-                        <span>{event.startTime} – {event.endTime}</span>
-                      </div>
-                      {event.venueName && (
-                        <div className="flex items-center gap-1.5 mt-0.5 text-[11px] text-muted-foreground">
-                          <MapPin size={11} className="shrink-0 text-primary/50" />
-                          <span className="truncate">{event.venueName}</span>
-                        </div>
-                      )}
-                      <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
-                        {event.eventType && (
-                          <span className="rounded-md border border-primary/20 bg-primary/10 px-1.5 py-0.5 text-[10px] font-semibold text-primary">
-                            {formatEventType(event.eventType)}
-                          </span>
-                        )}
-                        <span className="text-[11px] text-primary font-medium">
-                          {event.clubName}
-                        </span>
-                        {event.status === 'pending' && (
-                          <span className="rounded-md border border-yellow-500/20 bg-yellow-500/10 px-1.5 py-0.5 text-[10px] font-semibold text-yellow-600 dark:text-yellow-400">
-                            PENDING
-                          </span>
-                        )}
-                        {event.status === 'partial' && (
-                          <span className="rounded-md border border-orange-500/20 bg-orange-500/10 px-1.5 py-0.5 text-[10px] font-semibold text-orange-600 dark:text-orange-400">
-                            PARTIAL
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                  </motion.div>
-                ))}
-                {card.events.length > 4 && (
-                  <div className="text-center text-[11px] text-muted-foreground py-2 font-medium">
-                    Click the date to view {card.events.length - 4} more event{card.events.length - 4 !== 1 ? "s" : ""}
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
-        </motion.div>
-      )}
-    </AnimatePresence>,
-    document.body
-  )
-}
-
-export { Calendar, CalendarDayButton, type CalendarEvent }
+export { Calendar };
+export type { CalendarEvent };

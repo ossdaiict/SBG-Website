@@ -41,7 +41,7 @@ export const getArchivedEvents = async (req: Request, res: Response) => {
       LEFT JOIN venues v ON ab.venue_id = v.id
       WHERE ab.event_id IN (${idList})
     `, eventIds);
-    const reportsRes = await db.query(`SELECT id, club_id, event_id, level, level_description, report_doc_link, participants_sheet_link, photos_drive_link, awards_doc_link, created_at, updated_at, archived_at FROM archived_event_reports WHERE event_id IN (${idList})`, eventIds);
+    const reportsRes = await db.query(`SELECT id, club_id, event_id, level, report_doc_link, participants_sheet_link, photos_drive_link, awards_doc_link, created_at, updated_at, archived_at FROM archived_event_reports WHERE event_id IN (${idList})`, eventIds);
 
     const result = events.map(event => ({
       ...event,

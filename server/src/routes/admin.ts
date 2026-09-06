@@ -17,8 +17,8 @@ const baseBookingQuery = `
   SELECT b.*, 
          e.name AS event_name,
          COALESCE(e.event_type, 'closed_club') AS event_type,
-         json_build_object('name', c.name) AS clubs,
-         json_build_object('name', v.name) AS venues
+         jsonb_build_object('name', c.name) AS clubs,
+         jsonb_build_object('name', v.name) AS venues
   FROM bookings b
   LEFT JOIN clubs c ON b.club_id = c.id
   LEFT JOIN venues v ON b.venue_id = v.id
@@ -41,10 +41,14 @@ router.get('/pending', async (_req, res) => {
 router.get('/bookings', async (_req, res) => {
   try {
     const { rows } = await db.query(`
-      ${baseBookingQuery}
-      WHERE b.status = 'pending'
-         OR b.end_time >= NOW() - INTERVAL '180 days'
-      ORDER BY b.start_time DESC
+      SELECT * FROM (
+        ${baseBookingQuery}
+        WHERE b.status = 'pending'
+        UNION
+        ${baseBookingQuery}
+        WHERE b.end_time >= NOW() - INTERVAL '180 days'
+      ) AS combined
+      ORDER BY start_time DESC
     `);
     return res.json(rows);
   } catch (error: any) {
@@ -58,7 +62,7 @@ router.get('/events/pending', async (_req, res) => {
     const { rows } = await db.query(`
       SELECT e.*, 
              COALESCE(e.end_date, e.date) as dynamic_end_date,
-             json_build_object('name', c.name) AS clubs
+             jsonb_build_object('name', c.name) AS clubs
       FROM events e
       LEFT JOIN clubs c ON e.club_id = c.id
       WHERE e.status = 'pending'
@@ -75,7 +79,7 @@ router.get('/events', async (_req, res) => {
     const { rows } = await db.query(`
       SELECT e.*, 
              COALESCE(e.end_date, e.date) as dynamic_end_date,
-             json_build_object('name', c.name) AS clubs
+             jsonb_build_object('name', c.name) AS clubs
       FROM events e
       LEFT JOIN clubs c ON e.club_id = c.id
       ORDER BY e.created_at DESC
@@ -421,8 +425,8 @@ router.put('/bookings/:id', async (req, res) => {
         UPDATE bookings SET ${setString} WHERE id = $${values.length} RETURNING *
       )
       SELECT u.*, 
-             json_build_object('name', c.name, 'email', c.email) AS clubs,
-             json_build_object('name', v.name) AS venues
+             jsonb_build_object('name', c.name, 'email', c.email) AS clubs,
+             jsonb_build_object('name', v.name) AS venues
       FROM updated u
       LEFT JOIN clubs c ON u.club_id = c.id
       LEFT JOIN venues v ON u.venue_id = v.id
@@ -503,7 +507,7 @@ router.delete('/bookings/:id', async (req, res) => {
 });
 
 router.post('/bookings', async (req, res) => {
-  const { club_id, venue_ids, start_time: singleStartTime, end_time: singleEndTime, timeSlots: reqTimeSlots, expected_attendees, event_id, bookingName } = req.body;
+  const { club_id, venue_ids, start_time: singleStartTime, end_time: singleEndTime, timeSlots: reqTimeSlots, expected_attendees, event_id, bookingName, bookingMode = 'event' } = req.body;
 
   let timeSlots = reqTimeSlots;
   if (!timeSlots) {
@@ -512,22 +516,31 @@ router.post('/bookings', async (req, res) => {
     }
   }
 
-  if (!club_id || !venue_ids || !Array.isArray(venue_ids) || venue_ids.length === 0 || !timeSlots || timeSlots.length === 0 || !event_id || !bookingName || bookingName.trim().length === 0) {
-    return res.status(400).json({ error: 'Missing required fields. Event selection and Booking Name are mandatory.' });
+  if (!club_id || !venue_ids || !Array.isArray(venue_ids) || venue_ids.length === 0 || !timeSlots || timeSlots.length === 0 || !bookingName || bookingName.trim().length === 0) {
+    return res.status(400).json({ error: 'Missing required fields. Booking Name is mandatory.' });
+  }
+
+  if (bookingMode === 'event' && !event_id) {
+    return res.status(400).json({ error: 'Event selection is mandatory for an event booking.' });
   }
 
   try {
-    const { rows: fetchedEventRows } = await db.query(
-      'SELECT name, event_type FROM events WHERE id = $1',
-      [event_id]
-    );
+    let event_name = bookingName.trim();
+    let event_type = 'meet';
 
-    if (fetchedEventRows.length === 0) {
-      return res.status(404).json({ error: 'Selected event not found.' });
+    if (bookingMode === 'event') {
+      const { rows: fetchedEventRows } = await db.query(
+        'SELECT name, event_type FROM events WHERE id = $1',
+        [event_id]
+      );
+
+      if (fetchedEventRows.length === 0) {
+        return res.status(404).json({ error: 'Selected event not found.' });
+      }
+
+      event_name = fetchedEventRows[0].name;
+      event_type = fetchedEventRows[0].event_type;
     }
-
-    const event_name = fetchedEventRows[0].name;
-    const event_type = fetchedEventRows[0].event_type;
 
     // Admin endpoint bypasses co-curricular limits.
 
@@ -569,8 +582,8 @@ router.post('/bookings', async (req, res) => {
             SELECT i.*,
                    e.name AS event_name,
                    e.event_type,
-                   json_build_object('name', c.name) AS clubs,
-                   json_build_object('name', v.name) AS venues
+                   jsonb_build_object('name', c.name) AS clubs,
+                   jsonb_build_object('name', v.name) AS venues
             FROM inserted i
             LEFT JOIN clubs c ON i.club_id = c.id
             LEFT JOIN venues v ON i.venue_id = v.id

@@ -26,7 +26,6 @@ export default function EventReports() {
   const [editingReportId, setEditingReportId] = useState<string | null>(null);
   const [form, setForm] = useState({
     level: 'institutional',
-    level_description: '',
     report_doc_link: '',
     participants_sheet_link: '',
     photos_drive_link: '',
@@ -89,7 +88,6 @@ export default function EventReports() {
     setEditingReportId(report.id);
     setForm({
       level: report.level || 'institutional',
-      level_description: report.level_description || '',
       report_doc_link: report.report_doc_link || '',
       participants_sheet_link: report.participants_sheet_link || '',
       photos_drive_link: report.photos_drive_link || '',
@@ -102,7 +100,6 @@ export default function EventReports() {
     setEditingReportId(null);
     setForm({
       level: 'institutional',
-      level_description: '',
       report_doc_link: '',
       participants_sheet_link: '',
       photos_drive_link: '',
@@ -281,18 +278,7 @@ export default function EventReports() {
                 </Select>
               </div>
               
-              {form.level === 'other' && (
-                <div className="grid gap-2">
-                  <Label className="text-textSecondary font-semibold">Level Description *</Label>
-                  <Input 
-                    required 
-                    value={form.level_description} 
-                    onChange={e => setForm({...form, level_description: e.target.value})} 
-                    placeholder="Describe the level..."
-                    className="bg-bgMain h-10 rounded-xl border-borderSoft"
-                  />
-                </div>
-              )}
+
               
               <div className="grid gap-2">
                 <Label className="text-textSecondary font-semibold">Google Docs Link to Report *</Label>

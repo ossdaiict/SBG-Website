@@ -42,7 +42,7 @@ const AdminEventRequests: React.FC = () => {
   const [eventToDelete, setEventToDelete] = useState<string | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 25;
+  const itemsPerPage = 10;
 
   const fetchEvents = React.useCallback(async () => {
     setIsLoading(true);
@@ -163,7 +163,7 @@ const AdminEventRequests: React.FC = () => {
 
         <div className="flex flex-col sm:flex-row sm:flex-wrap items-center gap-3 w-full xl:w-auto mt-4 xl:mt-0">
           <Select value={filterClub} onValueChange={setFilterClub}>
-            <SelectTrigger className="w-full sm:w-[140px] rounded-xl">
+            <SelectTrigger className="w-full sm:flex-1 sm:min-w-[140px] rounded-xl">
               <SelectValue placeholder="All Clubs" />
             </SelectTrigger>
             <SelectContent>
@@ -175,7 +175,7 @@ const AdminEventRequests: React.FC = () => {
           </Select>
 
           <Select value={filterType} onValueChange={setFilterType}>
-            <SelectTrigger className="w-full sm:w-[140px] rounded-xl">
+            <SelectTrigger className="w-full sm:flex-1 sm:min-w-[140px] rounded-xl">
               <SelectValue placeholder="All Types" />
             </SelectTrigger>
             <SelectContent>
@@ -187,7 +187,7 @@ const AdminEventRequests: React.FC = () => {
           </Select>
 
           <Select value={filterStatus} onValueChange={setFilterStatus}>
-            <SelectTrigger className="w-full sm:w-[140px] rounded-xl">
+            <SelectTrigger className="w-full sm:flex-1 sm:min-w-[140px] rounded-xl">
               <SelectValue placeholder="All Status" />
             </SelectTrigger>
             <SelectContent>
@@ -198,7 +198,7 @@ const AdminEventRequests: React.FC = () => {
             </SelectContent>
           </Select>
 
-          <div className="relative w-full sm:w-64 shrink-0">
+          <div className="relative w-full sm:flex-1 sm:min-w-[250px] xl:flex-none xl:w-64 shrink-0">
             <Search className="absolute left-3 top-2.5 text-textMuted pointer-events-none z-10" size={18} />
             <Input
               type="text"
@@ -232,13 +232,13 @@ const AdminEventRequests: React.FC = () => {
           </CardContent>
         ) : filteredEvents.length > 0 ? (
           <div className="overflow-x-auto w-full">
-            <table className="w-full min-w-[600px] sm:min-w-0 text-left text-sm">
-              <thead className="bg-hoverSoft border-b border-borderSoft uppercase tracking-wider text-xs font-semibold text-textMuted">
+            <table className="w-full min-w-[1000px] text-left text-sm">
+              <thead className="bg-hoverSoft border-b border-borderSoft uppercase tracking-wider text-xs font-semibold text-textMuted text-left">
                 <tr>
-                  <th className="px-4 sm:px-6 py-4 w-[40%] sm:w-[35%]">Event</th>
-                  <th className="px-4 sm:px-6 py-4 w-[30%]">Date & Time</th>
-                  <th className="px-4 sm:px-6 py-4 w-[20%] sm:w-[15%]">Status</th>
-                  <th className="px-4 sm:px-6 py-4 text-right w-[40%] sm:w-[20%]">Actions</th>
+                  <th className="px-3 py-2 sm:py-4 w-[35%] text-left">Event</th>
+                  <th className="px-3 py-2 sm:py-4 w-[30%] text-left">Date & Time</th>
+                  <th className="px-3 py-2 sm:py-4 w-[15%] text-left">Status</th>
+                  <th className="px-3 py-2 sm:py-4 w-[20%] text-left">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border/40">
@@ -249,7 +249,6 @@ const AdminEventRequests: React.FC = () => {
                     index={index}
                     handleAction={handleEventAction}
                     handleDelete={handleDeleteEvent}
-                    isHistoryTab={filterStatus !== 'pending'}
                     isProcessingAction={isProcessingAction}
                   />
                 ))}
@@ -325,11 +324,10 @@ interface AdminEventRowProps {
   index: number;
   handleAction: (ids: string[], action: 'active' | 'rejected' | 'pending') => Promise<void>;
   handleDelete: (id: string) => void;
-  isHistoryTab: boolean;
   isProcessingAction: boolean;
 }
 
-const AdminEventRow: React.FC<AdminEventRowProps> = ({ ev, index, handleAction, handleDelete, isHistoryTab, isProcessingAction }) => {
+const AdminEventRow: React.FC<AdminEventRowProps> = ({ ev, index, handleAction, handleDelete, isProcessingAction }) => {
   const getStatusVariant = (status: string) => {
     switch (status) {
       case 'active': return 'success';
@@ -348,7 +346,7 @@ const AdminEventRow: React.FC<AdminEventRowProps> = ({ ev, index, handleAction, 
       transition={{ duration: 0.3, delay: index * 0.05 }}
       className="hover:bg-hoverSoft transition-colors"
     >
-      <td className="px-4 sm:px-6 py-4">
+      <td className="px-3 py-2 sm:py-4">
         <div className="flex items-center gap-2">
           <div>
             <div className="font-semibold text-textPrimary flex items-center gap-2">
@@ -366,7 +364,7 @@ const AdminEventRow: React.FC<AdminEventRowProps> = ({ ev, index, handleAction, 
           </div>
         </div>
       </td>
-      <td className="px-4 sm:px-6 py-4 whitespace-nowrap">
+      <td className="px-3 py-2 sm:py-4 whitespace-nowrap">
         <div className="flex flex-col gap-2">
           <div className="flex flex-col gap-0.5 text-xs">
             <span className="font-medium text-textPrimary">Start:</span>
@@ -388,13 +386,13 @@ const AdminEventRow: React.FC<AdminEventRowProps> = ({ ev, index, handleAction, 
           </div>
         </div>
       </td>
-      <td className="px-4 sm:px-6 py-4">
+      <td className="px-3 py-2 sm:py-4">
         <Badge variant={getStatusVariant(safeStatus)}>
           {String(safeStatus).charAt(0).toUpperCase() + String(safeStatus).slice(1)}
         </Badge>
       </td>
-      <td className="px-4 sm:px-6 py-4 text-right">
-        <div className="flex items-center justify-end gap-2" onClick={(e) => e.stopPropagation()}>
+      <td className="px-3 py-2 sm:py-4">
+        <div className="flex items-center justify-start gap-1" onClick={(e) => e.stopPropagation()}>
           {ev.status !== 'rejected' && (
             <Button
               variant="ghost"
