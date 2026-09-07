@@ -232,13 +232,13 @@ const AdminEventRequests: React.FC = () => {
           </CardContent>
         ) : filteredEvents.length > 0 ? (
           <div className="overflow-x-auto w-full">
-            <table className="w-full min-w-[1000px] text-left text-sm">
-              <thead className="bg-hoverSoft border-b border-borderSoft uppercase tracking-wider text-xs font-semibold text-textMuted text-left">
+            <table className="w-full min-w-[800px] text-left text-sm">
+              <thead className="bg-hoverSoft border-b border-borderSoft uppercase tracking-wider text-xs font-semibold text-textMuted text-center">
                 <tr>
-                  <th className="px-3 py-2 sm:py-4 w-[35%] text-left">Event</th>
-                  <th className="px-3 py-2 sm:py-4 w-[30%] text-left">Date & Time</th>
-                  <th className="px-3 py-2 sm:py-4 w-[15%] text-left">Status</th>
-                  <th className="px-3 py-2 sm:py-4 w-[20%] text-left">Actions</th>
+                  <th className="px-3 py-2 sm:py-4 w-[35%] text-center">Event</th>
+                  <th className="px-3 py-2 sm:py-4 w-[30%] text-center">Date & Time</th>
+                  <th className="px-3 py-2 sm:py-4 w-[15%] text-center">Status</th>
+                  <th className="px-3 py-2 sm:py-4 w-[20%] text-center">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border/40">
@@ -364,20 +364,20 @@ const AdminEventRow: React.FC<AdminEventRowProps> = ({ ev, index, handleAction, 
           </div>
         </div>
       </td>
-      <td className="px-3 py-2 sm:py-4 whitespace-nowrap">
-        <div className="flex flex-col gap-2">
-          <div className="flex flex-col gap-0.5 text-xs">
+      <td className="px-3 py-2 sm:py-4 whitespace-nowrap text-center">
+        <div className="flex flex-col gap-2 items-center">
+          <div className="flex flex-col gap-0.5 text-xs items-center">
             <span className="font-medium text-textPrimary">Start:</span>
-            <div className="flex items-center gap-1.5 text-textMuted">
+            <div className="flex items-center gap-1.5 text-textMuted justify-center">
               <Calendar size={14} className="shrink-0" />
               <span>{new Date(ev.date).toLocaleDateString('en-US', { timeZone: 'Asia/Kolkata', year: 'numeric', month: 'short', day: 'numeric' })}</span>
               <Clock size={14} className="shrink-0 ml-1" />
               <span>{new Date(ev.date).toLocaleTimeString([], { timeZone: 'Asia/Kolkata', hour: '2-digit', minute: '2-digit', hour12: true })}</span>
             </div>
           </div>
-          <div className="flex flex-col gap-0.5 text-xs">
+          <div className="flex flex-col gap-0.5 text-xs items-center">
             <span className="font-medium text-textPrimary">End:</span>
-            <div className="flex items-center gap-1.5 text-textMuted">
+            <div className="flex items-center gap-1.5 text-textMuted justify-center">
               <Calendar size={14} className="shrink-0" />
               <span>{ev.dynamic_end_date ? new Date(ev.dynamic_end_date).toLocaleDateString('en-US', { timeZone: 'Asia/Kolkata', year: 'numeric', month: 'short', day: 'numeric' }) : '?'}</span>
               <Clock size={14} className="shrink-0 ml-1" />
@@ -386,13 +386,13 @@ const AdminEventRow: React.FC<AdminEventRowProps> = ({ ev, index, handleAction, 
           </div>
         </div>
       </td>
-      <td className="px-3 py-2 sm:py-4">
+      <td className="px-3 py-2 sm:py-4 text-center">
         <Badge variant={getStatusVariant(safeStatus)}>
           {String(safeStatus).charAt(0).toUpperCase() + String(safeStatus).slice(1)}
         </Badge>
       </td>
-      <td className="px-3 py-2 sm:py-4">
-        <div className="flex items-center justify-start gap-1" onClick={(e) => e.stopPropagation()}>
+      <td className="px-3 py-2 sm:py-4 text-center">
+        <div className="flex items-center justify-center gap-1" onClick={(e) => e.stopPropagation()}>
           {ev.status !== 'rejected' && (
             <Button
               variant="ghost"

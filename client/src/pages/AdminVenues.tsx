@@ -170,15 +170,15 @@ const AdminVenues: React.FC = () => {
 
       <div className="bg-card border border-borderSoft rounded-2xl shadow-sm overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="w-full min-w-[1000px] text-left text-sm">
-            <thead className="bg-hoverSoft border-b border-borderSoft uppercase tracking-wider text-xs font-semibold text-textMuted text-left">
+          <table className="w-full min-w-[800px] text-left text-sm">
+            <thead className="bg-hoverSoft border-b border-borderSoft uppercase tracking-wider text-xs font-semibold text-textMuted text-center">
               <tr>
-                <th className="px-3 py-2 sm:py-4 w-[25%] text-left">Venue Name</th>
-                <th className="px-3 py-2 sm:py-4 w-[15%] text-left">Status</th>
-                <th className="px-3 py-2 sm:py-4 w-[20%] text-left">Category</th>
-                <th className="px-3 py-2 sm:py-4 w-[10%] text-left">Capacity</th>
-                <th className="px-3 py-2 sm:py-4 w-[20%] text-left">Location</th>
-                <th className="px-3 py-2 sm:py-4 w-[10%] text-left">Actions</th>
+                <th className="px-3 py-2 sm:py-4 w-[25%] text-center">Venue Name</th>
+                <th className="px-3 py-2 sm:py-4 w-[15%] text-center">Status</th>
+                <th className="px-3 py-2 sm:py-4 w-[20%] text-center">Category</th>
+                <th className="px-3 py-2 sm:py-4 w-[10%] text-center">Capacity</th>
+                <th className="px-3 py-2 sm:py-4 w-[20%] text-center">Location</th>
+                <th className="px-3 py-2 sm:py-4 w-[10%] text-center">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-borderSoft">
@@ -186,11 +186,11 @@ const AdminVenues: React.FC = () => {
                 Array.from({ length: 5 }).map((_, i) => (
                   <tr key={i}>
                     <td className="px-3 py-2 sm:py-4"><Skeleton className="h-5 w-32" /></td>
-                    <td className="px-3 py-2 sm:py-4"><Skeleton className="h-5 w-20" /></td>
-                    <td className="px-3 py-2 sm:py-4"><Skeleton className="h-5 w-24" /></td>
-                    <td className="px-3 py-2 sm:py-4"><Skeleton className="h-5 w-16" /></td>
-                    <td className="px-3 py-2 sm:py-4"><Skeleton className="h-5 w-24" /></td>
-                    <td className="px-3 py-2 sm:py-4"><Skeleton className="h-8 w-16" /></td>
+                    <td className="px-3 py-2 sm:py-4 text-center"><Skeleton className="h-5 w-20 mx-auto" /></td>
+                    <td className="px-3 py-2 sm:py-4 text-center"><Skeleton className="h-5 w-24 mx-auto" /></td>
+                    <td className="px-3 py-2 sm:py-4 text-center"><Skeleton className="h-5 w-16 mx-auto" /></td>
+                    <td className="px-3 py-2 sm:py-4 text-center"><Skeleton className="h-5 w-24 mx-auto" /></td>
+                    <td className="px-3 py-2 sm:py-4 text-center"><Skeleton className="h-8 w-16 mx-auto" /></td>
                   </tr>
                 ))
               ) : venues.length === 0 ? (
@@ -216,7 +216,7 @@ const AdminVenues: React.FC = () => {
                           <span className="ml-2 text-xs text-muted-foreground italic">(Unavailable for new bookings)</span>
                         )}
                       </td>
-                      <td className="px-3 py-2 sm:py-4">
+                      <td className="px-3 py-2 sm:py-4 text-center">
                         <button
                           type="button"
                           onClick={() => handleToggleActive(venue)}
@@ -240,19 +240,19 @@ const AdminVenues: React.FC = () => {
                           )}
                         </button>
                       </td>
-                      <td className="px-3 py-2 sm:py-4">
+                      <td className="px-3 py-2 sm:py-4 text-center">
                         <span className="px-2.5 py-1 text-xs rounded-full bg-brand/10 text-brand font-medium">
                           {venue.category.replace('_', ' ')}
                         </span>
                       </td>
-                      <td className="px-3 py-2 sm:py-4 text-textSecondary flex items-center gap-1.5 mt-2.5">
-                        <Users size={14} /> {venue.capacity || 'N/A'}
+                      <td className="px-3 py-2 sm:py-4 text-textSecondary text-center mt-2.5">
+                        <div className="flex items-center justify-center gap-1.5"><Users size={14} /> {venue.capacity || 'N/A'}</div>
                       </td>
-                      <td className="px-3 py-2 sm:py-4 text-textSecondary">
+                      <td className="px-3 py-2 sm:py-4 text-textSecondary text-center">
                         {venue.location || 'N/A'}
                       </td>
-                      <td className="px-3 py-2 sm:py-4">
-                        <div className="flex items-center justify-start gap-1">
+                      <td className="px-3 py-2 sm:py-4 text-center">
+                        <div className="flex items-center justify-center gap-1">
                           <Button 
                             variant="ghost" 
                             size="icon" 

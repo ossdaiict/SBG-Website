@@ -271,12 +271,12 @@ const AdminClubs: React.FC = () => {
 
                 <div className="overflow-x-auto">
                     <table className="w-full min-w-[1000px] text-left text-sm">
-                        <thead className="bg-hoverSoft border-b border-borderSoft uppercase tracking-wider text-xs font-semibold text-textMuted text-left">
+                        <thead className="bg-hoverSoft border-b border-borderSoft uppercase tracking-wider text-xs font-semibold text-textMuted text-center">
                             <tr>
-                                <th className="px-3 py-2 sm:py-4 w-[25%] text-left">Club Name</th>
-                                <th className="px-3 py-2 sm:py-4 w-[25%] text-left">Email</th>
-                                <th className="px-3 py-2 sm:py-4 w-[15%] text-left">Category</th>
-                                <th className="px-3 py-2 sm:py-4 w-[35%] text-left">Actions</th>
+                                <th className="px-3 py-2 sm:py-4 w-[25%] text-center">Club Name</th>
+                                <th className="px-3 py-2 sm:py-4 w-[20%] text-center">Email</th>
+                                <th className="px-3 py-2 sm:py-4 w-[20%] text-center">Category</th>
+                                <th className="px-3 py-2 sm:py-4 w-[35%] text-center">Actions</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-borderSoft">
@@ -284,9 +284,9 @@ const AdminClubs: React.FC = () => {
                                 Array.from({ length: 3 }).map((_, i) => (
                                     <tr key={i}>
                                         <td className="px-3 py-2 sm:py-4"><Skeleton className="h-4 w-32" /></td>
-                                        <td className="px-3 py-2 sm:py-4"><Skeleton className="h-4 w-40" /></td>
-                                        <td className="px-3 py-2 sm:py-4"><Skeleton className="h-4 w-16" /></td>
-                                        <td className="px-3 py-2 sm:py-4"><Skeleton className="h-8 w-40" /></td>
+                                        <td className="px-3 py-2 sm:py-4 text-center"><Skeleton className="h-4 w-40 mx-auto" /></td>
+                                        <td className="px-3 py-2 sm:py-4 text-center"><Skeleton className="h-4 w-16 mx-auto" /></td>
+                                        <td className="px-3 py-2 sm:py-4 text-center"><Skeleton className="h-8 w-40 mx-auto" /></td>
                                     </tr>
                                 ))
                             ) : filteredClubs.length === 0 ? (
@@ -305,13 +305,13 @@ const AdminClubs: React.FC = () => {
                                     >
                                         <td className="px-3 py-2 sm:py-4 font-medium text-textPrimary">{club.name}</td>
                                         <td className="px-3 py-2 sm:py-4 text-textSecondary">{club.email}</td>
-                                        <td className="px-3 py-2 sm:py-4">
+                                        <td className="px-3 py-2 sm:py-4 text-center">
                                             <Badge variant="secondary" className="bg-brand/10 text-brand border-brand/20">
                                                 Group {club.group_category || 'A'}
                                             </Badge>
                                         </td>
-                                        <td className="px-3 py-2 sm:py-4">
-                                            <div className="flex items-center justify-start gap-1">
+                                        <td className="px-3 py-2 sm:py-4 text-center">
+                                            <div className="flex justify-end items-center gap-1">
                                                 <Button
                                                     variant="ghost"
                                                     size="sm"
