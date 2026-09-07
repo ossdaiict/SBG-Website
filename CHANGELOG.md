@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.1.0](https://github.com/ossdaiict/SBG-Website/compare/v2.0.0...v2.1.0) (2026-09-07)
+
+
+### Features
+
+* Google Sheets sync, DB migration and query optimisations ([#38](https://github.com/ossdaiict/SBG-Website/issues/38)) ([aea6467](https://github.com/ossdaiict/SBG-Website/commit/aea6467db87796c3241f048b2b46f318714c5778))
+
 ## [2.0.0](https://github.com/ossdaiict/SBG-Website/compare/v1.3.0...v2.0.0) (2026-09-04)
 
 
