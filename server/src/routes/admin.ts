@@ -48,7 +48,7 @@ router.get('/bookings', async (_req, res) => {
         ${baseBookingQuery}
         WHERE b.end_time >= NOW() - INTERVAL '180 days'
       ) AS combined
-      ORDER BY start_time DESC
+      ORDER BY created_at DESC
     `);
     return res.json(rows);
   } catch (error: any) {

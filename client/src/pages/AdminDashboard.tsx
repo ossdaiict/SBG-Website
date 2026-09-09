@@ -1,4 +1,4 @@
-import { motion } from 'framer-motion';
+import { AnimatePresence, motion } from 'framer-motion';
 import { AlertCircle, AlertTriangle, Calendar as CalendarIcon, Check, CheckCircle, ChevronDown, ChevronRight, Download, ExternalLink, MapPin, Pencil, Plus, RefreshCw, Settings, X, XCircle } from 'lucide-react';
 import React from 'react';
 import { Link } from 'react-router-dom';
@@ -17,12 +17,18 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel,
 import { Input } from '../components/ui/input';
 import { Label } from '../components/ui/label';
 import { Skeleton } from '../components/ui/skeleton';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs';
 import { apiRequest, groupBookings, mapBooking, splitGroupedBookingsByDay, type ApiBooking, type ApiVenue } from '../lib/api';
 import { getErrorMessage } from '../lib/errors';
 import { cn, getISTParts } from '../lib/utils';
 import { getSocket, SOCKET_EVENTS } from '../lib/socket';
 import { toastError, toastSuccess } from '../lib/toast';
 import { GroupedBooking, Booking, AppEvent } from '../types';
+
+const formatEventType = (eventType?: string) => {
+  if (!eventType) return '';
+  return eventType.replace(/_/g, ' ').replace(/\b\w/g, char => char.toUpperCase());
+};
 
 const AdminDashboard: React.FC = () => {
   const [pendingRequests, setPendingRequests] = React.useState<GroupedBooking[]>([]);
@@ -39,6 +45,8 @@ const AdminDashboard: React.FC = () => {
   const [isLoading, setIsLoading] = React.useState(true);
 
   const [calendarEvents, setCalendarEvents] = React.useState<GroupedBooking[]>([]);
+  const [publicCampusEvents, setPublicCampusEvents] = React.useState<any[]>([]);
+  const [calendarView, setCalendarView] = React.useState<'campus_events' | 'bookings'>('bookings');
   const [selectedDate, setSelectedDate] = React.useState<Date | undefined>(new Date());
   const [error, setError] = React.useState<string | null>(null);
   const [addDialogOpen, setAddDialogOpen] = React.useState(false);
@@ -154,12 +162,13 @@ const AdminDashboard: React.FC = () => {
     setIsLoading(true);
     setError(null);
     try {
-      const [venuesData, pendingData, statsData, allBookingsData, pendingEventsData] = await Promise.all([
+      const [venuesData, pendingData, statsData, allBookingsData, pendingEventsData, publicEventsData] = await Promise.all([
         apiRequest<ApiVenue[]>('/api/venues'),
         apiRequest<ApiBooking[]>('/api/admin/pending', { auth: true }),
         apiRequest<{ pendingBookings: number; scheduledBookings: number; conflicts: number; activeClubs: number; pendingEvents: number; scheduledEvents: number }>('/api/admin/stats', { auth: true }),
         apiRequest<ApiBooking[]>('/api/admin/bookings', { auth: true }),
-        apiRequest<any[]>('/api/admin/events/pending', { auth: true })
+        apiRequest<any[]>('/api/admin/events/pending', { auth: true }),
+        apiRequest<any[]>('/api/events/public').catch(() => []),
       ]);
 
       setVenues(venuesData);
@@ -170,6 +179,7 @@ const AdminDashboard: React.FC = () => {
         ...e,
         clubName: e.clubs?.name || 'Unknown Club'
       })));
+      setPublicCampusEvents(publicEventsData || []);
     } catch (err) {
       console.error('Failed to fetch dashboard data:', err);
       setError(getErrorMessage(err, 'Failed to load dashboard.'));
@@ -177,6 +187,7 @@ const AdminDashboard: React.FC = () => {
       setStats({ pendingBookings: 0, scheduledBookings: 0, conflicts: 0, activeClubs: 0, pendingEvents: 0, scheduledEvents: 0 });
       setCalendarEvents([]);
       setPendingEvents([]);
+      setPublicCampusEvents([]);
     } finally {
       setIsLoading(false);
     }
@@ -252,12 +263,76 @@ const AdminDashboard: React.FC = () => {
       d1.getDate() === d2.getDate();
   };
 
-  const splitEvents = React.useMemo(() => splitGroupedBookingsByDay(calendarEvents), [calendarEvents]);
+  const splitPublicEventsByDay = React.useCallback((events: any[]): GroupedBooking[] => {
+    const result: GroupedBooking[] = [];
+
+    for (const event of events) {
+      const startDate = new Date(event.date);
+      const endDate = event.end_date ? new Date(event.end_date) : startDate;
+
+      const current = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate());
+      const last = new Date(endDate.getFullYear(), endDate.getMonth(), endDate.getDate());
+
+      const startTimeStr = startDate.toLocaleTimeString([], {
+        timeZone: 'Asia/Kolkata',
+        hour: '2-digit',
+        minute: '2-digit',
+      });
+      const endTimeStr = endDate.toLocaleTimeString([], {
+        timeZone: 'Asia/Kolkata',
+        hour: '2-digit',
+        minute: '2-digit',
+      });
+
+      const clubName = event.clubs?.name || event.club_name || 'Campus Event';
+
+      while (current <= last) {
+        const dayISO = new Date(current.getTime()).toISOString();
+        result.push({
+          id: `${event.id}-${current.toISOString().slice(0, 10)}`,
+          ids: [event.id],
+          bookingName: event.name,
+          eventName: event.name,
+          clubName: clubName,
+          clubId: event.club_id || '',
+          venueName: event.venue || 'No Venue Specified',
+          venueId: '',
+          venueIds: [],
+          date: dayISO,
+          startTime: startTimeStr,
+          endTime: endTimeStr,
+          startTimeISO: event.date,
+          endTimeISO: event.end_date || event.date,
+          status: 'approved',
+          eventType: event.event_type,
+          expectedAttendees: 0,
+          createdAt: event.created_at || '',
+          updatedAt: event.updated_at || '',
+          bookings: [],
+        } as unknown as GroupedBooking);
+
+        current.setDate(current.getDate() + 1);
+      }
+    }
+
+    return result;
+  }, []);
+
+  const campusEventsWithDaySplit = React.useMemo(() => splitPublicEventsByDay(publicCampusEvents), [splitPublicEventsByDay, publicCampusEvents]);
+
+  const splitBookings = React.useMemo(() => splitGroupedBookingsByDay(calendarEvents), [calendarEvents]);
+
+  const activeSourceEvents = React.useMemo(() => {
+    if (calendarView === 'campus_events') {
+      return campusEventsWithDaySplit;
+    }
+    return splitBookings.filter(e => e.status === 'approved' || e.status === 'partial');
+  }, [calendarView, campusEventsWithDaySplit, splitBookings]);
 
   const getEventsForDate = (date: Date) => {
-    return splitEvents.filter(e => {
+    return activeSourceEvents.filter(e => {
       const ist = getISTParts(e.date);
-      return ist.year === date.getFullYear() && ist.month === date.getMonth() && ist.date === date.getDate() && (e.status === 'approved' || e.status === 'partial');
+      return ist.year === date.getFullYear() && ist.month === date.getMonth() && ist.date === date.getDate();
     });
   };
 
@@ -266,19 +341,19 @@ const AdminDashboard: React.FC = () => {
     : [];
 
   const eventDates = React.useMemo(() =>
-    splitEvents.filter(e => e.status === 'approved' || e.status === 'partial').map(e => {
+    activeSourceEvents.map(e => {
       const ist = getISTParts(e.date);
       return new Date(ist.year, ist.month, ist.date);
     }),
-    [splitEvents]
+    [activeSourceEvents]
   );
 
   const calendarEventsWithVenue: CalendarEvent[] = React.useMemo(() =>
-    splitEvents.filter(e => e.status === 'approved' || e.status === 'partial').map(e => {
+    activeSourceEvents.map(e => {
       // For partial bookings, only show the names of approved venues
       const approvedVenueName = e.status === 'partial'
-        ? e.bookings.filter(b => b.status === 'approved').map(b => getVenueName(b.venueId)).sort((a, b) => a.localeCompare(b)).join(', ')
-        : (e.venueName || e.venueIds.map(getVenueName).sort((a, b) => a.localeCompare(b)).join(', '));
+        ? e.bookings?.filter(b => b.status === 'approved').map(b => getVenueName(b.venueId)).sort((a, b) => a.localeCompare(b)).join(', ')
+        : (e.venueName || e.venueIds?.map(getVenueName).sort((a, b) => a.localeCompare(b)).join(', '));
       return {
         eventName: e.eventName,
         bookingName: e.bookingName,
@@ -287,11 +362,12 @@ const AdminDashboard: React.FC = () => {
         startTime: e.startTime,
         endTime: e.endTime,
         startTimeISO: e.startTimeISO,
-        venueName: approvedVenueName || e.venueName || e.venueIds.map(getVenueName).sort((a, b) => a.localeCompare(b)).join(', '),
+        venueName: approvedVenueName || e.venueName || e.venueIds?.map(getVenueName).sort((a, b) => a.localeCompare(b)).join(', '),
         status: e.status,
+        eventType: e.eventType,
       };
     }),
-    [splitEvents, venues]
+    [activeSourceEvents, venues]
   );
 
   if (error) {
@@ -494,10 +570,24 @@ const AdminDashboard: React.FC = () => {
         className="w-full min-w-0"
       >
         <Card className="w-full min-w-0 border border-borderSoft rounded-xl overflow-hidden">
-          <CardHeader className="border-b border-borderSoft">
-            <CardTitle className="text-lg sm:text-xl">
-              Master Booking Calendar
-            </CardTitle>
+          <CardHeader className="border-b border-borderSoft p-3 sm:p-4">
+            <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+              <CardTitle className="text-lg sm:text-xl shrink-0">
+                {calendarView === 'campus_events' ? 'Master Events Calendar' : 'Master Booking Calendar'}
+              </CardTitle>
+              <Tabs
+                value={calendarView}
+                onValueChange={(value) => setCalendarView(value as 'campus_events' | 'bookings')}
+                className="w-full sm:w-auto"
+              >
+                <TabsList aria-label="Calendar view" className="flex items-center w-full sm:w-auto h-9 sm:h-10 p-1 gap-1 bg-hoverSoft rounded-xl border border-borderSoft">
+                  <TabsTrigger value="bookings" className="flex-1 text-[12px] sm:text-xs md:text-sm px-2 sm:px-3 py-1 sm:py-1.5 h-7 sm:h-8 font-medium">Bookings</TabsTrigger>
+                  <TabsTrigger value="campus_events" className="flex-1 text-[12px] sm:text-xs md:text-sm px-2 sm:px-3 py-1 sm:py-1.5 h-7 sm:h-8 font-medium">Events</TabsTrigger>
+                </TabsList>
+                <TabsContent value="campus_events" className="hidden" />
+                <TabsContent value="bookings" className="hidden" />
+              </Tabs>
+            </div>
           </CardHeader>
 
           <CardContent className="w-full min-w-0 overflow-hidden p-2 sm:p-4">
@@ -531,116 +621,132 @@ const AdminDashboard: React.FC = () => {
                     : "Select a date"}
                 </h4>
 
-                <div className="max-h-[280px] min-w-0 flex-1 space-y-3 overflow-y-auto">
-                  {selectedDateEvents.length > 0 ? (
-                    selectedDateEvents.map((event, index) => (
-                      <motion.div
-                        key={event.ids.join("-")}
-                        initial={{
-                          opacity: 0,
-                          scale: 0.9,
-                        }}
-                        animate={{
-                          opacity: 1,
-                          scale: 1,
-                        }}
-                        transition={{
-                          duration: 0.2,
-                          delay: index * 0.05,
-                        }}
-                        className="w-full min-w-0"
-                      >
-                        <Card className="w-full min-w-0 rounded-xl transition-colors">
-                          <CardContent className="p-3">
-                            <div className="flex min-w-0 items-start justify-between gap-2">
-                              <div className="min-w-0 flex-1">
-                                <div className="mb-1 break-words text-sm font-semibold text-textPrimary">
-                                  {event.bookingName}
+                <div className="max-h-[280px] min-w-0 flex-1 space-y-3 overflow-y-auto pr-1">
+                  <AnimatePresence mode="wait">
+                    <motion.div
+                      key={`${calendarView}-${selectedDate?.toISOString() || 'none'}`}
+                      initial={{ opacity: 0, y: 8 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -8 }}
+                      transition={{ duration: 0.25, ease: [0.25, 0.46, 0.45, 0.94] }}
+                      className="space-y-3"
+                    >
+                      {selectedDateEvents.length > 0 ? (
+                        selectedDateEvents.map((event, index) => (
+                          <motion.div
+                            key={event.ids.join("-")}
+                            initial={{
+                              opacity: 0,
+                              y: 6,
+                            }}
+                            animate={{
+                              opacity: 1,
+                              y: 0,
+                            }}
+                            transition={{
+                              duration: 0.2,
+                              delay: index * 0.03,
+                            }}
+                            className="w-full min-w-0"
+                          >
+                            <Card className="w-full min-w-0 rounded-xl transition-colors">
+                              <CardContent className="p-3">
+                                <div className="flex min-w-0 items-start justify-between gap-2">
+                                  <div className="min-w-0 flex-1">
+                                    <div className="mb-1 break-words text-sm font-semibold text-textPrimary">
+                                      {event.bookingName}
+                                    </div>
+
+                                    {event.eventName &&
+                                      event.eventName !== event.bookingName && (
+                                        <div className="mb-1.5 break-words text-xs font-medium text-textMuted">
+                                          Linked Event: {event.eventName}
+                                        </div>
+                                      )}
+                                  </div>
+
+                                  <Badge
+                                    variant={
+                                      event.status === "approved"
+                                        ? "success"
+                                        : event.status === "pending"
+                                          ? "pending"
+                                          : "destructive"
+                                    }
+                                    className="h-5 shrink-0 px-1.5 py-0 text-[10px]"
+                                  >
+                                    {event.status}
+                                  </Badge>
                                 </div>
 
-                                {event.eventName &&
-                                  event.eventName !== event.bookingName && (
-                                    <div className="mb-1.5 break-words text-xs font-medium text-textMuted">
-                                      Linked Event: {event.eventName}
-                                    </div>
+                                {/* Club & Event Type */}
+                                <div className="mb-2 mt-0.5 flex flex-wrap items-center gap-2">
+                                  <span className="text-xs font-medium text-brand">{event.clubName}</span>
+                                  {event.eventType && (
+                                    <Badge variant="outline" className="text-[10px] h-5">
+                                      {formatEventType(event.eventType)}
+                                    </Badge>
                                   )}
-                              </div>
+                                </div>
 
-                              <Badge
-                                variant={
-                                  event.status === "approved"
-                                    ? "success"
-                                    : event.status === "pending"
-                                      ? "pending"
-                                      : "destructive"
-                                }
-                                className="h-5 shrink-0 px-1.5 py-0 text-[10px]"
-                              >
-                                {event.status}
-                              </Badge>
-                            </div>
+                                {/* Permissions */}
+                                {event.permissionsLink && (
+                                  <div className="mb-3 mt-2">
+                                    <a
+                                      href={
+                                        event.permissionsLink.match(/^https?:\/\//)
+                                          ? event.permissionsLink
+                                          : `https://${event.permissionsLink}`
+                                      }
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      className="
+                                  inline-flex
+                                  w-fit
+                                  items-center
+                                  justify-center
+                                  gap-1
+                                  rounded-[2rem]
+                                  border
+                                  border-brand/30
+                                  px-2
+                                  text-[11px]
+                                  font-medium
+                                  text-brand
+                                  transition-colors
+                                  hover:bg-brand/10
+                                  sm:gap-1.5
+                                  sm:text-[13px]
+                                "
+                                    >
+                                      <ExternalLink className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
+                                      View Permissions
+                                    </a>
+                                  </div>
+                                )}
 
-                            {/* Club */}
-                            <div className="mb-2 mt-0.5 text-xs font-medium text-brand">
-                              {event.clubName}
-                            </div>
+                                {/* Time */}
+                                <div className="mt-2 text-xs text-textMuted">
+                                  {event.startTime} - {event.endTime}
+                                </div>
 
-                            {/* Permissions */}
-                            {event.permissionsLink && (
-                              <div className="mb-3 mt-2">
-                                <a
-                                  href={
-                                    event.permissionsLink.match(/^https?:\/\//)
-                                      ? event.permissionsLink
-                                      : `https://${event.permissionsLink}`
-                                  }
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  className="
-                              inline-flex
-                              w-fit
-                              items-center
-                              justify-center
-                              gap-1
-                              rounded-[2rem]
-                              border
-                              border-brand/30
-                              px-2
-                              text-[11px]
-                              font-medium
-                              text-brand
-                              transition-colors
-                              hover:bg-brand/10
-                              sm:gap-1.5
-                              sm:text-[13px]
-                            "
-                                >
-                                  <ExternalLink className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
-                                  View Permissions
-                                </a>
-                              </div>
-                            )}
-
-                            {/* Time */}
-                            <div className="mt-2 text-xs text-textMuted">
-                              {event.startTime} - {event.endTime}
-                            </div>
-
-                            {/* Venue */}
-                            {event.venueName && (
-                              <div className="mt-1 break-words text-xs text-textMuted">
-                                {event.venueName}
-                              </div>
-                            )}
-                          </CardContent>
-                        </Card>
-                      </motion.div>
-                    ))
-                  ) : (
-                    <div className="py-8 text-center text-sm text-textMuted">
-                      No events found for this day.
-                    </div>
-                  )}
+                                {/* Venue */}
+                                {event.venueName && (
+                                  <div className="mt-1 break-words text-xs text-textMuted">
+                                    {event.venueName}
+                                  </div>
+                                )}
+                              </CardContent>
+                            </Card>
+                          </motion.div>
+                        ))
+                      ) : (
+                        <div className="py-8 text-center text-sm text-textMuted">
+                          No events found for this day.
+                        </div>
+                      )}
+                    </motion.div>
+                  </AnimatePresence>
                 </div>
               </div>
             </div>

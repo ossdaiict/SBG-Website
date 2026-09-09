@@ -89,7 +89,7 @@ const PolicyPage: React.FC = () => {
                 <Card className="border border-border">
                   <CardHeader>
                     <CardTitle className="text-base">Category A (Auto-Approval)</CardTitle>
-                    <CardDescription className="text-xs">CEP 104, CEP 105, CEP 106, CEP 107, CEP 206, CEP 205, OAT, Cafeteria Entrance</CardDescription>
+                    <CardDescription className="text-xs">CEP 103, CEP 104, CEP 105, CEP 106, CEP 107, CEP 202, CEP 203, CEP 205, OAT, Cafeteria Entrance</CardDescription>
                   </CardHeader>
                   <CardContent>
                     <p className="text-sm text-muted-foreground">Bookings are automatically confirmed if the slot is vacant and timeline rules are met. No manual intervention required.</p>
@@ -98,7 +98,7 @@ const PolicyPage: React.FC = () => {
                 <Card className="border border-border">
                   <CardHeader>
                     <CardTitle className="text-base">Category B (Restricted)</CardTitle>
-                    <CardDescription className="text-xs">Lecture Theatres (LT), CEP 110, CEP 102, SAC Ground</CardDescription>
+                    <CardDescription className="text-xs">Lecture Theatres (LT), CEP 102, CEP 110, SAC Ground</CardDescription>
                   </CardHeader>
                   <CardContent>
                     <p className="text-sm text-muted-foreground">Always requires manual approval from the SBG Deputy Convener. Pending status applies until approved.</p>

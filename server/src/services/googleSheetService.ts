@@ -24,23 +24,39 @@ async function getGoogleSheetConfig() {
 
 function formatDate(d: any): string {
   if (!d) return '';
-  if (d instanceof Date) {
-    const day = String(d.getDate()).padStart(2, '0');
-    const month = String(d.getMonth() + 1).padStart(2, '0');
-    const year = d.getFullYear();
+
+  // If it's a strict date-only string like 'YYYY-MM-DD' without time, parse directly
+  if (typeof d === 'string') {
+    const trimmed = d.trim();
+    if (/^\d{4}-\d{2}-\d{2}$/.test(trimmed)) {
+      const [y, m, dayPart] = trimmed.split('-');
+      return `'${dayPart}/${m}/${y}`;
+    }
+  }
+
+  const date = d instanceof Date ? d : new Date(d);
+  if (isNaN(date.getTime())) return String(d);
+
+  try {
+    const parts = new Intl.DateTimeFormat('en-GB', {
+      timeZone: 'Asia/Kolkata',
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+    }).formatToParts(date);
+
+    const getPart = (type: string) => parts.find(p => p.type === type)?.value || '';
+    const day = getPart('day');
+    const month = getPart('month');
+    const year = getPart('year');
+
+    return `'${day}/${month}/${year}`;
+  } catch {
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const year = date.getFullYear();
     return `'${day}/${month}/${year}`;
   }
-  const str = String(d).trim();
-  if (/^\d{4}-\d{2}-\d{2}/.test(str)) {
-    const [y, m, dayPart] = str.split('T')[0].split('-');
-    return `'${dayPart}/${m}/${y}`;
-  }
-  const date = new Date(str);
-  if (isNaN(date.getTime())) return str;
-  const day = String(date.getDate()).padStart(2, '0');
-  const month = String(date.getMonth() + 1).padStart(2, '0');
-  const year = date.getFullYear();
-  return `'${day}/${month}/${year}`;
 }
 
 function formatSubmittedAt(d: any): string {
