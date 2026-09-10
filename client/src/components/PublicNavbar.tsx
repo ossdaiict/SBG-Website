@@ -84,7 +84,7 @@ export const PublicNavbar: React.FC<PublicNavbarProps> = ({ onGoToLogin }) => {
             ref={headerRef}
             className="sticky top-0 w-full z-30 bg-bgMain/80 backdrop-blur-xl border-b border-borderSoft/40 pt-safe"
         >
-            <div className="flex items-center justify-between h-16 sm:h-[4.5rem] px-4 sm:px-6 lg:px-8 w-full max-w-[1440px] mx-auto gap-2">
+            <div className="flex items-center justify-between h-16 sm:h-[4.5rem] px-4 sm:px-6 lg:px-8 3xl:px-12 w-full max-w-[1440px] 3xl:max-w-[1800px] 4k:max-w-[2400px] uhd:max-w-[3200px] mx-auto gap-2">
                 {/* Left: Logo & Nav Links */}
                 <div className="flex items-center gap-2 sm:gap-4 lg:gap-6 min-w-0">
                     <div className="shrink-0">

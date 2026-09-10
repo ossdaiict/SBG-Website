@@ -199,11 +199,11 @@ const ClubsCommitteesPage: React.FC = () => {
             {/* ====== Main Content ====== */}
             <main>
                 {/* ====== Hero Section ====== */}
-                <section className="relative z-10 text-center px-4 sm:px-6 pt-12 pb-8 max-w-4xl mx-auto">
+                <section className="relative z-10 text-center px-4 sm:px-6 3xl:px-12 pt-12 3xl:pt-20 pb-8 3xl:pb-12 max-w-4xl 3xl:max-w-6xl 4k:max-w-7xl mx-auto">
                     <motion.h1
                         initial={{ opacity: 0, y: 15 }}
                         animate={{ opacity: 1, y: 0 }}
-                        className="text-4xl sm:text-5xl font-extrabold tracking-tighter text-textPrimary pb-2"
+                        className="text-4xl sm:text-5xl 3xl:text-6xl 4k:text-7xl font-extrabold tracking-tighter text-textPrimary pb-2"
                     >
                         Clubs & Committees
                     </motion.h1>
@@ -211,14 +211,14 @@ const ClubsCommitteesPage: React.FC = () => {
                         initial={{ opacity: 0, y: 15 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.1 }}
-                        className="mt-4 text-base sm:text-lg text-textSecondary max-w-xl mx-auto font-medium"
+                        className="mt-4 3xl:mt-6 text-base sm:text-lg 3xl:text-xl text-textSecondary max-w-xl 3xl:max-w-3xl mx-auto font-medium"
                     >
                         Explore campus student organizations and active leadership in one place.
                     </motion.p>
                 </section>
 
                 {/* ====== Tabs & Search Controls ====== */}
-                <section className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 mb-8 space-y-4">
+                <section className="relative z-10 max-w-5xl 3xl:max-w-[1600px] 4k:max-w-[2100px] uhd:max-w-[2800px] mx-auto px-4 sm:px-6 3xl:px-10 mb-8 space-y-4">
                     <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4">
                         {/* Framer motion segment tabs control */}
                         <div className="flex flex-nowrap overflow-x-auto bg-hoverSoft/50 p-1 rounded-xl border border-borderSoft/40 w-full sm:w-auto self-start gap-1">
@@ -470,7 +470,7 @@ const ClubsCommitteesPage: React.FC = () => {
                 </Dialog>
 
                 {/* ====== Content Display ====== */}
-                <section className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6">
+                <section className="relative z-10 max-w-5xl 3xl:max-w-[1600px] 4k:max-w-[2100px] uhd:max-w-[2800px] mx-auto px-4 sm:px-6 3xl:px-10">
                     <AnimatePresence mode="wait">
                         {isLoading ? (
                             <motion.div
@@ -478,7 +478,7 @@ const ClubsCommitteesPage: React.FC = () => {
                                 initial={{ opacity: 0 }}
                                 animate={{ opacity: 1 }}
                                 exit={{ opacity: 0 }}
-                                className="grid grid-cols-1 md:grid-cols-2 gap-4"
+                                className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 3xl:grid-cols-4 gap-4"
                             >
                                 {[1, 2, 3, 4].map(i => (
                                     <div key={i} className="h-32 rounded-xl bg-hoverSoft/30 border border-borderSoft animate-pulse" />
@@ -491,7 +491,7 @@ const ClubsCommitteesPage: React.FC = () => {
                                 animate={{ opacity: 1, y: 0 }}
                                 exit={{ opacity: 0, y: -15 }}
                                 transition={{ duration: 0.25 }}
-                                className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5"
+                                className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 3xl:grid-cols-4 gap-5"
                             >
                                 {filteredClubs.length === 0 ? (
                                     <div className="col-span-full py-16 text-center text-textMuted">

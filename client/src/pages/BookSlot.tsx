@@ -572,7 +572,7 @@ const BookSlot: React.FC<BookSlotProps> = ({ currentUser }) => {
       initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-      className="max-w-5xl mx-auto space-y-6 sm:space-y-8 w-full pb-10"
+      className="max-w-5xl 3xl:max-w-[1600px] 4k:max-w-[2100px] uhd:max-w-[2800px] mx-auto space-y-6 sm:space-y-8 w-full pb-10 3xl:pb-16"
     >
       {/* Enhanced Header */}
       <div className="text-center space-y-3 sm:space-y-4 mb-8 sm:mb-10">

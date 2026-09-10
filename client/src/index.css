@@ -1,5 +1,11 @@
 @import "tailwindcss";
 
+@theme {
+  --breakpoint-3xl: 1920px;
+  --breakpoint-4k: 2560px;
+  --breakpoint-uhd: 3840px;
+}
+
 /* Generates the animate-in / fade-in-0 / zoom-in-95 / slide-in-from-* utilities
    that every Radix overlay in this app relies on. Without it those classes emit
    no CSS and all popovers, dialogs and menus appear with no transition. */

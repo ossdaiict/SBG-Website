@@ -1,5 +1,16 @@
 import { motion } from 'framer-motion';
-import { Archive as ArchiveIcon, Calendar, ChevronLeft, ChevronRight, Download, MapPin, RefreshCw, Trash2 } from 'lucide-react';
+import {
+  Archive as ArchiveIcon,
+  Calendar,
+  ChevronLeft,
+  ChevronRight,
+  Clock,
+  Download,
+  MapPin,
+  RefreshCw,
+  Trash2,
+  Users,
+} from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 import { Alert, AlertDescription, AlertTitle } from '../components/ui/alert';
 import { Badge } from '../components/ui/badge';
@@ -7,6 +18,7 @@ import { Button } from '../components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '../components/ui/dialog';
 import { Skeleton } from '../components/ui/skeleton';
+import { Tabs, TabsList, TabsTrigger } from '../components/ui/tabs';
 import { apiRequest } from '../lib/api';
 import { getErrorMessage } from '../lib/errors';
 import { toastError, toastSuccess } from '../lib/toast';
@@ -18,10 +30,15 @@ interface ArchivedBooking {
   start_time: string;
   end_time: string;
   status: string;
+  booking_name?: string;
   event_name: string;
   event_type: string;
+  expected_attendees?: number;
+  batch_id?: string;
+  event_id?: string;
   archived_at: string;
   venue_name?: string;
+  club_name?: string;
 }
 
 interface ArchivedReport {
@@ -47,13 +64,20 @@ interface ArchivedEvent {
   report: ArchivedReport | null;
 }
 
+type ArchiveItem =
+  | { type: 'event'; data: ArchivedEvent; archivedAt: string }
+  | { type: 'booking'; data: ArchivedBooking; archivedAt: string };
+
 const Archives: React.FC = () => {
-  const [archives, setArchives] = useState<ArchivedEvent[]>([]);
+  const [events, setEvents] = useState<ArchivedEvent[]>([]);
+  const [standaloneBookings, setStandaloneBookings] = useState<ArchivedBooking[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  const [activeTab, setActiveTab] = useState<'all' | 'events' | 'bookings'>('all');
+
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [archiveToDelete, setArchiveToDelete] = useState<string | null>(null);
+  const [itemToDelete, setItemToDelete] = useState<{ type: 'event' | 'booking'; id: string } | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
 
   const [emptyDialogOpen, setEmptyDialogOpen] = useState(false);
@@ -69,12 +93,20 @@ const Archives: React.FC = () => {
     setIsLoading(true);
     setError(null);
     try {
-      const data = await apiRequest<ArchivedEvent[]>('/api/archives/events', { auth: true });
-      setArchives(data);
+      const [eventsData, bookingsData] = await Promise.all([
+        apiRequest<ArchivedEvent[]>('/api/archives/events', { auth: true }),
+        apiRequest<ArchivedBooking[]>('/api/archives/bookings', { auth: true }).catch((err) => {
+          console.warn('Could not fetch standalone archived bookings:', err);
+          return [] as ArchivedBooking[];
+        }),
+      ]);
+      setEvents(eventsData || []);
+      setStandaloneBookings(bookingsData || []);
     } catch (err) {
       console.error('Failed to fetch archives:', err);
       setError(getErrorMessage(err, 'Failed to load archives.'));
-      setArchives([]);
+      setEvents([]);
+      setStandaloneBookings([]);
     } finally {
       setIsLoading(false);
     }
@@ -85,25 +117,32 @@ const Archives: React.FC = () => {
   }, [fetchArchives]);
 
   const confirmDelete = async () => {
-    if (!archiveToDelete) return;
+    if (!itemToDelete) return;
     setIsDeleting(true);
     try {
-      await apiRequest(`/api/archives/events/${archiveToDelete}`, { method: 'DELETE', auth: true });
-      setArchives(prev => prev.filter(a => a.id !== archiveToDelete));
+      if (itemToDelete.type === 'event') {
+        await apiRequest(`/api/archives/events/${itemToDelete.id}`, { method: 'DELETE', auth: true });
+        setEvents((prev) => prev.filter((a) => a.id !== itemToDelete.id));
+      } else {
+        await apiRequest(`/api/archives/bookings/${itemToDelete.id}`, { method: 'DELETE', auth: true });
+        setStandaloneBookings((prev) => prev.filter((b) => b.id !== itemToDelete.id));
+      }
       setDeleteDialogOpen(false);
+      toastSuccess('Archive deleted successfully');
     } catch (err) {
       toastError(err, 'Failed to delete archive');
     } finally {
       setIsDeleting(false);
-      setArchiveToDelete(null);
+      setItemToDelete(null);
     }
   };
 
   const confirmEmpty = async () => {
     setIsEmptying(true);
     try {
-      await apiRequest('/api/archives/events/all', { method: 'DELETE', auth: true });
-      setArchives([]);
+      await apiRequest('/api/archives/all', { method: 'DELETE', auth: true });
+      setEvents([]);
+      setStandaloneBookings([]);
       setEmptyDialogOpen(false);
       toastSuccess('All archives emptied successfully');
     } catch (err) {
@@ -112,6 +151,37 @@ const Archives: React.FC = () => {
       setIsEmptying(false);
     }
   };
+
+  const allItems: ArchiveItem[] = React.useMemo(() => {
+    const eventItems: ArchiveItem[] = events.map((e) => ({
+      type: 'event',
+      data: e,
+      archivedAt: e.archived_at,
+    }));
+    const bookingItems: ArchiveItem[] = standaloneBookings.map((b) => ({
+      type: 'booking',
+      data: b,
+      archivedAt: b.archived_at,
+    }));
+
+    let combined = [...eventItems, ...bookingItems];
+    if (activeTab === 'events') {
+      combined = eventItems;
+    } else if (activeTab === 'bookings') {
+      combined = bookingItems;
+    }
+
+    return combined.sort((a, b) => new Date(b.archivedAt).getTime() - new Date(a.archivedAt).getTime());
+  }, [events, standaloneBookings, activeTab]);
+
+  const totalItemsCount = events.length + standaloneBookings.length;
+
+  useEffect(() => {
+    const maxPage = Math.max(1, Math.ceil(allItems.length / itemsPerPage));
+    if (currentPage > maxPage) {
+      setCurrentPage(maxPage);
+    }
+  }, [allItems.length, currentPage, itemsPerPage]);
 
   if (isLoading) {
     return (
@@ -134,15 +204,22 @@ const Archives: React.FC = () => {
         <div className="min-w-0 flex items-center gap-3">
           <ArchiveIcon className="text-textSecondary" size={32} />
           <div>
-            <motion.h1 className="text-3xl sm:text-4xl font-extrabold text-textPrimary tracking-tighter">Database Archives</motion.h1>
+            <motion.h1 className="text-3xl sm:text-4xl font-extrabold text-textPrimary tracking-tighter">
+              Database Archives
+            </motion.h1>
             <p className="text-textSecondary mt-1 text-sm font-medium leading-relaxed max-w-xl">
-              Historical records of deleted events, their bookings, and reports.
+              Historical records of deleted events, meetings, slot bookings, and reports.
             </p>
           </div>
         </div>
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 shrink-0 w-full sm:w-auto mt-4 sm:mt-0">
-          {isAdmin && archives.length > 0 && (
-            <Button variant="destructive" size="sm" onClick={() => setEmptyDialogOpen(true)} className="w-full sm:w-auto gap-2 shrink-0">
+          {isAdmin && totalItemsCount > 0 && (
+            <Button
+              variant="destructive"
+              size="sm"
+              onClick={() => setEmptyDialogOpen(true)}
+              className="w-full sm:w-auto gap-2 shrink-0"
+            >
               <Trash2 size={16} /> Empty All
             </Button>
           )}
@@ -159,134 +236,294 @@ const Archives: React.FC = () => {
         </Alert>
       )}
 
-      {!error && archives.length === 0 && (
+      {/* Filter Tabs */}
+      <div className="flex items-center justify-between">
+        <Tabs
+          value={activeTab}
+          onValueChange={(val) => {
+            setActiveTab(val as 'all' | 'events' | 'bookings');
+            setCurrentPage(1);
+          }}
+          className="w-full sm:w-auto"
+        >
+          <TabsList aria-label="Archive filters" className="grid grid-cols-3 w-full sm:w-auto sm:inline-flex">
+            <TabsTrigger value="all" className="text-xs sm:text-sm">
+              All ({totalItemsCount})
+            </TabsTrigger>
+            <TabsTrigger value="events" className="text-xs sm:text-sm">
+              Events ({events.length})
+            </TabsTrigger>
+            <TabsTrigger value="bookings" className="text-xs sm:text-sm">
+              Meetings & Slots ({standaloneBookings.length})
+            </TabsTrigger>
+          </TabsList>
+        </Tabs>
+      </div>
+
+      {!error && allItems.length === 0 && (
         <div className="flex flex-col items-center justify-center p-12 text-center bg-card border border-borderSoft rounded-2xl shadow-sm">
           <ArchiveIcon size={48} className="text-textMuted mb-4 opacity-50" />
           <h3 className="text-lg font-bold text-textPrimary">No Archives Found</h3>
           <p className="text-textSecondary max-w-sm mt-2 text-sm">
-            When events are deleted, their records will appear here for historical reference.
+            When events, meetings, or slot bookings are deleted, their records will appear here for historical reference.
           </p>
         </div>
       )}
 
       <div className="grid grid-cols-1 gap-6">
         {(() => {
-          const totalPages = Math.ceil(archives.length / itemsPerPage);
+          const totalPages = Math.ceil(allItems.length / itemsPerPage);
           const startIndex = (currentPage - 1) * itemsPerPage;
-          const paginatedArchives = archives.slice(startIndex, startIndex + itemsPerPage);
+          const paginatedItems = allItems.slice(startIndex, startIndex + itemsPerPage);
 
           return (
             <>
-              {paginatedArchives.map((event, i) => (
-                <motion.div
-            key={event.id}
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: i * 0.05 }}
-          >
-            <Card className="border border-borderSoft rounded-xl overflow-hidden shadow-sm">
-              <CardHeader className="bg-bgMain border-b border-borderSoft p-4">
-                <div className="flex flex-col sm:flex-row justify-between items-start gap-4">
-                  <div className="min-w-0">
-                    <CardTitle className="text-lg text-textPrimary break-words">{event.name}</CardTitle>
-                    <div className="text-sm font-medium text-textSecondary mt-1">{event.club_name || 'Unknown Club'}</div>
-                    <div className="flex flex-wrap gap-x-4 gap-y-2 mt-2 text-xs text-textSecondary">
-  <span className="flex items-center gap-1 shrink-0">
-    <Calendar size={12}/> 
-    {event.date ? (
-      <>
-        {new Date(event.date).toLocaleDateString('en-GB', { timeZone: 'Asia/Kolkata' })}
-        {event.end_date && event.end_date !== event.date && (
-          <> – {new Date(event.end_date).toLocaleDateString('en-GB', { timeZone: 'Asia/Kolkata' })}</>
-        )}
-      </>
-    ) : 'No Date'}
-  </span>
-
-  {event.venue && (
-    <span className="flex items-center gap-1 shrink-0">
-      <MapPin size={12}/> {event.venue}
-    </span>
-  )}
-
-  {event.archived_at && (
-    <span className="flex items-center gap-1 shrink-0">
-      Archived: {new Date(event.archived_at).toLocaleDateString('en-GB', { timeZone: 'Asia/Kolkata' })}
-    </span>
-  )}
-</div>
-
-                  </div>
-                  <div className="flex items-center gap-2 shrink-0 w-full sm:w-auto justify-between sm:justify-end">
-                    <Badge variant="outline" className="text-xs bg-bgMain border-borderSoft">Event Record</Badge>
-                    <Button 
-                      variant="ghost" 
-                      size="sm" 
-                      onClick={() => {
-                        setArchiveToDelete(event.id);
-                        setDeleteDialogOpen(true);
-                      }}
-                      className="text-textMuted hover:text-error hover:bg-error/10 h-8 w-8 p-0 rounded-lg shrink-0"
-                      title="Delete Archive"
+              {paginatedItems.map((item, i) => {
+                if (item.type === 'event') {
+                  const event = item.data;
+                  return (
+                    <motion.div
+                      key={`event-${event.id}`}
+                      initial={{ opacity: 0, y: 16 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: i * 0.05 }}
                     >
-                      <Trash2 size={16} />
-                    </Button>
-                  </div>
-                </div>
-              </CardHeader>
-              <CardContent className="p-0">
-                {event.bookings.length > 0 && (
-                  <div className="p-4 border-b border-borderSoft/50 bg-card">
-                    <h4 className="text-sm font-semibold mb-2 text-textPrimary flex items-center gap-2">
-                      <ArchiveIcon size={14} className="text-brand" /> Associated Bookings ({event.bookings.length})
-                    </h4>
-                    <div className="space-y-2">
-                      {event.bookings.map(b => (
-                        <div key={b.id} className="text-xs flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 p-3 sm:p-2 rounded-lg bg-bgMain">
-                          <div className="flex flex-col gap-1">
-                            <span className="font-semibold text-textPrimary">{b.venue_name || 'Unknown Venue'}</span>
-                            <span className="text-textSecondary">{new Date(b.start_time).toLocaleString('en-GB', { timeZone: 'Asia/Kolkata' })} - {new Date(b.end_time).toLocaleTimeString('en-GB', { timeZone: 'Asia/Kolkata' })}</span>
+                      <Card className="border border-borderSoft rounded-xl overflow-hidden shadow-sm">
+                        <CardHeader className="bg-bgMain border-b border-borderSoft p-4">
+                          <div className="flex flex-col sm:flex-row justify-between items-start gap-4">
+                            <div className="min-w-0">
+                              <CardTitle className="text-lg text-textPrimary break-words">{event.name}</CardTitle>
+                              <div className="text-sm font-medium text-textSecondary mt-1">
+                                {event.club_name || 'Unknown Club'}
+                              </div>
+                              <div className="flex flex-wrap gap-x-4 gap-y-2 mt-2 text-xs text-textSecondary">
+                                <span className="flex items-center gap-1 shrink-0">
+                                  <Calendar size={12} />
+                                  {event.date ? (
+                                    <>
+                                      {new Date(event.date).toLocaleDateString('en-GB', { timeZone: 'Asia/Kolkata' })}
+                                      {event.end_date && event.end_date !== event.date && (
+                                        <> – {new Date(event.end_date).toLocaleDateString('en-GB', { timeZone: 'Asia/Kolkata' })}</>
+                                      )}
+                                    </>
+                                  ) : (
+                                    'No Date'
+                                  )}
+                                </span>
+
+                                {event.venue && (
+                                  <span className="flex items-center gap-1 shrink-0">
+                                    <MapPin size={12} /> {event.venue}
+                                  </span>
+                                )}
+
+                                {event.archived_at && (
+                                  <span className="flex items-center gap-1 shrink-0">
+                                    Archived: {new Date(event.archived_at).toLocaleDateString('en-GB', { timeZone: 'Asia/Kolkata' })}
+                                  </span>
+                                )}
+                              </div>
+                            </div>
+                            <div className="flex items-center gap-2 shrink-0 w-full sm:w-auto justify-between sm:justify-end">
+                              <Badge variant="outline" className="text-xs bg-bgMain border-borderSoft">
+                                Event Record
+                              </Badge>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => {
+                                  setItemToDelete({ type: 'event', id: event.id });
+                                  setDeleteDialogOpen(true);
+                                }}
+                                className="text-textMuted hover:text-error hover:bg-error/10 h-8 w-8 p-0 rounded-lg shrink-0"
+                                title="Delete Archive"
+                              >
+                                <Trash2 size={16} />
+                              </Button>
+                            </div>
                           </div>
-                          <Badge variant="outline" className="text-[10px] self-start sm:self-auto shrink-0">{b.status}</Badge>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-                {event.report && (
-                  <div className="p-4 bg-card">
-                    <h4 className="text-sm font-semibold mb-2 text-textPrimary flex items-center gap-2">
-                      <ArchiveIcon size={14} className="text-brand" /> Associated Event Report
-                    </h4>
-                    <div className="text-xs text-textSecondary flex flex-wrap gap-x-4 gap-y-2">
-                      <span className="shrink-0">Level: {event.report.level}</span>
-                      <a href={event.report.report_doc_link} target="_blank" rel="noreferrer" className="flex items-center gap-1 text-brand hover:underline shrink-0"><Download size={12}/> Doc</a>
-                      {event.report.photos_drive_link && (
-                        <a href={event.report.photos_drive_link} target="_blank" rel="noreferrer" className="flex items-center gap-1 text-brand hover:underline shrink-0"><Download size={12}/> Photos</a>
-                      )}
-                    </div>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          </motion.div>
-        ))}
-        </>
-      );
-    })()}
-        {archives.length > 0 && Math.ceil(archives.length / itemsPerPage) > 1 && (() => {
-          const totalPages = Math.ceil(archives.length / itemsPerPage);
+                        </CardHeader>
+                        <CardContent className="p-0">
+                          {event.bookings.length > 0 && (
+                            <div className="p-4 border-b border-borderSoft/50 bg-card">
+                              <h4 className="text-sm font-semibold mb-2 text-textPrimary flex items-center gap-2">
+                                <ArchiveIcon size={14} className="text-brand" /> Associated Bookings ({event.bookings.length})
+                              </h4>
+                              <div className="space-y-2">
+                                {event.bookings.map((b) => (
+                                  <div
+                                    key={b.id}
+                                    className="text-xs flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 p-3 sm:p-2 rounded-lg bg-bgMain"
+                                  >
+                                    <div className="flex flex-col gap-1">
+                                      <span className="font-semibold text-textPrimary">{b.venue_name || 'Unknown Venue'}</span>
+                                      <span className="text-textSecondary">
+                                        {new Date(b.start_time).toLocaleString('en-GB', { timeZone: 'Asia/Kolkata' })} -{' '}
+                                        {new Date(b.end_time).toLocaleTimeString('en-GB', { timeZone: 'Asia/Kolkata' })}
+                                      </span>
+                                    </div>
+                                    <Badge variant="outline" className="text-[10px] self-start sm:self-auto shrink-0">
+                                      {b.status}
+                                    </Badge>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+                          {event.report && (
+                            <div className="p-4 bg-card">
+                              <h4 className="text-sm font-semibold mb-2 text-textPrimary flex items-center gap-2">
+                                <ArchiveIcon size={14} className="text-brand" /> Associated Event Report
+                              </h4>
+                              <div className="text-xs text-textSecondary flex flex-wrap gap-x-4 gap-y-2">
+                                <span className="shrink-0">Level: {event.report.level}</span>
+                                <a
+                                  href={event.report.report_doc_link}
+                                  target="_blank"
+                                  rel="noreferrer"
+                                  className="flex items-center gap-1 text-brand hover:underline shrink-0"
+                                >
+                                  <Download size={12} /> Doc
+                                </a>
+                                {event.report.photos_drive_link && (
+                                  <a
+                                    href={event.report.photos_drive_link}
+                                    target="_blank"
+                                    rel="noreferrer"
+                                    className="flex items-center gap-1 text-brand hover:underline shrink-0"
+                                  >
+                                    <Download size={12} /> Photos
+                                  </a>
+                                )}
+                              </div>
+                            </div>
+                          )}
+                        </CardContent>
+                      </Card>
+                    </motion.div>
+                  );
+                } else {
+                  const booking = item.data;
+                  return (
+                    <motion.div
+                      key={`booking-${booking.id}`}
+                      initial={{ opacity: 0, y: 16 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: i * 0.05 }}
+                    >
+                      <Card className="border border-borderSoft rounded-xl overflow-hidden shadow-sm">
+                        <CardHeader className="bg-bgMain border-b border-borderSoft p-4">
+                          <div className="flex flex-col sm:flex-row justify-between items-start gap-4">
+                            <div className="min-w-0">
+                              <CardTitle className="text-lg text-textPrimary break-words">
+                                {booking.booking_name || booking.event_name || 'Club Meeting'}
+                              </CardTitle>
+                              <div className="text-sm font-medium text-textSecondary mt-1">
+                                {booking.club_name || 'Unknown Club'}
+                              </div>
+                              <div className="flex flex-wrap gap-x-4 gap-y-2 mt-2 text-xs text-textSecondary">
+                                <span className="flex items-center gap-1 shrink-0">
+                                  <Calendar size={12} />
+                                  {new Date(booking.start_time).toLocaleDateString('en-GB', { timeZone: 'Asia/Kolkata' })}
+                                </span>
+                                <span className="flex items-center gap-1 shrink-0">
+                                  <Clock size={12} />
+                                  {new Date(booking.start_time).toLocaleTimeString('en-GB', {
+                                    timeZone: 'Asia/Kolkata',
+                                    hour: '2-digit',
+                                    minute: '2-digit',
+                                  })}{' '}
+                                  -{' '}
+                                  {new Date(booking.end_time).toLocaleTimeString('en-GB', {
+                                    timeZone: 'Asia/Kolkata',
+                                    hour: '2-digit',
+                                    minute: '2-digit',
+                                  })}
+                                </span>
+                                {booking.venue_name && (
+                                  <span className="flex items-center gap-1 shrink-0">
+                                    <MapPin size={12} /> {booking.venue_name}
+                                  </span>
+                                )}
+                                {booking.expected_attendees && booking.expected_attendees > 0 ? (
+                                  <span className="flex items-center gap-1 shrink-0">
+                                    <Users size={12} /> {booking.expected_attendees} attendees
+                                  </span>
+                                ) : null}
+                                {booking.archived_at && (
+                                  <span className="flex items-center gap-1 shrink-0">
+                                    Archived: {new Date(booking.archived_at).toLocaleDateString('en-GB', { timeZone: 'Asia/Kolkata' })}
+                                  </span>
+                                )}
+                              </div>
+                            </div>
+                            <div className="flex items-center gap-2 shrink-0 w-full sm:w-auto justify-between sm:justify-end">
+                              <Badge variant="outline" className="text-xs bg-brand/5 text-brand border-brand/20">
+                                Meeting / Slot Booking
+                              </Badge>
+                              <Badge
+                                variant={
+                                  booking.status === 'approved'
+                                    ? 'success'
+                                    : booking.status === 'pending'
+                                      ? 'pending'
+                                      : booking.status === 'partial'
+                                        ? 'warning'
+                                        : 'destructive'
+                                }
+                                className="text-[10px]"
+                              >
+                                {booking.status}
+                              </Badge>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => {
+                                  setItemToDelete({ type: 'booking', id: booking.id });
+                                  setDeleteDialogOpen(true);
+                                }}
+                                className="text-textMuted hover:text-error hover:bg-error/10 h-8 w-8 p-0 rounded-lg shrink-0"
+                                title="Delete Archive"
+                              >
+                                <Trash2 size={16} />
+                              </Button>
+                            </div>
+                          </div>
+                        </CardHeader>
+                      </Card>
+                    </motion.div>
+                  );
+                }
+              })}
+            </>
+          );
+        })()}
+
+        {allItems.length > 0 && Math.ceil(allItems.length / itemsPerPage) > 1 && (() => {
+          const totalPages = Math.ceil(allItems.length / itemsPerPage);
           const startIndex = (currentPage - 1) * itemsPerPage;
           return (
             <div className="flex flex-col sm:flex-row items-center justify-between mt-8 pt-4 border-t border-borderSoft gap-4">
               <div className="flex items-center text-sm text-textMuted">
-                Showing <span className="font-medium mx-1">{startIndex + 1}</span> to <span className="font-medium mx-1">{Math.min(startIndex + itemsPerPage, archives.length)}</span> of <span className="font-medium mx-1">{archives.length}</span> results
+                Showing <span className="font-medium mx-1">{startIndex + 1}</span> to{' '}
+                <span className="font-medium mx-1">{Math.min(startIndex + itemsPerPage, allItems.length)}</span> of{' '}
+                <span className="font-medium mx-1">{allItems.length}</span> results
               </div>
               <div className="flex gap-2">
-                <Button variant="outline" size="sm" onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))} disabled={currentPage === 1}>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                  disabled={currentPage === 1}
+                >
                   <ChevronLeft size={16} className="mr-1" /> Previous
                 </Button>
-                <Button variant="outline" size="sm" onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))} disabled={currentPage === totalPages}>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+                  disabled={currentPage === totalPages}
+                >
                   Next <ChevronRight size={16} className="ml-1" />
                 </Button>
               </div>
@@ -303,14 +540,26 @@ const Archives: React.FC = () => {
               Delete Archive Permanently
             </DialogTitle>
             <DialogDescription>
-              Are you sure you want to completely delete this event record and all its associated bookings and reports? This action cannot be undone.
+              {itemToDelete?.type === 'event'
+                ? 'Are you sure you want to completely delete this event record and all its associated bookings and reports? This action cannot be undone.'
+                : 'Are you sure you want to completely delete this archived meeting / slot booking record? This action cannot be undone.'}
             </DialogDescription>
           </DialogHeader>
           <DialogFooter className="mt-4">
-            <Button variant="outline" onClick={() => setDeleteDialogOpen(false)} disabled={isDeleting} className="rounded-xl">
+            <Button
+              variant="outline"
+              onClick={() => setDeleteDialogOpen(false)}
+              disabled={isDeleting}
+              className="rounded-xl"
+            >
               Cancel
             </Button>
-            <Button variant="destructive" onClick={confirmDelete} disabled={isDeleting} className="rounded-xl bg-error hover:bg-error/90 text-white font-semibold">
+            <Button
+              variant="destructive"
+              onClick={confirmDelete}
+              disabled={isDeleting}
+              className="rounded-xl bg-error hover:bg-error/90 text-white font-semibold"
+            >
               {isDeleting ? 'Deleting...' : 'Yes, Delete Permanently'}
             </Button>
           </DialogFooter>
@@ -325,14 +574,25 @@ const Archives: React.FC = () => {
               Empty All Archives
             </DialogTitle>
             <DialogDescription>
-              Are you sure you want to completely delete ALL event records, bookings, and reports in the archives? This action cannot be undone.
+              Are you sure you want to completely delete ALL event records, meetings, bookings, and reports in the
+              archives? This action cannot be undone.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter className="mt-4">
-            <Button variant="outline" onClick={() => setEmptyDialogOpen(false)} disabled={isEmptying} className="rounded-xl">
+            <Button
+              variant="outline"
+              onClick={() => setEmptyDialogOpen(false)}
+              disabled={isEmptying}
+              className="rounded-xl"
+            >
               Cancel
             </Button>
-            <Button variant="destructive" onClick={confirmEmpty} disabled={isEmptying} className="rounded-xl bg-error hover:bg-error/90 text-white font-semibold">
+            <Button
+              variant="destructive"
+              onClick={confirmEmpty}
+              disabled={isEmptying}
+              className="rounded-xl bg-error hover:bg-error/90 text-white font-semibold"
+            >
               {isEmptying ? 'Emptying...' : 'Yes, Empty All'}
             </Button>
           </DialogFooter>

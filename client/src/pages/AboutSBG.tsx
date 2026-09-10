@@ -233,7 +233,7 @@ const AboutSBG: React.FC = () => {
     return (
         <div className="min-h-dvh bg-bgMain">
 
-            <main className="max-w-7xl mx-auto px-4 sm:px-6 py-8 sm:py-10">
+            <main className="max-w-7xl 3xl:max-w-[1800px] 4k:max-w-[2400px] uhd:max-w-[3200px] mx-auto px-4 sm:px-6 3xl:px-12 py-8 sm:py-10 3xl:py-16">
 
                 {/* ====== Page title bar (left-aligned, dashboard style) ====== */}
                 <motion.div

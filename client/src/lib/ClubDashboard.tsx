@@ -838,7 +838,7 @@ const ClubDashboard: React.FC<ClubDashboardProps> = ({ user }) => {
           className="space-y-6"
         >
           {/* Card 1: My Club Bookings */}
-          <Card className="border border-borderSoft rounded-xl">
+          <Card className="border border-borderSoft rounded-xl xl:max-h-[250px]">
             <CardHeader className="border-b border-borderSoft p-3.5">
               <div className="flex items-center justify-between">
                 <CardTitle className="text-lg">
@@ -860,7 +860,7 @@ const ClubDashboard: React.FC<ClubDashboardProps> = ({ user }) => {
               </div>
             </CardHeader>
             <CardContent className="p-0">
-              <div className="divide-y divide-border/40 overflow-y-auto max-h-[300px]">
+              <div className="divide-y divide-border/40 overflow-y-auto max-h-[300px] xl:max-h-[160px]">
                 {[...groupBookings(myEvents, venues)]
                   .sort(
                     (a, b) =>
@@ -907,7 +907,7 @@ const ClubDashboard: React.FC<ClubDashboardProps> = ({ user }) => {
                             {formatEventType(event.eventType)}
                           </Badge>
                         )}
-                        {event.expectedAttendees && (
+                        {Boolean(event.expectedAttendees && event.expectedAttendees > 0) && (
                           <div className="flex items-center gap-1 text-[10px] text-muted-foreground">
                             <Users size={10} />
                             <span>{event.expectedAttendees}</span>
@@ -946,7 +946,7 @@ const ClubDashboard: React.FC<ClubDashboardProps> = ({ user }) => {
           </Card>
 
           {/* Card 2: Registered Events */}
-          <Card className="border border-borderSoft rounded-xl">
+          <Card className="border border-borderSoft rounded-xl xl:max-h-[250px]">
             <CardHeader className="border-b border-borderSoft p-3.5">
               <div className="flex items-center justify-between">
                 <CardTitle className="text-lg">
@@ -968,7 +968,7 @@ const ClubDashboard: React.FC<ClubDashboardProps> = ({ user }) => {
               </div>
             </CardHeader>
             <CardContent className="p-0">
-              <div className="divide-y divide-border/40 overflow-y-auto max-h-[300px]">
+              <div className="divide-y divide-border/40 overflow-y-auto max-h-[300px] xl:max-h-[160px]">
                 {[...registeredEvents]
                   .sort(
                     (a, b) =>

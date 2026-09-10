@@ -1,8 +1,9 @@
 import express from 'express';
 import { cache, CACHE_KEYS, invalidateClubs, invalidatePublicBookings } from '../cache';
 import { checkConflict, createBooking, updateBookingTimings, getBusyVenues } from '../controllers/bookingController';
-import { db } from '../db';
+import { db, withTransaction } from '../db';
 import authMiddleware from '../middleware/auth';
+import { io } from '../server';
 import { CO_CURRICULAR_LIMIT, countCoCurricularBookings, getSemesterRange } from '../services/semesterUtils';
 
 
@@ -243,10 +244,36 @@ router.delete('/my-bookings/:id', authMiddleware, async (req, res) => {
       return res.status(400).json({ error: 'Cannot cancel a booking after its start time has passed.' });
     }
     
-    await db.query('DELETE FROM bookings WHERE id = $1', [id]);
-    invalidatePublicBookings();
+    await withTransaction(async (client) => {
+      await client.query(`
+        INSERT INTO archived_bookings (
+          id, club_id, venue_id, start_time, end_time, status, user_id, 
+          event_name, event_type, expected_attendees, batch_id, event_id, 
+          created_at, updated_at, booking_name
+        )
+        SELECT 
+          b.id, b.club_id, b.venue_id, b.start_time, b.end_time, b.status, b.user_id,
+          COALESCE(b.booking_name, e.name, 'Club Meeting'),
+          COALESCE(e.event_type, 'closed_club'),
+          b.expected_attendees, b.batch_id, b.event_id,
+          b.created_at, b.updated_at,
+          COALESCE(b.booking_name, e.name, 'Club Meeting')
+        FROM bookings b
+        LEFT JOIN events e ON b.event_id = e.id
+        WHERE b.id = $1
+        ON CONFLICT (id) DO UPDATE SET
+          archived_at = NOW(),
+          booking_name = EXCLUDED.booking_name,
+          event_name = EXCLUDED.event_name
+      `, [id]);
 
-    return res.json({ success: true, message: 'Booking deleted successfully' });
+      await client.query('DELETE FROM bookings WHERE id = $1', [id]);
+    });
+
+    invalidatePublicBookings();
+    io.emit('events:updated');
+
+    return res.json({ success: true, message: 'Booking deleted and archived successfully' });
   } catch (err: any) {
     console.error('Error deleting booking:', err);
     return res.status(500).json({ error: 'Failed to delete booking' });

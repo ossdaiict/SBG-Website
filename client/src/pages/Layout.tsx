@@ -253,35 +253,32 @@ const Layout: React.FC<LayoutProps> = ({ children, user, onLogout }) => {
                     </div>
                   </nav>
                   
-                  {/* User Profile Area (Mobile) */}
-                  <div className="p-3 border-t border-borderSoft mt-auto bg-card">
-                    <div className="flex items-center gap-3 p-1">
-                       <Avatar className={cn("h-10 w-10 border border-borderSoft shrink-0 shadow-sm ring-2 ring-brand/10", user.logoBg === 'white' ? 'bg-white' : user.logoBg === 'dark' ? 'bg-slate-900' : 'bg-transparent')}>
+                  {/* User info in mobile drawer */}
+                  <div className="p-3 border-t border-borderSoft">
+                    <div className="flex items-center gap-3 p-2 rounded-xl bg-hoverSoft/50">
+                      <Avatar className={cn("h-9 w-9 border border-borderSoft shrink-0 shadow-sm", user.logoBg === 'white' ? 'bg-white' : user.logoBg === 'dark' ? 'bg-slate-900' : 'bg-transparent')}>
                         <AvatarImage src={user.logoUrl || ''} alt={user.name} className="object-contain" />
-                        <AvatarFallback className="bg-brand text-white font-semibold">
+                        <AvatarFallback className="bg-brand text-white font-semibold text-xs flex items-center justify-center">
                           {user.name.charAt(0).toUpperCase()}
                         </AvatarFallback>
                       </Avatar>
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-semibold text-textPrimary line-clamp-3 leading-snug">{user.name}</p>
-                        <p className="text-[11px] text-textMuted truncate mt-0.5">{user.role === 'club' ? `Group ${user.group}` : 'Administrator'}</p>
+                        <p className="text-xs font-semibold text-textPrimary truncate">{user.name}</p>
+                        <p className="text-[10px] text-textMuted dark:text-white/85 truncate">{user.role === 'club' ? `Group ${user.group}` : 'Administrator'}</p>
                       </div>
                     </div>
                   </div>
                 </SheetContent>
               </Sheet>
-              
             </div>
           </div>
 
           <div className="flex items-center gap-2 shrink-0">
             <ThemeToggle />
-            <NotificationPanel />
             <Button
               variant="ghost"
               size="sm"
               onClick={onLogout}
-              aria-label="Logout"
               className="flex items-center gap-2 text-textMuted hover:text-error hover:bg-error/10 rounded-lg h-9 px-2.5 sm:px-3 font-medium transition-all border border-borderSoft/60 shadow-sm bg-card/80 backdrop-blur cursor-pointer"
             >
               <LogOut size={15} />
@@ -291,8 +288,8 @@ const Layout: React.FC<LayoutProps> = ({ children, user, onLogout }) => {
         </motion.header>
 
         {/* Page Content */}
-        <main className="flex-1 p-4 sm:p-6 lg:p-8 mb-bottom-nav">
-          <div className="max-w-7xl mx-auto w-full">
+        <main className="flex-1 p-4 sm:p-6 lg:p-8 3xl:p-12 mb-bottom-nav">
+          <div className="max-w-7xl 3xl:max-w-[1800px] 4k:max-w-[2400px] uhd:max-w-[3200px] mx-auto w-full">
             <AnimatePresence mode="wait">
               <motion.div
                 key={location.pathname}

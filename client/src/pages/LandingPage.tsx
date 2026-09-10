@@ -302,22 +302,22 @@ const LandingPage: React.FC = () => {
             {/* ====== Main Content ====== */}
             <main>
                 {/* ====== Hero ====== */}
-                <section className="relative z-10 text-center px-4 sm:px-6 pt-8 sm:pt-12 md:pt-14 pb-5 sm:pb-7 max-w-3xl mx-auto">
+                <section className="relative z-10 text-center px-4 sm:px-6 3xl:px-12 pt-8 sm:pt-12 md:pt-14 3xl:pt-20 4k:pt-24 pb-5 sm:pb-7 3xl:pb-10 max-w-3xl 3xl:max-w-5xl 4k:max-w-6xl mx-auto">
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.6 }}
-                        className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-brand/20 bg-brand/5 mb-4 sm:mb-5"
+                        className="inline-flex items-center gap-2 px-3.5 py-1.5 3xl:px-5 3xl:py-2 rounded-full border border-brand/20 bg-brand/5 mb-4 sm:mb-5 3xl:mb-8"
                     >
-                        <Sparkles size={14} className="text-brand" />
-                        <span className="text-xs sm:text-sm font-semibold text-brand">Campus Event Calendar</span>
+                        <Sparkles size={14} className="text-brand 3xl:scale-125" />
+                        <span className="text-xs sm:text-sm 3xl:text-base font-semibold text-brand">Campus Event Calendar</span>
                     </motion.div>
 
                     <motion.h1
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.6, delay: 0 }}
-                        className="text-3xl sm:text-4xl md:text-5xl lg:text-5xl font-extrabold tracking-tighter text-textPrimary leading-[1.1] pb-1"
+                        className="text-3xl sm:text-4xl md:text-5xl lg:text-5xl 3xl:text-6xl 4k:text-7xl font-extrabold tracking-tighter text-textPrimary leading-[1.1] pb-1"
                     >
                         Discover What's
                         <br />
@@ -330,7 +330,7 @@ const LandingPage: React.FC = () => {
                         initial={{ opacity: 0, y: 16 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.5, delay: 0.2 }}
-                        className="mt-3.5 sm:mt-4 text-sm sm:text-base text-textSecondary max-w-lg mx-auto leading-relaxed font-normal"
+                        className="mt-3.5 sm:mt-4 3xl:mt-6 text-sm sm:text-base 3xl:text-lg 4k:text-xl text-textSecondary max-w-lg 3xl:max-w-2xl mx-auto leading-relaxed font-normal"
                     >
                         Browse upcoming events from clubs across campus.
                         Find something you love, or sign in to book your own venue.
@@ -342,7 +342,7 @@ const LandingPage: React.FC = () => {
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.3 }}
-                    className="relative z-10 flex flex-wrap items-center justify-center gap-4 sm:gap-6 mb-4 sm:mb-5 px-4"
+                    className="relative z-10 flex flex-wrap items-center justify-center gap-4 sm:gap-6 3xl:gap-8 mb-4 sm:mb-5 3xl:mb-8 px-4"
                 >
                     {[
                         { key: 'co_curricular', label: 'Co-Curricular' },
@@ -351,8 +351,8 @@ const LandingPage: React.FC = () => {
                         const c = EVENT_TYPE_COLORS[key];
                         return (
                             <div key={key} className="flex items-center gap-2">
-                                <div className={`h-2.5 w-2.5 rounded-full ${c.dot}`} />
-                                <span className="text-xs font-semibold text-textSecondary">{label}</span>
+                                <div className={`h-2.5 w-2.5 3xl:h-3.5 3xl:w-3.5 rounded-full ${c.dot}`} />
+                                <span className="text-xs sm:text-sm 3xl:text-base font-semibold text-textSecondary">{label}</span>
                             </div>
                         );
                     })}
@@ -363,7 +363,7 @@ const LandingPage: React.FC = () => {
                     initial={{ opacity: 0, y: 30 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.6, delay: 0.25 }}
-                    className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 pb-8 sm:pb-12"
+                    className="relative z-10 max-w-6xl 2xl:max-w-7xl 3xl:max-w-[1720px] 4k:max-w-[2200px] uhd:max-w-[2800px] mx-auto px-4 sm:px-6 3xl:px-10 pb-8 sm:pb-12 3xl:pb-20"
                 >
                     <div className="rounded-2xl border border-borderSoft bg-card/80 backdrop-blur-sm shadow-sm overflow-hidden">
                         {/* Calendar header */}

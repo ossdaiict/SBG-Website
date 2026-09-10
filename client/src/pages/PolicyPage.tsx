@@ -13,7 +13,7 @@ const PolicyPage: React.FC = () => {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.4 }}
-      className="max-w-4xl mx-auto space-y-6 sm:space-y-8 w-full px-1"
+      className="max-w-4xl 3xl:max-w-6xl 4k:max-w-7xl mx-auto space-y-6 sm:space-y-8 w-full px-1 3xl:px-4"
     >
       <motion.div
         initial={{ opacity: 0, y: -20 }}
