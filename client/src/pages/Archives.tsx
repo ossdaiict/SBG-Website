@@ -191,10 +191,31 @@ const Archives: React.FC = () => {
                     <CardTitle className="text-lg text-textPrimary break-words">{event.name}</CardTitle>
                     <div className="text-sm font-medium text-textSecondary mt-1">{event.club_name || 'Unknown Club'}</div>
                     <div className="flex flex-wrap gap-x-4 gap-y-2 mt-2 text-xs text-textSecondary">
-                      <span className="flex items-center gap-1 shrink-0"><Calendar size={12}/> {new Date(event.date).toLocaleDateString('en-US', { timeZone: 'Asia/Kolkata' })}</span>
-                      {event.venue && <span className="flex items-center gap-1 shrink-0"><MapPin size={12}/> {event.venue}</span>}
-                      <span className="flex items-center gap-1 shrink-0">Archived: {new Date(event.archived_at).toLocaleDateString('en-US', { timeZone: 'Asia/Kolkata' })}</span>
-                    </div>
+  <span className="flex items-center gap-1 shrink-0">
+    <Calendar size={12}/> 
+    {event.date ? (
+      <>
+        {new Date(event.date).toLocaleDateString('en-GB', { timeZone: 'Asia/Kolkata' })}
+        {event.end_date && event.end_date !== event.date && (
+          <> – {new Date(event.end_date).toLocaleDateString('en-GB', { timeZone: 'Asia/Kolkata' })}</>
+        )}
+      </>
+    ) : 'No Date'}
+  </span>
+
+  {event.venue && (
+    <span className="flex items-center gap-1 shrink-0">
+      <MapPin size={12}/> {event.venue}
+    </span>
+  )}
+
+  {event.archived_at && (
+    <span className="flex items-center gap-1 shrink-0">
+      Archived: {new Date(event.archived_at).toLocaleDateString('en-GB', { timeZone: 'Asia/Kolkata' })}
+    </span>
+  )}
+</div>
+
                   </div>
                   <div className="flex items-center gap-2 shrink-0 w-full sm:w-auto justify-between sm:justify-end">
                     <Badge variant="outline" className="text-xs bg-bgMain border-borderSoft">Event Record</Badge>
@@ -224,7 +245,7 @@ const Archives: React.FC = () => {
                         <div key={b.id} className="text-xs flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 p-3 sm:p-2 rounded-lg bg-bgMain">
                           <div className="flex flex-col gap-1">
                             <span className="font-semibold text-textPrimary">{b.venue_name || 'Unknown Venue'}</span>
-                            <span className="text-textSecondary">{new Date(b.start_time).toLocaleString('en-US', { timeZone: 'Asia/Kolkata' })} - {new Date(b.end_time).toLocaleTimeString('en-US', { timeZone: 'Asia/Kolkata' })}</span>
+                            <span className="text-textSecondary">{new Date(b.start_time).toLocaleString('en-GB', { timeZone: 'Asia/Kolkata' })} - {new Date(b.end_time).toLocaleTimeString('en-GB', { timeZone: 'Asia/Kolkata' })}</span>
                           </div>
                           <Badge variant="outline" className="text-[10px] self-start sm:self-auto shrink-0">{b.status}</Badge>
                         </div>

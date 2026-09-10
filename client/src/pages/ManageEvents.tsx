@@ -198,15 +198,17 @@ const ManageEvents: React.FC<ManageEventsProps> = ({ currentUser }) => {
           <p className="text-textMuted text-lg font-semibold">No registered events found.</p>
         </Card>
       ) : (
-        <div className="grid gap-6">
-          <div className="flex bg-card p-1 rounded-xl border border-borderSoft w-fit">
-            {['upcoming', 'ongoing', 'past'].map(tab => (
+        <div className="space-y-6">
+          <div className="flex bg-hoverSoft/80 p-1 gap-1 rounded-xl border border-borderSoft w-fit items-center">
+            {(['upcoming', 'ongoing', 'past'] as const).map(tab => (
               <button
                 key={tab}
-                onClick={() => setActiveTab(tab as any)}
+                onClick={() => setActiveTab(tab)}
                 className={cn(
-                  "px-6 py-2.5 rounded-lg text-sm font-semibold capitalize transition-all",
-                  activeTab === tab ? "bg-brand text-white shadow-sm" : "text-textMuted hover:text-textPrimary hover:bg-hoverSoft cursor-pointer"
+                  "px-4 sm:px-5 py-1.5 rounded-lg text-xs sm:text-sm font-medium border border-transparent transition-all flex items-center justify-center cursor-pointer capitalize",
+                  activeTab === tab
+                    ? "bg-card text-textPrimary border-borderSoft/60 shadow-sm font-semibold"
+                    : "text-textMuted hover:text-textPrimary hover:bg-background/40"
                 )}
               >
                 {tab}
@@ -316,7 +318,7 @@ const ManageEvents: React.FC<ManageEventsProps> = ({ currentUser }) => {
             <div className="grid gap-2">
                 <Label htmlFor="event-type" className="text-sm font-medium">Event Type *</Label>
                 <Select value={editForm.event_type} onValueChange={val => setEditForm({ ...editForm, event_type: val })}>
-                  <SelectTrigger className="rounded-xl">
+                  <SelectTrigger id="event-type" className="rounded-xl">
                     <SelectValue placeholder="Select event type" />
                   </SelectTrigger>
                   <SelectContent>
@@ -378,7 +380,7 @@ const ManageEvents: React.FC<ManageEventsProps> = ({ currentUser }) => {
               </div>
             </div>
             <div className="grid gap-2">
-              <Label htmlFor="venues" className="text-textSecondary font-medium">Venues * (Select one or more)</Label>
+              <Label className="text-textSecondary font-medium">Venues * (Select one or more)</Label>
               <div className="flex flex-wrap gap-2 max-h-32 overflow-y-auto p-2 border border-borderSoft rounded-xl bg-white/90 dark:bg-white/5 backdrop-blur-sm">
                 {[{ id: 'online', name: 'Online' }, ...venues].map(v => {
                   const isSelected = editForm.venue.includes(v.name);

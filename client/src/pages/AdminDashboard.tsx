@@ -493,20 +493,20 @@ const AdminDashboard: React.FC = () => {
         transition={{ delay: 0.1 }}
         className="px-1 sm:px-4"
       >
-        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-4 gap-2 sm:gap-3 w-full">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3 w-full">
           <Link
             to="/admin/requests?status=pending"
             className="block focus-visible:ring-2 focus-visible:ring-warning rounded-xl outline-none cursor-pointer"
           >
-            <div className="flex items-center gap-2 sm:gap-3 p-2.5 sm:p-3 bg-card/60 backdrop-blur-sm border border-borderSoft rounded-xl shadow-sm hover:border-warning/40 hover:bg-warning/5 transition-all group">
-              <div className="p-1.5 sm:p-2 bg-warning/10 text-warning rounded-lg shrink-0 group-hover:scale-110 transition-transform">
+            <div className="flex items-center gap-2 sm:gap-3 p-2 bg-card/60 backdrop-blur-sm border border-borderSoft rounded-xl shadow-sm hover:border-warning/40 hover:bg-warning/5 transition-all group">
+              <div className="p-2 bg-warning/10 text-warning rounded-lg shrink-0 group-hover:scale-110 transition-transform">
                 <AlertCircle className="w-4 h-4 sm:w-5 sm:h-5" />
               </div>
-              <div className="min-w-0">
-                <div className="text-[10px] sm:text-xs text-textMuted font-bold uppercase tracking-wider truncate">
+              <div className="min-w-0 flex-1">
+                <div className="text-[10px] sm:text-xs text-textMuted font-bold uppercase tracking-wide leading-tight">
                   Pending Bookings
                 </div>
-                <div className="text-base sm:text-lg font-extrabold text-textPrimary leading-none mt-0.5">
+                <div className="text-base sm:text-lg font-extrabold text-textPrimary leading-none mt-1">
                   {stats.pendingBookings}
                 </div>
               </div>
@@ -517,44 +517,44 @@ const AdminDashboard: React.FC = () => {
             to="/admin/event-requests?status=pending"
             className="block focus-visible:ring-2 focus-visible:ring-warning rounded-xl outline-none cursor-pointer"
           >
-            <div className="flex items-center gap-2 sm:gap-3 p-2.5 sm:p-3 bg-card/60 backdrop-blur-sm border border-borderSoft rounded-xl shadow-sm hover:border-warning/40 hover:bg-warning/5 transition-all group">
-              <div className="p-1.5 sm:p-2 bg-warning/10 text-warning rounded-lg shrink-0 group-hover:scale-110 transition-transform">
+            <div className="flex items-center gap-2 sm:gap-3 p-2 bg-card/60 backdrop-blur-sm border border-borderSoft rounded-xl shadow-sm hover:border-warning/40 hover:bg-warning/5 transition-all group">
+              <div className="p-2 bg-warning/10 text-warning rounded-lg shrink-0 group-hover:scale-110 transition-transform">
                 <CalendarIcon className="w-4 h-4 sm:w-5 sm:h-5" />
               </div>
-              <div className="min-w-0">
-                <div className="text-[10px] sm:text-xs text-textMuted font-bold uppercase tracking-wider truncate">
+              <div className="min-w-0 flex-1">
+                <div className="text-[10px] sm:text-xs text-textMuted font-bold uppercase tracking-wide leading-tight">
                   Pending Events
                 </div>
-                <div className="text-base sm:text-lg font-extrabold text-textPrimary leading-none mt-0.5">
+                <div className="text-base sm:text-lg font-extrabold text-textPrimary leading-none mt-1">
                   {stats.pendingEvents}
                 </div>
               </div>
             </div>
           </Link>
 
-          <div className="flex items-center gap-2 sm:gap-3 p-2.5 sm:p-3 bg-card/60 backdrop-blur-sm border border-borderSoft rounded-xl shadow-sm hover:border-brand/40 transition-colors cursor-pointer">
-            <div className="p-1.5 sm:p-2 bg-brand/10 text-brand rounded-lg shrink-0">
+          <div className="flex items-center gap-2 sm:gap-3 p-2 bg-card/60 backdrop-blur-sm border border-borderSoft rounded-xl shadow-sm hover:border-brand/40 transition-colors">
+            <div className="p-2 bg-brand/10 text-brand rounded-lg shrink-0">
               <CalendarIcon className="w-4 h-4 sm:w-5 sm:h-5" />
             </div>
-            <div className="min-w-0">
-              <div className="text-[10px] sm:text-xs text-textMuted font-bold uppercase tracking-wider truncate">
+            <div className="min-w-0 flex-1">
+              <div className="text-[10px] sm:text-xs text-textMuted font-bold uppercase tracking-wide leading-tight">
                 Scheduled Bookings
               </div>
-              <div className="text-base sm:text-lg font-extrabold text-textPrimary leading-none mt-0.5">
+              <div className="text-base sm:text-lg font-extrabold text-textPrimary leading-none mt-1">
                 {stats.scheduledBookings}
               </div>
             </div>
           </div>
 
-          <div className="flex items-center gap-2 sm:gap-3 p-2.5 sm:p-3 bg-card/60 backdrop-blur-sm border border-borderSoft rounded-xl shadow-sm hover:border-brand/40 transition-colors cursor-pointer">
-            <div className="p-1.5 sm:p-2 bg-brand/10 text-brand rounded-lg shrink-0">
+          <div className="flex items-center gap-2 sm:gap-3 p-2 bg-card/60 backdrop-blur-sm border border-borderSoft rounded-xl shadow-sm hover:border-brand/40 transition-colors">
+            <div className="p-2 bg-brand/10 text-brand rounded-lg shrink-0">
               <CalendarIcon className="w-4 h-4 sm:w-5 sm:h-5" />
             </div>
-            <div className="min-w-0">
-              <div className="text-[10px] sm:text-xs text-textMuted font-bold uppercase tracking-wider truncate">
+            <div className="min-w-0 flex-1">
+              <div className="text-[10px] sm:text-xs text-textMuted font-bold uppercase tracking-wide leading-tight">
                 Scheduled Events
               </div>
-              <div className="text-base sm:text-lg font-extrabold text-textPrimary leading-none mt-0.5">
+              <div className="text-base sm:text-lg font-extrabold text-textPrimary leading-none mt-1">
                 {stats.scheduledEvents}
               </div>
             </div>
@@ -571,22 +571,24 @@ const AdminDashboard: React.FC = () => {
       >
         <Card className="w-full min-w-0 border border-borderSoft rounded-xl overflow-hidden">
           <CardHeader className="border-b border-borderSoft p-3 sm:p-4">
-            <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-              <CardTitle className="text-lg sm:text-xl shrink-0">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between min-w-0">
+              <CardTitle className="text-base sm:text-lg md:text-xl font-bold truncate min-w-0">
                 {calendarView === 'campus_events' ? 'Master Events Calendar' : 'Master Booking Calendar'}
               </CardTitle>
-              <Tabs
-                value={calendarView}
-                onValueChange={(value) => setCalendarView(value as 'campus_events' | 'bookings')}
-                className="w-full sm:w-auto"
-              >
-                <TabsList aria-label="Calendar view" className="w-full sm:w-auto">
-                  <TabsTrigger value="bookings" className="flex-1">Bookings</TabsTrigger>
-                  <TabsTrigger value="campus_events" className="flex-1">Events</TabsTrigger>
-                </TabsList>
-                <TabsContent value="campus_events" className="hidden" />
-                <TabsContent value="bookings" className="hidden" />
-              </Tabs>
+              <div className="shrink-0 max-w-full">
+                <Tabs
+                  value={calendarView}
+                  onValueChange={(value) => setCalendarView(value as 'campus_events' | 'bookings')}
+                  className="w-full sm:w-auto"
+                >
+                  <TabsList aria-label="Calendar view" className="grid grid-cols-2 w-full sm:w-auto sm:inline-flex">
+                    <TabsTrigger value="bookings" className="flex-1 sm:flex-initial whitespace-nowrap px-2.5 sm:px-3.5 text-xs sm:text-sm">Bookings</TabsTrigger>
+                    <TabsTrigger value="campus_events" className="flex-1 sm:flex-initial whitespace-nowrap px-2.5 sm:px-3.5 text-xs sm:text-sm">Events</TabsTrigger>
+                  </TabsList>
+                  <TabsContent value="campus_events" className="hidden" />
+                  <TabsContent value="bookings" className="hidden" />
+                </Tabs>
+              </div>
             </div>
           </CardHeader>
 
@@ -710,7 +712,7 @@ const AdminDashboard: React.FC = () => {
                                   border
                                   border-brand/30
                                   px-2
-                                  text-[11px]
+                                  text-[10px]
                                   font-medium
                                   text-brand
                                   transition-colors
@@ -1074,7 +1076,7 @@ const AdminDashboard: React.FC = () => {
                               }
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="inline-flex items-center justify-center gap-1 sm:gap-1.5 p-[1px] px-1.5 rounded-[2rem] border border-brand/30 bg-transparent text-[11px] sm:text-[13px] font-medium text-brand hover:bg-brand/10 transition-colors w-fit"
+                              className="inline-flex items-center justify-center gap-1 sm:gap-1.5 p-[1px] px-1.5 rounded-[2rem] border border-brand/30 bg-transparent text-[10px] sm:text-[13px] font-medium text-brand hover:bg-brand/10 transition-colors w-fit"
                             >
                               <ExternalLink className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
                               View Permissions

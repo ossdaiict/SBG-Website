@@ -270,7 +270,7 @@ const AdminClubs: React.FC = () => {
                 </div>
 
                 <div className="overflow-x-auto">
-                    <table className="w-full min-w-[1000px] text-left text-sm">
+                    <table className="w-full min-w-[800px] text-left text-sm">
                         <thead className="bg-hoverSoft border-b border-borderSoft uppercase tracking-wider text-xs font-semibold text-textMuted text-center">
                             <tr>
                                 <th className="px-3 py-2 sm:py-4 w-[25%] text-center">Club Name</th>
@@ -311,7 +311,7 @@ const AdminClubs: React.FC = () => {
                                             </Badge>
                                         </td>
                                         <td className="px-3 py-2 sm:py-4 text-center">
-                                            <div className="flex justify-end items-center gap-1">
+                                            <div className="flex justify-center items-center gap-1">
                                                 <Button
                                                     variant="ghost"
                                                     size="sm"

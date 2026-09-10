@@ -114,11 +114,13 @@ const ScheduleCalendarCard = ({
     : [];
 
   return (
-    <Card className="rounded-xl h-full">
+    <Card className="rounded-xl h-full border border-borderSoft overflow-hidden">
       <CardHeader className="border-b border-borderSoft p-3 sm:p-4">
-        <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-          <CardTitle className="text-lg sm:text-xl shrink-0">{title}</CardTitle>
-          {headerAction}
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between min-w-0">
+          <CardTitle className="text-base sm:text-lg md:text-xl font-bold truncate min-w-0">{title}</CardTitle>
+          <div className="shrink-0 max-w-full">
+            {headerAction}
+          </div>
         </div>
       </CardHeader>
 
@@ -595,7 +597,7 @@ const ClubDashboard: React.FC<ClubDashboardProps> = ({ user }) => {
   const activeCalendar = React.useMemo(() => {
     if (calendarView === "campus_events") {
       return {
-        title: "Campus Events Calendar",
+        title: "Event Calendar",
         sourceGroupedEvents: campusEventsWithDaySplit,
         calendarEvents: campusCalendarEventsWithVenue,
         eventDates: campusEventDates,
@@ -605,7 +607,7 @@ const ClubDashboard: React.FC<ClubDashboardProps> = ({ user }) => {
 
     if (calendarView === "club") {
       return {
-        title: `My ${entityType} Calendar`,
+        title: `My Calendar`,
         sourceGroupedEvents: myCalendarEventsWithVenueSplit,
         calendarEvents: myCalendarEventsWithVenue,
         eventDates: myEventDates,
@@ -614,7 +616,7 @@ const ClubDashboard: React.FC<ClubDashboardProps> = ({ user }) => {
     }
 
     return {
-      title: "Global Booking Calendar",
+      title: "Booking Calendar",
       sourceGroupedEvents: calendarEventsWithVenueSplit,
       calendarEvents: calendarEventsWithVenue,
       eventDates,
@@ -778,6 +780,7 @@ const ClubDashboard: React.FC<ClubDashboardProps> = ({ user }) => {
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.5, delay: 0.2 }}
+          className="min-w-0"
         >
           <ScheduleCalendarCard
             title={activeCalendar.title}
@@ -787,27 +790,27 @@ const ClubDashboard: React.FC<ClubDashboardProps> = ({ user }) => {
                 onValueChange={(value) =>
                   setCalendarView(value as "campus_events" | "global" | "club")
                 }
-                className="w-full lg:max-w-[60%]"
+                className="w-full sm:w-auto"
               >
                 <TabsList
                   aria-label="Calendar view"
-                  className="w-full sm:w-auto"
+                  className="grid grid-cols-3 w-full sm:w-auto sm:inline-flex"
                 >
                   <TabsTrigger
                     value="global"
-                    className="flex-1"
+                    className="flex-1 sm:flex-initial whitespace-nowrap px-2.5 sm:px-3.5 text-xs sm:text-sm"
                   >
                     Bookings
                   </TabsTrigger>
                   <TabsTrigger
                     value="campus_events"
-                    className="flex-1"
+                    className="flex-1 sm:flex-initial whitespace-nowrap px-2.5 sm:px-3.5 text-xs sm:text-sm"
                   >
                     Events
                   </TabsTrigger>
                   <TabsTrigger
                     value="club"
-                    className="flex-1"
+                    className="flex-1 sm:flex-initial whitespace-nowrap px-2.5 sm:px-3.5 text-xs sm:text-sm"
                   >
                     My Calendar
                   </TabsTrigger>
