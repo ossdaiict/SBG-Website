@@ -121,6 +121,15 @@ router.patch('/events/bulk-status', async (req, res) => {
       throw new Error('No valid events found');
     }
 
+    const now = new Date();
+    const pastEvents = events.filter((e: any) => new Date(e.end_date || e.date) < now);
+    if (pastEvents.length > 0) {
+      await client.query('ROLLBACK');
+      return res.status(400).json({
+        error: 'Cannot approve or reject past events whose end date/time has already elapsed'
+      });
+    }
+
     // Update statuses
     await client.query(
       `UPDATE events SET status = $1 WHERE id = ANY($2)`,
@@ -189,6 +198,15 @@ router.patch('/bookings/bulk-status', async (req, res) => {
 
     if (bookings.length === 0) {
       throw new Error('No valid bookings found');
+    }
+
+    const now = new Date();
+    const pastBookings = bookings.filter((b: any) => new Date(b.end_time) < now);
+    if (pastBookings.length > 0) {
+      await client.query('ROLLBACK');
+      return res.status(400).json({
+        error: 'Cannot approve or reject past bookings whose end time has already elapsed'
+      });
     }
 
     if (status === 'approved') {
@@ -333,9 +351,17 @@ router.patch('/bookings/:id/status', async (req, res) => {
   }
 
   try {
-    const fetchRes = await db.query('SELECT status FROM bookings WHERE id = $1', [id]);
+    const fetchRes = await db.query('SELECT status, end_time FROM bookings WHERE id = $1', [id]);
     if (fetchRes.rows.length === 0) return res.status(404).json({ error: 'Booking not found' });
-    const oldStatus = fetchRes.rows[0].status;
+    const booking = fetchRes.rows[0];
+
+    if (new Date(booking.end_time) < new Date()) {
+      return res.status(400).json({
+        error: 'Cannot approve or reject past bookings whose end time has already elapsed'
+      });
+    }
+
+    const oldStatus = booking.status;
 
     const { rows } = await db.query(`
       UPDATE bookings SET status = $1 

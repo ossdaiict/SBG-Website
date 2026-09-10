@@ -209,17 +209,11 @@ export default function AdminEventReports() {
           }}
           className="w-full"
         >
-          <TabsList className="grid w-full grid-cols-3 bg-hoverSoft border-borderSoft rounded-xl p-1">
-            <TabsTrigger
-              value="submitted"
-              className="data-[state=active]:bg-background"
-            >
+          <TabsList className="grid w-full grid-cols-3">
+            <TabsTrigger value="submitted">
               Submitted ({reports.length})
             </TabsTrigger>
-            <TabsTrigger
-              value="tracking"
-              className="data-[state=active]:bg-background"
-            >
+            <TabsTrigger value="tracking">
               Tracking (
               {
                 pastEvents.filter((e) => !e.has_report && !e.report_exempt)
@@ -227,10 +221,7 @@ export default function AdminEventReports() {
               }
               )
             </TabsTrigger>
-            <TabsTrigger
-              value="exempt"
-              className="data-[state=active]:bg-background"
-            >
+            <TabsTrigger value="exempt">
               Exempt ({pastEvents.filter((e) => e.report_exempt).length})
             </TabsTrigger>
           </TabsList>

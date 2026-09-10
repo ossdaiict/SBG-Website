@@ -791,23 +791,23 @@ const ClubDashboard: React.FC<ClubDashboardProps> = ({ user }) => {
               >
                 <TabsList
                   aria-label="Calendar view"
-                  className="flex items-center w-full sm:w-auto h-9 sm:h-8 p-1 gap-1 bg-hoverSoft rounded-xl border border-borderSoft"
+                  className="w-full sm:w-auto"
                 >
                   <TabsTrigger
                     value="global"
-                    className="flex-1 text-[13px] sm:text-xs md:text-sm px-2 sm:px-3 py-1 sm:py-1.5 h-7 sm:h-8 font-medium"
+                    className="flex-1"
                   >
                     Bookings
                   </TabsTrigger>
                   <TabsTrigger
                     value="campus_events"
-                    className="flex-1 text-[13px] sm:text-xs md:text-sm px-2 sm:px-3 py-1 sm:py-1.5 h-7 sm:h-8 font-medium"
+                    className="flex-1"
                   >
                     Events
                   </TabsTrigger>
                   <TabsTrigger
                     value="club"
-                    className="flex-1 text-[13px] sm:text-xs md:text-sm px-2 sm:px-3 py-1 sm:py-1.5 h-7 sm:h-8 font-medium"
+                    className="flex-1"
                   >
                     My Calendar
                   </TabsTrigger>

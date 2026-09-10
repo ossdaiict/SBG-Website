@@ -116,7 +116,7 @@ const AdminRequests: React.FC = () => {
         body: { ids, status: action },
       });
       toastSuccess(
-        `Request(s) ${action === "approved" ? "approved" : "rejected"} successfully`,
+        `Request(s) ${action === "approved" ? "approved" : action === "rejected" ? "rejected" : "moved to pending"} successfully`,
       );
       fetchRequests();
     } catch (err) {
@@ -498,6 +498,13 @@ const AdminRequestRow: React.FC<AdminRequestRowProps> = ({
   const safeBookings = req.bookings || [];
   const isMultiVenue = safeBookings.length > 1;
 
+  const isPast =
+    req.endTimeISO
+      ? new Date(req.endTimeISO).getTime() < Date.now()
+      : safeBookings.length > 0 && safeBookings[0].endTimeISO
+        ? new Date(safeBookings[0].endTimeISO).getTime() < Date.now()
+        : false;
+
   // Check if issueFlag applies universally to all venues in the batch
   const hasUniversalFlag =
     safeBookings.length > 0 &&
@@ -716,8 +723,12 @@ const AdminRequestRow: React.FC<AdminRequestRowProps> = ({
                     handleAction([safeBookings[0].id], "rejected");
                   }}
                   className="text-textMuted hover:text-error h-8 w-8 rounded-full"
-                  title="Reject this venue"
-                  disabled={isProcessingAction}
+                  title={
+                    isPast
+                      ? "Cannot reject past bookings whose end time has already elapsed"
+                      : "Reject this venue"
+                  }
+                  disabled={isProcessingAction || isPast}
                 >
                   <XCircle size={18} />
                 </Button>
@@ -731,10 +742,53 @@ const AdminRequestRow: React.FC<AdminRequestRowProps> = ({
                     handleAction(req.ids, "rejected");
                   }}
                   className="text-textMuted hover:text-error h-8 w-8 rounded-full"
-                  title="Reject all venues"
-                  disabled={isProcessingAction}
+                  title={
+                    isPast
+                      ? "Cannot reject past bookings whose end time has already elapsed"
+                      : "Reject all venues"
+                  }
+                  disabled={isProcessingAction || isPast}
                 >
                   <XCircle size={18} />
+                </Button>
+              )}
+
+              {!isMultiVenue && safeBookings[0]?.status !== "approved" && (
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleAction([safeBookings[0].id], "approved");
+                  }}
+                  className="text-primary hover:text-primary/80 h-8 w-8 rounded-full"
+                  title={
+                    isPast
+                      ? "Cannot approve past bookings whose end time has already elapsed"
+                      : "Approve this venue"
+                  }
+                  disabled={isProcessingAction || isPast}
+                >
+                  <CheckCircle size={18} />
+                </Button>
+              )}
+              {isMultiVenue && req.status !== "approved" && (
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleAction(req.ids, "approved");
+                  }}
+                  className="text-primary hover:text-primary/80 h-8 w-8 rounded-full"
+                  title={
+                    isPast
+                      ? "Cannot approve past bookings whose end time has already elapsed"
+                      : "Approve all venues"
+                  }
+                  disabled={isProcessingAction || isPast}
+                >
+                  <CheckCircle size={18} />
                 </Button>
               )}
 
@@ -753,36 +807,6 @@ const AdminRequestRow: React.FC<AdminRequestRowProps> = ({
                   <Pencil size={16} />
                 </Button>
               )}
-              {!isMultiVenue && safeBookings[0]?.status !== "approved" && (
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleAction([safeBookings[0].id], "approved");
-                  }}
-                  className="text-primary hover:text-primary/80 h-8 w-8 rounded-full"
-                  title="Approve this venue"
-                  disabled={isProcessingAction}
-                >
-                  <CheckCircle size={18} />
-                </Button>
-              )}
-              {isMultiVenue && req.status !== "approved" && (
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleAction(req.ids, "approved");
-                  }}
-                  className="text-primary hover:text-primary/80 h-8 w-8 rounded-full"
-                  title="Approve all venues"
-                  disabled={isProcessingAction}
-                >
-                  <CheckCircle size={18} />
-                </Button>
-              )}
 
               {!isMultiVenue && safeBookings[0]?.status !== "pending" && (
                 <Button
@@ -793,8 +817,12 @@ const AdminRequestRow: React.FC<AdminRequestRowProps> = ({
                     handleAction([safeBookings[0].id], "pending");
                   }}
                   className="text-textMuted hover:text-warning h-8 w-8 rounded-full"
-                  title="Move to pending"
-                  disabled={isProcessingAction}
+                  title={
+                    isPast
+                      ? "Cannot change status of past bookings"
+                      : "Move to pending"
+                  }
+                  disabled={isProcessingAction || isPast}
                 >
                   <RotateCcw size={18} />
                 </Button>
@@ -808,8 +836,12 @@ const AdminRequestRow: React.FC<AdminRequestRowProps> = ({
                     handleAction(req.ids, "pending");
                   }}
                   className="text-textMuted hover:text-warning h-8 w-8 rounded-full"
-                  title="Move all to pending"
-                  disabled={isProcessingAction}
+                  title={
+                    isPast
+                      ? "Cannot change status of past bookings"
+                      : "Move all to pending"
+                  }
+                  disabled={isProcessingAction || isPast}
                 >
                   <RotateCcw size={18} />
                 </Button>
@@ -866,145 +898,173 @@ const AdminRequestRow: React.FC<AdminRequestRowProps> = ({
                     Individual Venue Statuses
                   </div>
                 </div>
-                {safeBookings.map((booking) => (
-                  <div
-                    key={booking.id}
-                    className="flex items-center justify-between p-3 bg-background rounded-lg border border-borderSoft shadow-sm gap-3"
-                  >
-                    <div className="flex items-center gap-2.5 min-w-0 flex-1">
-                      <span className="font-semibold text-sm text-textPrimary">
-                        {getVenueName(booking.venueId)}
-                      </span>
-                      {booking.issueFlag && !hasUniversalFlag && (
-                        <Popover>
-                          <PopoverTrigger asChild>
-                            <button
-                              type="button"
+                {safeBookings.map((booking) => {
+                  const isBookingPast = booking.endTimeISO
+                    ? new Date(booking.endTimeISO).getTime() < Date.now()
+                    : isPast;
+
+                  return (
+                    <div
+                      key={booking.id}
+                      className="flex items-center justify-between p-3 bg-background rounded-lg border border-borderSoft shadow-sm gap-3"
+                    >
+                      <div className="flex items-center gap-2.5 min-w-0 flex-1">
+                        <span className="font-semibold text-sm text-textPrimary">
+                          {getVenueName(booking.venueId)}
+                        </span>
+                        {booking.issueFlag && !hasUniversalFlag && (
+                          <Popover>
+                            <PopoverTrigger asChild>
+                              <button
+                                type="button"
+                                onClick={(e) => e.stopPropagation()}
+                                className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-warning/15 text-warning border border-warning/30 hover:bg-warning/25 transition-all cursor-pointer shrink-0 active:scale-95"
+                                title="Click to view flag details"
+                              >
+                                <AlertTriangle
+                                  size={10}
+                                  className="shrink-0 text-warning"
+                                />
+                                <span>Flagged</span>
+                              </button>
+                            </PopoverTrigger>
+                            <PopoverContent
+                              side="bottom"
+                              align="start"
                               onClick={(e) => e.stopPropagation()}
-                              className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-warning/15 text-warning border border-warning/30 hover:bg-warning/25 transition-all cursor-pointer shrink-0 active:scale-95"
-                              title="Click to view flag details"
+                              className="w-72 sm:w-80 text-xs bg-popover text-popover-foreground border border-borderSoft p-3 shadow-2xl rounded-xl z-50"
                             >
-                              <AlertTriangle
-                                size={10}
-                                className="shrink-0 text-warning"
-                              />
-                              <span>Flagged</span>
-                            </button>
-                          </PopoverTrigger>
-                          <PopoverContent
-                            side="bottom"
-                            align="start"
-                            onClick={(e) => e.stopPropagation()}
-                            className="w-72 sm:w-80 text-xs bg-popover text-popover-foreground border border-borderSoft p-3 shadow-2xl rounded-xl z-50"
-                          >
-                            <div className="font-semibold text-warning flex items-center gap-1.5 mb-2 pb-1.5 border-b border-borderSoft/60">
-                              <AlertTriangle
-                                size={13}
-                                className="shrink-0 text-warning"
-                              />
-                              <span>Venue Flag Reason</span>
-                            </div>
-                            <div className="space-y-1.5 text-textSecondary text-xs leading-relaxed">
-                              {booking.issueFlag
-                                .split(" | ")
-                                .map((part: string, i: number) => (
-                                  <div
-                                    key={i}
-                                    className="flex items-start gap-1.5 bg-warning/5 p-1.5 rounded-lg border border-warning/15"
-                                  >
-                                    <span className="text-warning font-bold">
-                                      •
-                                    </span>
-                                    <span className="text-textPrimary">
-                                      {part}
-                                    </span>
-                                  </div>
-                                ))}
-                            </div>
-                          </PopoverContent>
-                        </Popover>
-                      )}
-                    </div>
+                              <div className="font-semibold text-warning flex items-center gap-1.5 mb-2 pb-1.5 border-b border-borderSoft/60">
+                                <AlertTriangle
+                                  size={13}
+                                  className="shrink-0 text-warning"
+                                />
+                                <span>Venue Flag Reason</span>
+                              </div>
+                              <div className="space-y-1.5 text-textSecondary text-xs leading-relaxed">
+                                {booking.issueFlag
+                                  .split(" | ")
+                                  .map((part: string, i: number) => (
+                                    <div
+                                      key={i}
+                                      className="flex items-start gap-1.5 bg-warning/5 p-1.5 rounded-lg border border-warning/15"
+                                    >
+                                      <span className="text-warning font-bold">
+                                        •
+                                      </span>
+                                      <span className="text-textPrimary">
+                                        {part}
+                                      </span>
+                                    </div>
+                                  ))}
+                              </div>
+                            </PopoverContent>
+                          </Popover>
+                        )}
+                      </div>
 
-                    <div className="flex items-center gap-4 shrink-0">
-                      <Badge
-                        variant={
-                          booking.status === "approved"
-                            ? "success"
-                            : booking.status === "rejected"
-                              ? "destructive"
-                              : "pending"
-                        }
-                        className="text-[10px] h-5 px-2 font-medium shrink-0"
-                      >
-                        {booking.status.toUpperCase()}
-                      </Badge>
+                      <div className="flex items-center gap-4 shrink-0">
+                        <Badge
+                          variant={
+                            booking.status === "approved"
+                              ? "success"
+                              : booking.status === "rejected"
+                                ? "destructive"
+                                : "pending"
+                          }
+                          className="text-[10px] h-5 px-2 font-medium shrink-0"
+                        >
+                          {booking.status.toUpperCase()}
+                        </Badge>
 
-                      {/* Spacer to match Send Mail button on the main row so status badge aligns with the column */}
-                      <div className="w-[98px] hidden sm:block shrink-0" aria-hidden="true" />
+                        {/* Spacer to match Send Mail button on the main row so status badge aligns with the column */}
+                        <div
+                          className="w-[98px] hidden sm:block shrink-0"
+                          aria-hidden="true"
+                        />
 
-                      <div className="flex items-center justify-end gap-1 w-[140px]">
-                        <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => onEdit(booking)}
-                        className="h-8 w-8 p-0 text-textMuted hover:text-primary"
-                        title="Edit booking timings"
-                        disabled={isProcessingAction}
-                      >
-                        <Pencil size={14} />
-                      </Button>
-                        {booking.status !== "rejected" && (
+                        <div className="flex items-center justify-end gap-1 w-[140px]">
+                          {booking.status !== "rejected" && (
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() =>
+                                handleAction([booking.id], "rejected")
+                              }
+                              className="h-8 w-8 p-0 text-textMuted hover:text-error"
+                              title={
+                                isBookingPast
+                                  ? "Cannot reject past bookings whose end time has already elapsed"
+                                  : "Reject this venue"
+                              }
+                              disabled={isProcessingAction || isBookingPast}
+                            >
+                              <X size={16} />
+                            </Button>
+                          )}
+
+                          {booking.status !== "approved" && (
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() =>
+                                handleAction([booking.id], "approved")
+                              }
+                              className="h-8 w-8 p-0 text-primary hover:text-primary/80"
+                              title={
+                                isBookingPast
+                                  ? "Cannot approve past bookings whose end time has already elapsed"
+                                  : "Approve this venue"
+                              }
+                              disabled={isProcessingAction || isBookingPast}
+                            >
+                              <Check size={16} />
+                            </Button>
+                          )}
+
                           <Button
                             variant="ghost"
                             size="sm"
-                            onClick={() => handleAction([booking.id], "rejected")}
+                            onClick={() => onEdit(booking)}
+                            className="h-8 w-8 p-0 text-textMuted hover:text-primary"
+                            title="Edit booking timings"
+                            disabled={isProcessingAction}
+                          >
+                            <Pencil size={14} />
+                          </Button>
+                          {booking.status !== "pending" && (
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() =>
+                                handleAction([booking.id], "pending")
+                              }
+                              className="h-8 w-8 p-0 text-textMuted hover:text-warning"
+                              title={
+                                isBookingPast
+                                  ? "Cannot change status of past bookings"
+                                  : "Move to pending"
+                              }
+                              disabled={isProcessingAction || isBookingPast}
+                            >
+                              <RotateCcw size={16} />
+                            </Button>
+                          )}
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleDelete([booking.id])}
                             className="h-8 w-8 p-0 text-textMuted hover:text-error"
-                          title="Reject this venue"
-                          disabled={isProcessingAction}
-                        >
-                          <X size={16} />
-                        </Button>
-                      )}
-                      
-                      {booking.status !== "approved" && (
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleAction([booking.id], "approved")}
-                          className="h-8 w-8 p-0 text-primary hover:text-primary/80"
-                          title="Approve this venue"
-                          disabled={isProcessingAction}
-                        >
-                          <Check size={16} />
-                        </Button>
-                      )}
-                      {booking.status !== "pending" && (
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleAction([booking.id], "pending")}
-                          className="h-8 w-8 p-0 text-textMuted hover:text-warning"
-                          title="Move to pending"
-                          disabled={isProcessingAction}
-                        >
-                          <RotateCcw size={16} />
-                        </Button>
-                      )}
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => handleDelete([booking.id])}
-                        className="h-8 w-8 p-0 text-textMuted hover:text-error"
-                        title="Delete this venue booking"
-                        disabled={isProcessingAction}
-                      >
-                        <Trash2 size={14} />
-                      </Button>
+                            title="Delete this venue booking"
+                            disabled={isProcessingAction}
+                          >
+                            <Trash2 size={14} />
+                          </Button>
+                        </div>
+                      </div>
                     </div>
-                  </div>
-                </div>
-              ))}
+                  );
+                })}
             </div>
           </td>
         </motion.tr>

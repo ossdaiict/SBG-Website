@@ -309,12 +309,12 @@ const ClubsCommitteesPage: React.FC = () => {
                         </DialogHeader>
 
                         <Tabs value={modalTab} onValueChange={(value) => setModalTab(value as 'about' | 'members')} className="w-full mt-4">
-                            <TabsList className="grid w-full grid-cols-2 gap-1 mb-4 bg-hoverSoft/50 p-1 rounded-xl border border-borderSoft/40 items-stretch h-12">
+                            <TabsList className="grid w-full grid-cols-2 gap-1 mb-4 bg-hoverSoft/80 p-1 rounded-xl border border-borderSoft items-stretch">
                                 {(['about', 'members'] as const).map(tab => (
                                     <TabsTrigger
                                         key={tab}
                                         value={tab}
-                                        className="relative rounded-lg py-1.2 text-sm font-medium cursor-pointer bg-transparent shadow-none data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:text-textPrimary hover:text-textPrimary hover:bg-hoverSoft"
+                                        className="relative rounded-lg px-3.5 py-1.5 text-sm font-medium cursor-pointer bg-transparent shadow-none data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:text-textPrimary hover:text-textPrimary hover:bg-hoverSoft"
                                     >
                                         {modalTab === tab && (
                                             <motion.div

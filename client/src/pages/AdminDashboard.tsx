@@ -580,9 +580,9 @@ const AdminDashboard: React.FC = () => {
                 onValueChange={(value) => setCalendarView(value as 'campus_events' | 'bookings')}
                 className="w-full sm:w-auto"
               >
-                <TabsList aria-label="Calendar view" className="flex items-center w-full sm:w-auto h-9 sm:h-10 p-1 gap-1 bg-hoverSoft rounded-xl border border-borderSoft">
-                  <TabsTrigger value="bookings" className="flex-1 text-[12px] sm:text-xs md:text-sm px-2 sm:px-3 py-1 sm:py-1.5 h-7 sm:h-8 font-medium">Bookings</TabsTrigger>
-                  <TabsTrigger value="campus_events" className="flex-1 text-[12px] sm:text-xs md:text-sm px-2 sm:px-3 py-1 sm:py-1.5 h-7 sm:h-8 font-medium">Events</TabsTrigger>
+                <TabsList aria-label="Calendar view" className="w-full sm:w-auto">
+                  <TabsTrigger value="bookings" className="flex-1">Bookings</TabsTrigger>
+                  <TabsTrigger value="campus_events" className="flex-1">Events</TabsTrigger>
                 </TabsList>
                 <TabsContent value="campus_events" className="hidden" />
                 <TabsContent value="bookings" className="hidden" />
@@ -1298,29 +1298,49 @@ const AdminDashboard: React.FC = () => {
                         </div>
                       </div>
 
-                      <div className="flex items-center gap-2 sm:gap-3">
-                        <Button
-                          variant="destructive"
-                          size="sm"
-                          className="flex items-center gap-2"
-                          onClick={() =>
-                            handleEventAction([evt.id], "rejected")
-                          }
-                          disabled={isProcessingAction}
-                        >
-                          <XCircle size={16} />
-                          <span className="hidden sm:inline">Reject</span>
-                        </Button>
-                        <Button
-                          size="sm"
-                          className="flex items-center gap-2"
-                          onClick={() => handleEventAction([evt.id], "active")}
-                          disabled={isProcessingAction}
-                        >
-                          <CheckCircle size={16} />
-                          <span className="hidden sm:inline">Approve</span>
-                        </Button>
-                      </div>
+                      {(() => {
+                        const isPast = evt.dynamic_end_date
+                          ? new Date(evt.dynamic_end_date).getTime() < Date.now()
+                          : evt.end_date
+                            ? new Date(evt.end_date).getTime() < Date.now()
+                            : new Date(evt.date).getTime() < Date.now();
+
+                        return (
+                          <div className="flex items-center gap-2 sm:gap-3">
+                            <Button
+                              variant="destructive"
+                              size="sm"
+                              className="flex items-center gap-2"
+                              onClick={() =>
+                                handleEventAction([evt.id], "rejected")
+                              }
+                              title={
+                                isPast
+                                  ? "Cannot reject past events whose end date/time has already elapsed"
+                                  : "Reject"
+                              }
+                              disabled={isProcessingAction || isPast}
+                            >
+                              <XCircle size={16} />
+                              <span className="hidden sm:inline">Reject</span>
+                            </Button>
+                            <Button
+                              size="sm"
+                              className="flex items-center gap-2"
+                              onClick={() => handleEventAction([evt.id], "active")}
+                              title={
+                                isPast
+                                  ? "Cannot approve past events whose end date/time has already elapsed"
+                                  : "Approve"
+                              }
+                              disabled={isProcessingAction || isPast}
+                            >
+                              <CheckCircle size={16} />
+                              <span className="hidden sm:inline">Approve</span>
+                            </Button>
+                          </div>
+                        );
+                      })()}
                     </div>
                   </motion.div>
                 ))

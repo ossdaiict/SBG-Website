@@ -91,7 +91,9 @@ const AdminEventRequests: React.FC = () => {
         auth: true,
         body: { ids, status: action },
       });
-      toastSuccess(`Event(s) ${action === 'active' ? 'approved' : 'rejected'} successfully`);
+      toastSuccess(
+        `Event(s) ${action === 'active' ? 'approved' : action === 'rejected' ? 'rejected' : 'moved to pending'} successfully`,
+      );
       fetchEvents();
     } catch (err) {
       console.error('Failed to update event(s):', err);
@@ -338,6 +340,8 @@ const AdminEventRow: React.FC<AdminEventRowProps> = ({ ev, index, handleAction, 
   };
 
   const safeStatus = ev.status || 'pending';
+  const endDate = ev.dynamic_end_date || ev.end_date || ev.date;
+  const isPast = endDate ? new Date(endDate).getTime() < Date.now() : false;
 
   return (
     <motion.tr
@@ -388,7 +392,9 @@ const AdminEventRow: React.FC<AdminEventRowProps> = ({ ev, index, handleAction, 
       </td>
       <td className="px-3 py-2 sm:py-4 text-center">
         <Badge variant={getStatusVariant(safeStatus)}>
-          {String(safeStatus).charAt(0).toUpperCase() + String(safeStatus).slice(1)}
+          {safeStatus === 'active'
+            ? 'Approved'
+            : String(safeStatus).charAt(0).toUpperCase() + String(safeStatus).slice(1)}
         </Badge>
       </td>
       <td className="px-3 py-2 sm:py-4 text-center">
@@ -400,8 +406,8 @@ const AdminEventRow: React.FC<AdminEventRowProps> = ({ ev, index, handleAction, 
               aria-label="Reject Event"
               onClick={(e) => { e.stopPropagation(); handleAction([ev.id], 'rejected'); }}
               className="text-textMuted hover:text-error"
-              title="Reject Event"
-              disabled={isProcessingAction}
+              title={isPast ? "Cannot reject past events whose end date/time has already elapsed" : "Reject Event"}
+              disabled={isProcessingAction || isPast}
             >
               <XCircle size={18} />
             </Button>
@@ -413,8 +419,8 @@ const AdminEventRow: React.FC<AdminEventRowProps> = ({ ev, index, handleAction, 
               aria-label="Approve Event"
               onClick={(e) => { e.stopPropagation(); handleAction([ev.id], 'active'); }}
               className="text-primary hover:text-primary/80"
-              title="Approve Event"
-              disabled={isProcessingAction}
+              title={isPast ? "Cannot approve past events whose end date/time has already elapsed" : "Approve Event"}
+              disabled={isProcessingAction || isPast}
             >
               <CheckCircle size={18} />
             </Button>
@@ -426,8 +432,8 @@ const AdminEventRow: React.FC<AdminEventRowProps> = ({ ev, index, handleAction, 
               aria-label="Move to Pending"
               onClick={(e) => { e.stopPropagation(); handleAction([ev.id], 'pending'); }}
               className="text-textMuted hover:text-warning"
-              title="Move to Pending"
-              disabled={isProcessingAction}
+              title={isPast ? "Cannot change status of past events" : "Move to Pending"}
+              disabled={isProcessingAction || isPast}
             >
               <RotateCcw size={18} />
             </Button>
