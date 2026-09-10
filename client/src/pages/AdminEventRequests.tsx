@@ -157,7 +157,7 @@ const AdminEventRequests: React.FC = () => {
       transition={{ duration: 0.4 }}
       className="space-y-6"
     >
-      <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-4">
+      <div className="flex flex-col justify-between gap-4">
         <div className="min-w-0 flex-1">
           <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-textPrimary tracking-tight leading-tight">Event Registrations</h1>
           <p className="text-textMuted mt-2 text-sm sm:text-base font-medium">Review and take action on event registrations.</p>
