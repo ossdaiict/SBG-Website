@@ -94,7 +94,7 @@ export const performVenueConflictCheck = async (
   excludeIds?: string[],
   queryable: PoolClient | typeof db = db
 ) => {
-  if (!venueIds || venueIds.length === 0) return { conflict: false, message: '' };
+  if (!venueIds || venueIds.length === 0) return { conflict: false, message: '', conflictingVenueIds: [] as string[] };
 
   let query = `
     SELECT b.venue_id, v.name AS venue_name, c.name AS club_name
@@ -117,15 +117,17 @@ export const performVenueConflictCheck = async (
   const { rows: conflicts } = await queryable.query(query, params);
 
   if (conflicts.length > 0) {
+    const conflictingVenueIds = [...new Set(conflicts.map((c: any) => c.venue_id as string))];
     // Get unique venue names that have conflicts
     const conflictingVenueNames = [...new Set(conflicts.map((c: any) => `${c.venue_name || 'Unknown Venue'} (by ${c.club_name || 'Unknown Club'})`))];
     return {
       conflict: true,
+      conflictingVenueIds,
       message: `Conflict: The following venues are already booked during this time: ${conflictingVenueNames.join(', ')}`
     };
   }
 
-  return { conflict: false, message: '' };
+  return { conflict: false, message: '', conflictingVenueIds: [] as string[] };
 };
 
 export const createBooking = async (req: Request, res: Response) => {
@@ -490,15 +492,27 @@ export const checkConflict = async (req: Request, res: Response) => {
 
   try {
     if (finalVenueIds.length > 0) {
+      const allBusyVenueIds = new Set<string>();
+      let firstConflictMessage = '';
+
       for (const slot of timeSlots) {
-        const { conflict: venueConflict, message: venueMessage } = await performVenueConflictCheck(finalVenueIds, slot.startTime, slot.endTime);
+        const { conflict: venueConflict, message: venueMessage, conflictingVenueIds } = await performVenueConflictCheck(finalVenueIds, slot.startTime, slot.endTime);
         if (venueConflict) {
-          return res.json({ hasConflict: true, message: venueMessage });
+          if (!firstConflictMessage) firstConflictMessage = venueMessage;
+          conflictingVenueIds?.forEach(id => allBusyVenueIds.add(id));
         }
+      }
+
+      if (allBusyVenueIds.size > 0) {
+        return res.json({
+          hasConflict: true,
+          message: firstConflictMessage,
+          busyVenueIds: Array.from(allBusyVenueIds)
+        });
       }
     }
 
-    return res.json({ hasConflict: false, message: '' });
+    return res.json({ hasConflict: false, message: '', busyVenueIds: [] });
   } catch (err) {
     return res.status(500).json({ error: (err as Error).message });
   }

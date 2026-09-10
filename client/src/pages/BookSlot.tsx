@@ -372,25 +372,28 @@ const BookSlot: React.FC<BookSlotProps> = ({ currentUser }) => {
       try {
         if (venues.length === 0) return;
 
+        const selectedClubId = clubs.find(c => c.name === formData.clubName)?.id || '';
+        const allVenueIds = venues.map(v => v.id);
         const timeSlots = generateTimeSlots();
 
-        const query = new URLSearchParams({
-          clubId: clubs.find(c => c.name === formData.clubName)?.id || '',
-          venueIds: venues.map(v => v.id).join(','),
-        });
-
-        const { hasConflict, message } = await apiRequest<{ hasConflict: boolean; message: string }>(
-          `/api/bookings/check-conflict?${query.toString()}`,
+        const { hasConflict, message, busyVenueIds: returnedBusyIds } = await apiRequest<{ hasConflict: boolean; message: string; busyVenueIds?: string[] }>(
+          `/api/bookings/check-conflict`,
           { 
             method: 'POST',
             auth: true,
-            body: { timeSlots }
+            body: {
+              clubId: selectedClubId,
+              venueIds: allVenueIds,
+              timeSlots
+            }
           }
         );
 
-        if (hasConflict) {
+        if (hasConflict && returnedBusyIds && returnedBusyIds.length > 0) {
+          setBusyVenueIds(returnedBusyIds);
+        } else if (hasConflict) {
           const busyNames = message.split(': ').pop()?.split(', ') || [];
-          const busyIds = venues.filter(v => busyNames.includes(v.name)).map(v => v.id);
+          const busyIds = venues.filter(v => busyNames.some(bn => bn.includes(v.name))).map(v => v.id);
           setBusyVenueIds(busyIds);
         } else {
           setBusyVenueIds([]);

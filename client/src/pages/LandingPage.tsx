@@ -302,22 +302,22 @@ const LandingPage: React.FC = () => {
             {/* ====== Main Content ====== */}
             <main>
                 {/* ====== Hero ====== */}
-                <section className="relative z-10 text-center px-5 sm:px-8 pt-12 sm:pt-20 pb-10 sm:pb-14 max-w-4xl mx-auto">
+                <section className="relative z-10 text-center px-4 sm:px-6 pt-8 sm:pt-12 md:pt-14 pb-5 sm:pb-7 max-w-3xl mx-auto">
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.6 }}
-                        className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-brand/20 bg-brand/5 mb-6 sm:mb-8"
+                        className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-brand/20 bg-brand/5 mb-4 sm:mb-5"
                     >
                         <Sparkles size={14} className="text-brand" />
-                        <span className="text-sm font-semibold text-brand">Campus Event Calendar</span>
+                        <span className="text-xs sm:text-sm font-semibold text-brand">Campus Event Calendar</span>
                     </motion.div>
 
                     <motion.h1
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.6, delay: 0 }}
-                        className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold tracking-tighter text-textPrimary leading-[1.08] pb-2"
+                        className="text-3xl sm:text-4xl md:text-5xl lg:text-5xl font-extrabold tracking-tighter text-textPrimary leading-[1.1] pb-1"
                     >
                         Discover What's
                         <br />
@@ -330,7 +330,7 @@ const LandingPage: React.FC = () => {
                         initial={{ opacity: 0, y: 16 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.5, delay: 0.2 }}
-                        className="mt-6 sm:mt-8 text-base sm:text-lg text-textSecondary max-w-xl mx-auto leading-relaxed font-medium"
+                        className="mt-3.5 sm:mt-4 text-sm sm:text-base text-textSecondary max-w-lg mx-auto leading-relaxed font-normal"
                     >
                         Browse upcoming events from clubs across campus.
                         Find something you love, or sign in to book your own venue.
@@ -342,7 +342,7 @@ const LandingPage: React.FC = () => {
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.3 }}
-                    className="relative z-10 flex flex-wrap items-center justify-center gap-4 sm:gap-6 mb-6 px-4"
+                    className="relative z-10 flex flex-wrap items-center justify-center gap-4 sm:gap-6 mb-4 sm:mb-5 px-4"
                 >
                     {[
                         { key: 'co_curricular', label: 'Co-Curricular' },
@@ -363,11 +363,11 @@ const LandingPage: React.FC = () => {
                     initial={{ opacity: 0, y: 30 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.6, delay: 0.25 }}
-                    className="relative z-10 max-w-7xl mx-auto px-5 sm:px-8 pb-8 sm:pb-16"
+                    className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 pb-8 sm:pb-12"
                 >
                     <div className="rounded-2xl border border-borderSoft bg-card/80 backdrop-blur-sm shadow-sm overflow-hidden">
                         {/* Calendar header */}
-                        <div className="flex items-center justify-between px-4 sm:px-6 py-3.5 border-b border-borderSoft bg-hoverSoft/30">
+                        <div className="flex items-center justify-between px-4 sm:px-6 py-3 border-b border-borderSoft bg-hoverSoft/30">
                             <div className="flex items-center gap-2">
                                 <Button variant="outline" size="sm" onClick={goToday} className="rounded-lg text-xs font-semibold h-8 bg-card shadow-sm">
                                     Today
@@ -397,7 +397,7 @@ const LandingPage: React.FC = () => {
                             {DAY_HEADERS.map(d => (
                                 <div
                                     key={d}
-                                    className="py-2 sm:py-2.5 text-center text-xs sm:text-xs font-bold uppercase tracking-wider text-textSecondary border-r last:border-r-0 border-borderSoft/20"
+                                    className="py-2 text-center text-xs font-bold uppercase tracking-wider text-textSecondary border-r last:border-r-0 border-borderSoft/20"
                                 >
                                     {d}
                                 </div>
@@ -410,175 +410,186 @@ const LandingPage: React.FC = () => {
                                 <div className="h-8 w-8 border-3 border-brand/30 border-t-brand rounded-full animate-spin" />
                             </div>
                         ) : (() => {
-                            // Centralized layout constants — single source of truth
+                            // Centralized layout constants — compact and adaptive for laptops/MacBook
                             const L = {
-                                cellPad:    isMobile ? 4  : 8,    // p-1 vs p-2
-                                dayNumH:    isMobile ? 22 : 28,   // day number circle
-                                dayNumMb:   isMobile ? 2  : 4,    // margin below number
-                                barH:       isMobile ? 22 : 24,   // event bar height
-                                barGap:     isMobile ? 3  : 4,    // gap between rows
-                                maxSlots:   2,
-                                barMargin:  isMobile ? 2  : 6,    // ml/mr on bars
-                                barFont:    isMobile ? 10 : 12,   // event name font
-                                barPadX:    isMobile ? 4  : 8,    // horizontal padding in bars
-                                overflowFont: isMobile ? 10 : 11, // "+N more" font
+                                cellPad:      isMobile ? 3 : 5,    // compact padding
+                                dayNumH:      isMobile ? 20 : 24,  // sleek day number
+                                dayNumMb:     2,                   // tight margin below number
+                                barH:         isMobile ? 20 : 22,  // event bar height
+                                barGap:       3,                   // gap between rows
+                                maxSlots:     2,
+                                barMargin:    isMobile ? 2 : 4,    // ml/mr on bars
+                                barFont:      isMobile ? 10 : 11,  // event name font
+                                barPadX:      isMobile ? 4 : 6,    // horizontal padding in bars
+                                overflowFont: isMobile ? 10 : 11,  // "+N more" font
                             };
                             // Derived values
                             const overlayTop = L.cellPad + L.dayNumH + L.dayNumMb;
                             const rowH = L.barH + L.barGap;
-                            const eventsAreaH = L.maxSlots * rowH;
-                            const spacerH = eventsAreaH; // strict 1:1 mapping with events area
-                            const overflowH = isMobile ? 16 : 18;
-                            const weekMinH = overlayTop + spacerH + overflowH + L.cellPad;
+                            const overflowH = isMobile ? 14 : 16;
 
                             return (
                             <div className="flex flex-col border-x border-borderSoft/30">
-                                {calendarWeeks.map((week, wIdx) => (
-                                    <div
-                                        key={wIdx}
-                                        className="relative grid grid-cols-7 border-b border-borderSoft/30 last:border-b-0"
-                                        style={{ height: weekMinH }}
-                                    >
+                                {calendarWeeks.map((week, wIdx) => {
+                                    const weekHasOverflow = week.days.some((day, dIdx) => {
+                                        if (!day) return false;
+                                        const count = week.events.filter(we => we.startCol <= dIdx + 1 && we.startCol + we.span - 1 >= dIdx + 1).length;
+                                        return count > L.maxSlots;
+                                    });
+                                    const visibleEvents = week.events.filter(we => we.slot < L.maxSlots);
+                                    const maxSlotUsedInWeek = visibleEvents.length > 0 ? Math.max(...visibleEvents.map(we => we.slot)) : -1;
+                                    const weekEventsH = (maxSlotUsedInWeek + 1) * rowH;
+                                    const weekOverflowH = weekHasOverflow ? overflowH : 0;
+                                    const emptyMinH = isMobile ? 44 : 54;
+                                    const weekH = Math.max(emptyMinH, overlayTop + weekEventsH + weekOverflowH + L.cellPad);
 
-                                        {/* Background Day Cells */}
-                                        {week.days.map((day, dIdx) => {
-                                            if (!day) {
+                                    return (
+                                        <div
+                                            key={wIdx}
+                                            className="relative grid grid-cols-7 border-b border-borderSoft/30 last:border-b-0"
+                                            style={{ height: weekH }}
+                                        >
+
+                                            {/* Background Day Cells */}
+                                            {week.days.map((day, dIdx) => {
+                                                if (!day) {
+                                                    return (
+                                                        <div
+                                                            key={`blank-${dIdx}`}
+                                                            className="border-r border-borderSoft/20 last:border-r-0 bg-hoverSoft/20"
+                                                            style={{ height: weekH }}
+                                                        />
+                                                    );
+                                                }
+
+                                                const isToday = isSameDay(day, today);
+                                                const isCurrentMonth = day.getMonth() === currentMonth.getMonth();
+
+                                                const dayEventsForCell = week.events.filter(we => we.startCol <= dIdx + 1 && we.startCol + we.span - 1 >= dIdx + 1);
+                                                const actualEventsCount = dayEventsForCell.length;
+                                                const overflow = actualEventsCount > L.maxSlots ? actualEventsCount - L.maxSlots : 0;
+                                                
+                                                // Find the lowest visual slot occupied in this specific column to snug the +1 more text under it
+                                                const visibleEventsForCell = dayEventsForCell.filter(we => we.slot < L.maxSlots);
+                                                const maxSlotUsed = visibleEventsForCell.length > 0 ? Math.max(...visibleEventsForCell.map(we => we.slot)) : -1;
+                                                const dynamicSpacerH = (maxSlotUsed + 1) * rowH;
+
                                                 return (
                                                     <div
-                                                        key={`blank-${dIdx}`}
-                                                        className="border-r border-borderSoft/20 last:border-r-0 bg-hoverSoft/20"
-                                                        style={{ height: weekMinH }}
-                                                    />
-                                                );
-                                            }
-
-                                            const isToday = isSameDay(day, today);
-                                            const isCurrentMonth = day.getMonth() === currentMonth.getMonth();
-
-                                            const dayEventsForCell = week.events.filter(we => we.startCol <= dIdx + 1 && we.startCol + we.span - 1 >= dIdx + 1);
-                                            const actualEventsCount = dayEventsForCell.length;
-                                            const overflow = actualEventsCount > L.maxSlots ? actualEventsCount - L.maxSlots : 0;
-                                            
-                                            // Find the lowest visual slot occupied in this specific column to snug the +1 more text under it
-                                            const visibleEventsForCell = dayEventsForCell.filter(we => we.slot < L.maxSlots);
-                                            const maxSlotUsed = visibleEventsForCell.length > 0 ? Math.max(...visibleEventsForCell.map(we => we.slot)) : -1;
-                                            const dynamicSpacerH = (maxSlotUsed + 1) * rowH;
-
-                                            return (
-                                                <div
-                                                    key={day.toISOString()}
-                                                    onClick={() => {
-                                                        if (dayEventsForCell.length > 0) {
-                                                            setSelectedDayInfo({ date: day, events: dayEventsForCell.map(we => we.event) });
-                                                        }
-                                                    }}
-                                                    className={`
-                                                    border-r border-borderSoft/20 last:border-r-0
-                                                    transition-colors ${dayEventsForCell.length > 0 ? 'cursor-pointer' : 'cursor-default'}
-                                                    ${isToday ? 'bg-brand/4 dark:bg-brand/6' : ''}
-                                                    ${!isCurrentMonth ? 'opacity-40' : ''}
-                                                    hover:bg-hoverSoft/40
-                                                `}
-                                                    style={{
-                                                        padding: L.cellPad,
-                                                        height: weekMinH,
-                                                        display: 'grid',
-                                                        gridTemplateRows: `${L.dayNumH}px ${dynamicSpacerH}px ${overflowH}px`,
-                                                        rowGap: `${L.dayNumMb}px`,
-                                                        alignContent: 'start'
-                                                    }}
-                                                >
-                                                    <div className="flex items-start">
-                                                        <span
-                                                            className={`
-                                                            inline-flex items-center justify-center font-semibold z-20 relative
-                                                            ${isToday
-                                                                    ? 'rounded-full bg-brand text-white shadow-sm shadow-brand/30'
-                                                                    : 'text-textPrimary'
-                                                                }
-                                                        `}
-                                                            style={{
-                                                                height: L.dayNumH,
-                                                                width: L.dayNumH,
-                                                                fontSize: isMobile ? 12 : 14,
-                                                            }}
-                                                        >
-                                                            {day.getDate()}
-                                                        </span>
-                                                    </div>
-
-                                                    {/* Spacer — dynamically aligns with the lowest visible tag on this day */}
-                                                    <div />
-
-                                                    {overflow > 0 && (
-                                                        <button
-                                                            onClick={(e) => {
-                                                                e.stopPropagation();
-                                                                const dayEvents = week.events.filter(we => we.startCol <= dIdx + 1 && we.startCol + we.span - 1 >= dIdx + 1).map(we => we.event);
-                                                                setSelectedDayInfo({ date: day, events: dayEvents });
-                                                            }}
-                                                            className="w-full text-left font-semibold text-brand hover:text-brandLink transition-colors z-20 cursor-pointer select-none truncate"
-                                                            style={{
-                                                                fontSize: L.overflowFont,
-                                                                lineHeight: `${overflowH}px`,
-                                                                paddingLeft: 2,
-                                                                paddingRight: 2,
-                                                            }}
-                                                        >
-                                                            +{overflow} more
-                                                        </button>
-                                                    )}
-                                                </div>
-                                            );
-                                        })}
-
-                                        <div
-                                            className="absolute left-0 right-0 bottom-0 pointer-events-none grid grid-cols-7 content-start z-10"
-                                            style={{
-                                                top: overlayTop,
-                                                gridAutoRows: `${rowH}px`,
-                                            }}
-                                        >
-                                            {week.events.filter(we => we.slot < L.maxSlots).map((we, eIdx) => {
-                                                const c = getColor(we.event.eventType);
-                                                return (
-                                                    <button
-                                                        key={`${we.event.id}-${eIdx}`}
-                                                        onClick={() => setSelectedEvent(we.event)}
+                                                        key={day.toISOString()}
+                                                        onClick={() => {
+                                                            if (dayEventsForCell.length > 0) {
+                                                                setSelectedDayInfo({ date: day, events: dayEventsForCell.map(we => we.event) });
+                                                            }
+                                                        }}
                                                         className={`
-                                                        pointer-events-auto flex items-center justify-start text-left font-medium overflow-hidden
-                                                        transition-all hover:brightness-95 border cursor-pointer select-none
-                                                        ${c.bg} ${c.text} ${c.border}
-                                                        ${we.isStart ? 'rounded-l sm:rounded-l-md' : 'rounded-l-none border-l-0'}
-                                                        ${we.isEnd ? 'rounded-r sm:rounded-r-md' : 'rounded-r-none border-r-0'}
+                                                        border-r border-borderSoft/20 last:border-r-0
+                                                        transition-colors ${dayEventsForCell.length > 0 ? 'cursor-pointer' : 'cursor-default'}
+                                                        ${isToday ? 'bg-brand/4 dark:bg-brand/6' : ''}
+                                                        ${!isCurrentMonth ? 'opacity-40' : ''}
+                                                        hover:bg-hoverSoft/40
                                                     `}
                                                         style={{
-                                                            gridColumn: `${we.startCol} / span ${we.span}`,
-                                                            gridRow: we.slot + 1,
-                                                            height: L.barH,
-                                                            minHeight: L.barH,
-                                                            lineHeight: `${L.barH}px`,
-                                                            fontSize: L.barFont,
-                                                            paddingLeft: L.barPadX,
-                                                            paddingRight: L.barPadX,
-                                                            marginLeft: we.isStart ? L.barMargin : 0,
-                                                            marginRight: we.isEnd ? L.barMargin : 0,
+                                                            padding: L.cellPad,
+                                                            height: weekH,
+                                                            display: 'grid',
+                                                            gridTemplateRows: `${L.dayNumH}px ${dynamicSpacerH}px ${overflowH}px`,
+                                                            rowGap: `${L.dayNumMb}px`,
+                                                            alignContent: 'start'
                                                         }}
-                                                        title={we.event.eventName}
                                                     >
-                                                        <span className="truncate w-full inline-block leading-none">
-                                                            {(we.isStart || we.startCol === 1) && (
-                                                                <>
-                                                                    {we.event.eventName}
-                                                                </>
-                                                            )}
-                                                        </span>
-                                                    </button>
+                                                        <div className="flex items-start">
+                                                            <span
+                                                                className={`
+                                                                inline-flex items-center justify-center font-semibold z-20 relative
+                                                                ${isToday
+                                                                        ? 'rounded-full bg-brand text-white shadow-sm shadow-brand/30'
+                                                                        : 'text-textPrimary'
+                                                                    }
+                                                            `}
+                                                                style={{
+                                                                    height: L.dayNumH,
+                                                                    width: L.dayNumH,
+                                                                    fontSize: isMobile ? 11 : 13,
+                                                                }}
+                                                            >
+                                                                {day.getDate()}
+                                                            </span>
+                                                        </div>
+
+                                                        {/* Spacer — dynamically aligns with the lowest visible tag on this day */}
+                                                        <div />
+
+                                                        {overflow > 0 && (
+                                                            <button
+                                                                onClick={(e) => {
+                                                                    e.stopPropagation();
+                                                                    const dayEvents = week.events.filter(we => we.startCol <= dIdx + 1 && we.startCol + we.span - 1 >= dIdx + 1).map(we => we.event);
+                                                                    setSelectedDayInfo({ date: day, events: dayEvents });
+                                                                }}
+                                                                className="w-full text-left font-semibold text-brand hover:text-brandLink transition-colors z-20 cursor-pointer select-none truncate"
+                                                                style={{
+                                                                    fontSize: L.overflowFont,
+                                                                    lineHeight: `${overflowH}px`,
+                                                                    paddingLeft: 2,
+                                                                    paddingRight: 2,
+                                                                }}
+                                                            >
+                                                                +{overflow} more
+                                                            </button>
+                                                        )}
+                                                    </div>
                                                 );
                                             })}
+
+                                            <div
+                                                className="absolute left-0 right-0 bottom-0 pointer-events-none grid grid-cols-7 content-start z-10"
+                                                style={{
+                                                    top: overlayTop,
+                                                    gridAutoRows: `${rowH}px`,
+                                                }}
+                                            >
+                                                {week.events.filter(we => we.slot < L.maxSlots).map((we, eIdx) => {
+                                                    const c = getColor(we.event.eventType);
+                                                    return (
+                                                        <button
+                                                            key={`${we.event.id}-${eIdx}`}
+                                                            onClick={() => setSelectedEvent(we.event)}
+                                                            className={`
+                                                            pointer-events-auto flex items-center justify-start text-left font-medium overflow-hidden
+                                                            transition-all hover:brightness-95 border cursor-pointer select-none
+                                                            ${c.bg} ${c.text} ${c.border}
+                                                            ${we.isStart ? 'rounded-l sm:rounded-l-md' : 'rounded-l-none border-l-0'}
+                                                            ${we.isEnd ? 'rounded-r sm:rounded-r-md' : 'rounded-r-none border-r-0'}
+                                                        `}
+                                                            style={{
+                                                                gridColumn: `${we.startCol} / span ${we.span}`,
+                                                                gridRow: we.slot + 1,
+                                                                height: L.barH,
+                                                                minHeight: L.barH,
+                                                                lineHeight: `${L.barH}px`,
+                                                                fontSize: L.barFont,
+                                                                paddingLeft: L.barPadX,
+                                                                paddingRight: L.barPadX,
+                                                                marginLeft: we.isStart ? L.barMargin : 0,
+                                                                marginRight: we.isEnd ? L.barMargin : 0,
+                                                            }}
+                                                            title={we.event.eventName}
+                                                        >
+                                                            <span className="truncate w-full inline-block leading-none">
+                                                                {(we.isStart || we.startCol === 1) && (
+                                                                    <>
+                                                                        {we.event.eventName}
+                                                                    </>
+                                                                )}
+                                                            </span>
+                                                        </button>
+                                                    );
+                                                })}
+                                            </div>
                                         </div>
-                                    </div>
-                                ))}
+                                    );
+                                })}
                             </div>
                             );
                         })()}

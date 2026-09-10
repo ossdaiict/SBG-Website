@@ -350,26 +350,52 @@ router.patch('/bookings/:id/status', async (req, res) => {
     return res.status(400).json({ error: 'Invalid status' });
   }
 
+  const client = await db.connect();
   try {
-    const fetchRes = await db.query('SELECT status, end_time FROM bookings WHERE id = $1', [id]);
-    if (fetchRes.rows.length === 0) return res.status(404).json({ error: 'Booking not found' });
+    await client.query('BEGIN');
+
+    const fetchRes = await client.query('SELECT * FROM bookings WHERE id = $1', [id]);
+    if (fetchRes.rows.length === 0) {
+      await client.query('ROLLBACK');
+      return res.status(404).json({ error: 'Booking not found' });
+    }
     const booking = fetchRes.rows[0];
 
     if (new Date(booking.end_time) < new Date()) {
+      await client.query('ROLLBACK');
       return res.status(400).json({
         error: 'Cannot approve or reject past bookings whose end time has already elapsed'
       });
     }
 
-    const oldStatus = booking.status;
+    if (status === 'approved') {
+      await client.query(
+        'SELECT id FROM venues WHERE id = $1 FOR UPDATE',
+        [booking.venue_id]
+      );
 
-    const { rows } = await db.query(`
+      const { conflict, message } = await performVenueConflictCheck(
+        [booking.venue_id],
+        booking.start_time,
+        booking.end_time,
+        [id],
+        client
+      );
+
+      if (conflict) {
+        await client.query('ROLLBACK');
+        return res.status(409).json({ error: message });
+      }
+    }
+
+    const { rows } = await client.query(`
       UPDATE bookings SET status = $1 
       WHERE id = $2 
       RETURNING *
     `, [status, id]);
 
-    if (rows.length === 0) throw new Error('Booking not found');
+    await client.query('COMMIT');
+
     const data = rows[0];
 
     // Create a notification for the status change
@@ -391,12 +417,13 @@ router.patch('/bookings/:id/status', async (req, res) => {
 
     io.emit('events:updated');
 
-
-
     invalidatePublicBookings();
     return res.json(data);
   } catch (error: any) {
+    await client.query('ROLLBACK');
     return res.status(500).json({ error: error.message });
+  } finally {
+    client.release();
   }
 });
 
@@ -421,21 +448,53 @@ router.put('/bookings/:id', async (req, res) => {
     return res.status(400).json({ error: 'No fields to update' });
   }
 
+  const client = await db.connect();
   try {
+    await client.query('BEGIN');
+
     // Co-curricular limit check — event_type from the events table
-    if (status === 'approved') {
-      const existRes = await db.query(
-        `SELECT b.club_id, b.start_time, e.event_type
-         FROM bookings b LEFT JOIN events e ON b.event_id = e.id
-         WHERE b.id = $1`, [id]);
-      if (existRes.rows.length > 0 && existRes.rows[0].event_type === 'co_curricular') {
-        const existing = existRes.rows[0];
-        const eventDate = new Date(start_time || existing.start_time);
-        const { start: semStart, end: semEnd } = getSemesterRange(eventDate);
-        const count = await countCoCurricularBookings(existing.club_id, semStart, semEnd, id);
-        if (count >= CO_CURRICULAR_LIMIT) {
-          return res.status(400).json({ error: `This club has already booked ${CO_CURRICULAR_LIMIT} co-curricular events.` });
-        }
+    const existRes = await client.query(
+      `SELECT b.*, e.event_type
+       FROM bookings b LEFT JOIN events e ON b.event_id = e.id
+       WHERE b.id = $1`, [id]);
+    if (existRes.rows.length === 0) {
+      await client.query('ROLLBACK');
+      return res.status(404).json({ error: 'Booking not found' });
+    }
+    const existing = existRes.rows[0];
+
+    const finalStatus = status !== undefined ? status : existing.status;
+    const finalVenueId = venue_id !== undefined ? venue_id : existing.venue_id;
+    const finalStartTime = start_time !== undefined ? start_time : existing.start_time;
+    const finalEndTime = end_time !== undefined ? end_time : existing.end_time;
+
+    if (finalStatus === 'approved' && existing.event_type === 'co_curricular') {
+      const eventDate = new Date(finalStartTime);
+      const { start: semStart, end: semEnd } = getSemesterRange(eventDate);
+      const count = await countCoCurricularBookings(existing.club_id, semStart, semEnd, id);
+      if (count >= CO_CURRICULAR_LIMIT) {
+        await client.query('ROLLBACK');
+        return res.status(400).json({ error: `This club has already booked ${CO_CURRICULAR_LIMIT} co-curricular events.` });
+      }
+    }
+
+    if (finalStatus === 'approved') {
+      await client.query(
+        'SELECT id FROM venues WHERE id = $1 FOR UPDATE',
+        [finalVenueId]
+      );
+
+      const { conflict, message } = await performVenueConflictCheck(
+        [finalVenueId],
+        finalStartTime,
+        finalEndTime,
+        [id],
+        client
+      );
+
+      if (conflict) {
+        await client.query('ROLLBACK');
+        return res.status(409).json({ error: message });
       }
     }
 
@@ -446,7 +505,7 @@ router.put('/bookings/:id', async (req, res) => {
     values.push(id); // Push ID as the final parameter for the WHERE clause
 
     // We use a CTE (WITH clause) to perform the update and then immediately join the club/venue names
-    const { rows } = await db.query(`
+    const { rows } = await client.query(`
       WITH updated AS (
         UPDATE bookings SET ${setString} WHERE id = $${values.length} RETURNING *
       )
@@ -459,6 +518,8 @@ router.put('/bookings/:id', async (req, res) => {
     `, values);
 
     if (rows.length === 0) throw new Error('Update failed');
+    await client.query('COMMIT');
+
     const data = rows[0];
 
     io.emit('events:updated');
@@ -472,7 +533,10 @@ router.put('/bookings/:id', async (req, res) => {
     invalidatePublicBookings();
     return res.json(data);
   } catch (error: any) {
+    await client.query('ROLLBACK');
     return res.status(500).json({ error: error.message });
+  } finally {
+    client.release();
   }
 });
 
