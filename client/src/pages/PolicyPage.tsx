@@ -25,7 +25,7 @@ const PolicyPage: React.FC = () => {
         <p className="text-muted-foreground mt-2 text-sm sm:text-base font-medium max-w-lg mx-auto">Guidelines for venue reservation and campus event conduct</p>
       </motion.div>
 
-      <Accordion type="single" collapsible defaultValue="item-0" className="space-y-3 sm:space-y-4">my
+      <Accordion type="single" collapsible defaultValue="item-0" className="space-y-3 sm:space-y-4">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}

@@ -130,7 +130,7 @@ export default function EventReports() {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.4 }}
-      className="space-y-8 px-4"
+      className="space-y-6 px-4"
     >
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="min-w-0">
@@ -339,8 +339,8 @@ export default function EventReports() {
           </DialogContent>
         </Dialog>
 
-          </>
-        )}
-      </motion.div>
+      </>
+    )}
+  </motion.div>
   );
 }
