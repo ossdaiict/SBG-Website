@@ -987,10 +987,26 @@ const AdminDashboard: React.FC = () => {
                                 key={booking.id}
                                 className="flex items-center justify-between bg-background border border-borderSoft rounded-md p-2 text-sm"
                               >
-                                <span className="font-medium text-foreground">
-                                  {getVenueName(booking.venueId)}
-                                </span>
-                                <div className="flex items-center gap-2 sm:gap-3">
+                                <div className="flex items-center gap-2 min-w-0">
+                                  <span className="font-medium text-foreground truncate">
+                                    {getVenueName(booking.venueId)}
+                                  </span>
+                                  {req.bookings.length > 1 && (
+                                    <Badge
+                                      variant={
+                                        booking.status === "approved"
+                                          ? "success"
+                                          : booking.status === "rejected"
+                                            ? "destructive"
+                                            : "pending"
+                                      }
+                                      className="text-[10px] h-4.5 px-1.5 shrink-0 font-medium"
+                                    >
+                                      {booking.status.toUpperCase()}
+                                    </Badge>
+                                  )}
+                                </div>
+                                <div className="flex items-center gap-2 sm:gap-3 shrink-0">
                                   {booking.status !== "rejected" &&
                                     req.bookings.length > 1 && (
                                       <Button

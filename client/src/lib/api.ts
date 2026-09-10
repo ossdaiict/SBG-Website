@@ -212,11 +212,8 @@ export const groupBookings = (bookings: Booking[], venues: ApiVenue[] = []): Gro
         existing.bookings.push(b);
       }
 
-      // Re-calculate display venue names from the unique set of active bookings
-      const activeBookings = existing.bookings.filter(book => book.status !== 'rejected');
-      const bookingsForName = activeBookings.length > 0 ? activeBookings : existing.bookings;
-      
-      existing.venueName = bookingsForName
+      // Re-calculate display venue names from all requested bookings in the group
+      existing.venueName = existing.bookings
         .map(book => getVenueName(book.venueId, book))
         .filter((val, idx, self) => self.indexOf(val) === idx)
         .sort((a, b) => a.localeCompare(b))
@@ -227,16 +224,15 @@ export const groupBookings = (bookings: Booking[], venues: ApiVenue[] = []): Gro
       const allApproved = statuses.every(s => s === 'approved');
       const allRejected = statuses.every(s => s === 'rejected');
       const allPending = statuses.every(s => s === 'pending');
-      const anyApproved = statuses.some(s => s === 'approved');
-      const anyPending = statuses.some(s => s === 'pending');
 
-      if (allApproved || (anyApproved && !anyPending)) {
+      if (allApproved) {
         existing.status = 'approved';
       } else if (allRejected) {
         existing.status = 'rejected';
-      } else if (allPending || (!anyApproved && anyPending)) {
+      } else if (allPending) {
         existing.status = 'pending';
-      } else if (anyApproved && anyPending) {
+      } else {
+        // Mixed statuses across venues in this booking (e.g. approved + rejected, approved + pending, etc.)
         existing.status = 'partial';
       }
       

@@ -163,9 +163,8 @@ const ScheduleCalendarCard = ({
                           initial={{ opacity: 0, scale: 0.95 }}
                           animate={{ opacity: 1, scale: 1 }}
                           transition={{ duration: 0.3, delay: index * 0.05 }}
-                          whileHover={{ scale: 1.01 }}
                         >
-                          <Card className="border border-borderSoft rounded-xl hover:border-brand/30 transition-colors">
+                          <Card className="border border-borderSoft rounded-xl transition-colors">
                             <CardContent className="p-4">
                               <div className="font-semibold text-foreground text-sm mb-1">
                                 {event.bookingName}
@@ -788,11 +787,11 @@ const ClubDashboard: React.FC<ClubDashboardProps> = ({ user }) => {
                 onValueChange={(value) =>
                   setCalendarView(value as "campus_events" | "global" | "club")
                 }
-                className="w-full sm:w-auto"
+                className="w-full lg:max-w-[60%]"
               >
                 <TabsList
                   aria-label="Calendar view"
-                  className="flex items-center w-full sm:w-auto h-9 sm:h-10 p-1 gap-1 bg-hoverSoft rounded-xl border border-borderSoft"
+                  className="flex items-center w-full sm:w-auto h-9 sm:h-8 p-1 gap-1 bg-hoverSoft rounded-xl border border-borderSoft"
                 >
                   <TabsTrigger
                     value="global"
@@ -1084,9 +1083,8 @@ const ClubDashboard: React.FC<ClubDashboardProps> = ({ user }) => {
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ duration: 0.3, delay: index * 0.05 }}
-                      whileHover={{ y: -2 }}
                     >
-                      <Card className="border border-borderSoft rounded-xl hover:border-brand/30 hover:shadow-md transition-all duration-200 h-full">
+                      <Card className="border border-borderSoft rounded-xl h-full">
                         <CardContent className="p-4">
                           <div className="font-semibold text-foreground text-sm leading-tight mb-1">
                             {event.name}
