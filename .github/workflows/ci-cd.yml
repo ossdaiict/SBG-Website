@@ -174,7 +174,7 @@ jobs:
           build-args: |
             BUILD_ID=${{ github.sha }}
           cache-from: type=gha
-          cache-to: type=gha,mode=max,ignore-error=true
+          cache-to: type=gha,mode=min,ignore-error=true
           provenance: false
 
   # ─── Stage 4: Deploy to production ─────────────────────────
