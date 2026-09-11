@@ -173,8 +173,6 @@ jobs:
             org.opencontainers.image.version=${{ needs.release-please.outputs.version || steps.pkg.outputs.version }}
           build-args: |
             BUILD_ID=${{ github.sha }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=min,ignore-error=true
           provenance: false
 
   # ─── Stage 4: Deploy to production ─────────────────────────
