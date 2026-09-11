@@ -138,8 +138,6 @@ const LandingPage: React.FC = () => {
         };
     }, [fetchEvents]);
 
-
-
     const calendarDays = useMemo(() => {
         const year = currentMonth.getFullYear();
         const month = currentMonth.getMonth();
@@ -245,6 +243,19 @@ const LandingPage: React.FC = () => {
 
         return weeks;
     }, [calendarDays, events]);
+
+    const currentMonthEventsCount = useMemo(() => {
+        const year = currentMonth.getFullYear();
+        const month = currentMonth.getMonth();
+        const startOfMonth = new Date(year, month, 1, 0, 0, 0, 0);
+        const endOfMonth = new Date(year, month + 1, 0, 23, 59, 59, 999);
+
+        return events.filter(event => {
+            const start = new Date(event.startTime);
+            const end = new Date(event.endTime);
+            return start <= endOfMonth && end >= startOfMonth;
+        }).length;
+    }, [events, currentMonth]);
 
     const upcomingEvents = useMemo(
         () => {
@@ -388,7 +399,7 @@ const LandingPage: React.FC = () => {
 
                             <div className="hidden sm:flex items-center gap-2 text-xs text-textMuted font-medium">
                                 <CalendarIcon size={14} />
-                                {events.length} events
+                                {currentMonthEventsCount} {currentMonthEventsCount === 1 ? 'event' : 'events'}
                             </div>
                         </div>
 
