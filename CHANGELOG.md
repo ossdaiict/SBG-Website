@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.2.0](https://github.com/ossdaiict/SBG-Website/compare/v2.1.0...v2.2.0) (2026-09-11)
+
+
+### Features
+
+* **calendar & admin:** Responsive calendar scaling, DB-backed SBG photos, booking conflict fixes, and UI modernization ([#40](https://github.com/ossdaiict/SBG-Website/issues/40)) ([4bb91bf](https://github.com/ossdaiict/SBG-Website/commit/4bb91bf8a3474949565d11b80360f800a9fffdaa))
+
 ## [2.1.0](https://github.com/ossdaiict/SBG-Website/compare/v2.0.0...v2.1.0) (2026-09-07)
 
 
