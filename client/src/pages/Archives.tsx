@@ -198,7 +198,7 @@ const Archives: React.FC = () => {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.4 }}
-      className="space-y-8 px-4"
+      className="space-y-8"
     >
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="min-w-0 flex items-center gap-3">
@@ -254,7 +254,7 @@ const Archives: React.FC = () => {
               Events ({events.length})
             </TabsTrigger>
             <TabsTrigger value="bookings" className="text-xs sm:text-sm">
-              Meetings & Slots ({standaloneBookings.length})
+              Meetings ({standaloneBookings.length})
             </TabsTrigger>
           </TabsList>
         </Tabs>

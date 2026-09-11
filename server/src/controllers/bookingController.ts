@@ -163,9 +163,9 @@ export const createBooking = async (req: Request, res: Response) => {
   let eventType: EventType = 'meet';
 
   if (bookingMode === 'event') {
-    // Fetch event name, type, and status
+    // Fetch event details
     const { rows: fetchedEventRows } = await db.query(
-      'SELECT name, event_type, status FROM events WHERE id = $1',
+      'SELECT name, event_type, status, date, end_date FROM events WHERE id = $1',
       [event_id]
     );
 
@@ -179,6 +179,22 @@ export const createBooking = async (req: Request, res: Response) => {
 
     eventName = fetchedEventRows[0].name;
     eventType = fetchedEventRows[0].event_type as EventType;
+
+    const eventEnd = new Date(fetchedEventRows[0].end_date || fetchedEventRows[0].date);
+
+    if (eventEnd.getTime() < Date.now()) {
+      return res.status(400).json({ error: 'Cannot create bookings for an event that has already concluded.' });
+    }
+
+    for (const slot of timeSlots) {
+      const slotEnd = new Date(slot.endTime);
+
+      if (slotEnd > eventEnd) {
+        return res.status(400).json({
+          error: `Cannot book venue slot after the event ends. Event ends at ${eventEnd.toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })}.`
+        });
+      }
+    }
   }
 
   if (!Object.keys(MIN_DAYS_BY_EVENT).includes(eventType)) {
@@ -193,24 +209,6 @@ export const createBooking = async (req: Request, res: Response) => {
     const end = new Date(slot.endTime);
     if (end <= start) {
       return res.status(400).json({ error: 'endTime must be after startTime' });
-    }
-  }
-
-  if (bookingMode === 'event' && event_id) {
-    const { rows: eventRows } = await db.query(
-      `SELECT COALESCE(e.end_date, e.date) as dynamic_end_date
-       FROM events e
-       WHERE e.id = $1`,
-      [event_id]
-    );
-    if (eventRows.length > 0) {
-      const eventDate = new Date(eventRows[0].dynamic_end_date);
-      eventDate.setHours(0, 0, 0, 0);
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
-      if (eventDate < today) {
-        return res.status(400).json({ error: 'Cannot create bookings for an event that has already concluded.' });
-      }
     }
   }
 
@@ -592,14 +590,22 @@ export const updateBookingTimings = async (req: Request, res: Response) => {
     const venueIds = bookingRes.rows.map((b: any) => b.venue_id);
     const eventId = bookingRes.rows[0].event_id;
 
-    // Fetch event type — for meets (no event_id), it's implicitly closed_club
+    // Fetch event type and validate timeframe — for meets (no event_id), it's implicitly closed_club
     let eventType: EventType | null = null;
     if (!eventId) {
       eventType = 'closed_club';
     } else if (eventId) {
-      const { rows: eventRows } = await db.query('SELECT event_type FROM events WHERE id = $1', [eventId]);
+      const { rows: eventRows } = await db.query('SELECT event_type, date, end_date FROM events WHERE id = $1', [eventId]);
       if (eventRows.length > 0) {
         eventType = eventRows[0].event_type as EventType;
+        const eventEnd = new Date(eventRows[0].end_date || eventRows[0].date);
+        const newEnd = new Date(endTime);
+
+        if (newEnd > eventEnd) {
+          return res.status(400).json({
+            error: `Cannot update booking timing after the event ends (${eventEnd.toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })}).`
+          });
+        } 
       }
     }
 

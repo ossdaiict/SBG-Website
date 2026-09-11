@@ -230,6 +230,20 @@ const AddBookingDialog: React.FC<Props> = ({ open, onOpenChange, onCreated }) =>
 
             const timeSlots = generateTimeSlots();
 
+            if (!isMeeting && selectedEventId) {
+                const linked = clubEvents.find(e => e.id === selectedEventId);
+                if (linked) {
+                    const eventEnd = new Date(linked.end_date || linked.date);
+                    for (const slot of timeSlots) {
+                        const end = new Date(slot.endTime);
+                        if (end > eventEnd) {
+                            setError(`Cannot book venue slot after the event ends (${eventEnd.toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })}).`);
+                            return;
+                        }
+                    }
+                }
+            }
+
             await apiRequest('/api/admin/bookings', {
                 method: 'POST',
                 auth: true,
@@ -467,31 +481,55 @@ const AddBookingDialog: React.FC<Props> = ({ open, onOpenChange, onCreated }) =>
                             </div>
                             
                             {startDate && endDate && startDate.getTime() !== endDate.getTime() && (
-                                <div className="pt-3 border-t border-borderSoft mt-2">
-                                    <Label className="text-textPrimary font-bold text-sm md:text-base mb-3 block">Multi-Day Booking Type</Label>
-                                    <div className="flex flex-col sm:flex-row gap-3">
-                                        <Button
+                                <div className="pt-3 border-t border-borderSoft mt-2 space-y-3">
+                                    <div>
+                                        <Label className="text-textPrimary font-bold text-sm block">Multi-Day Booking Schedule</Label>
+                                        <p className="text-xs text-textSecondary mt-0.5">Select how slots should be allocated</p>
+                                    </div>
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                                        <button
                                             type="button"
-                                            variant={bookingType === 'recurring' ? 'default' : 'outline'}
-                                            className={cn("flex-1 justify-start h-auto py-3 px-4", bookingType === 'recurring' ? "bg-brand text-white border-transparent" : "border-borderSoft")}
+                                            className={cn(
+                                                "w-full text-left p-3 rounded-xl border-2 transition-all duration-200 flex items-start gap-2.5 select-none cursor-pointer",
+                                                bookingType === 'recurring'
+                                                    ? "bg-brand/8 border-brand ring-2 ring-brand/20 shadow-sm"
+                                                    : "bg-card hover:bg-hoverSoft/50 border-borderSoft hover:border-borderSoft/80"
+                                            )}
                                             onClick={() => setBookingType('recurring')}
                                         >
-                                            <div className="text-left whitespace-normal">
-                                                <div className="font-bold text-sm md:text-base">Recurring Daily</div>
-                                                <div className="text-xs font-normal opacity-80 mt-1">Book specific hours each day</div>
+                                            <div className={cn(
+                                                "h-3.5 w-3.5 rounded-full border-2 mt-0.5 flex items-center justify-center shrink-0 transition-all",
+                                                bookingType === 'recurring' ? "border-brand bg-brand" : "border-textMuted/40"
+                                            )}>
+                                                {bookingType === 'recurring' && <div className="h-1 w-1 rounded-full bg-white" />}
                                             </div>
-                                        </Button>
-                                        <Button
+                                            <div className="flex-1 min-w-0">
+                                                <div className="font-bold text-xs sm:text-sm text-textPrimary leading-snug">Recurring Daily</div>
+                                                <div className="text-[11px] text-textSecondary mt-0.5 leading-tight">Book specific hours each day</div>
+                                            </div>
+                                        </button>
+
+                                        <button
                                             type="button"
-                                            variant={bookingType === 'continuous' ? 'default' : 'outline'}
-                                            className={cn("flex-1 justify-start h-auto py-3 px-4", bookingType === 'continuous' ? "bg-brand text-white border-transparent" : "border-borderSoft")}
+                                            className={cn(
+                                                "w-full text-left p-3 rounded-xl border-2 transition-all duration-200 flex items-start gap-2.5 select-none cursor-pointer",
+                                                bookingType === 'continuous'
+                                                    ? "bg-brand/8 border-brand ring-2 ring-brand/20 shadow-sm"
+                                                    : "bg-card hover:bg-hoverSoft/50 border-borderSoft hover:border-borderSoft/80"
+                                            )}
                                             onClick={() => setBookingType('continuous')}
                                         >
-                                            <div className="text-left whitespace-normal">
-                                                <div className="font-bold text-sm md:text-base">Continuous</div>
-                                                <div className="text-xs font-normal opacity-80 mt-1">Book continuously from start to end</div>
+                                            <div className={cn(
+                                                "h-3.5 w-3.5 rounded-full border-2 mt-0.5 flex items-center justify-center shrink-0 transition-all",
+                                                bookingType === 'continuous' ? "border-brand bg-brand" : "border-textMuted/40"
+                                            )}>
+                                                {bookingType === 'continuous' && <div className="h-1 w-1 rounded-full bg-white" />}
                                             </div>
-                                        </Button>
+                                            <div className="flex-1 min-w-0">
+                                                <div className="font-bold text-xs sm:text-sm text-textPrimary leading-snug">Continuous Slot</div>
+                                                <div className="text-[11px] text-textSecondary mt-0.5 leading-tight">Book continuously start to end</div>
+                                            </div>
+                                        </button>
                                     </div>
                                 </div>
                             )}

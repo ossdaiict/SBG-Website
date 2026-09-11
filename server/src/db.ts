@@ -21,7 +21,9 @@ export const db = new Pool({
   ssl: databaseUrl?.includes('localhost') ? false : { rejectUnauthorized: false },
   max: 15,
   idleTimeoutMillis: 30000,
-  connectionTimeoutMillis: 10000, // Increased from 2000 to prevent Neon cold-start timeouts
+  connectionTimeoutMillis: 30000, // 30s to handle Neon/Cloud PostgreSQL cold-start wakeups
+  keepAlive: true,
+  keepAliveInitialDelayMillis: 10000,
 });
 
 // Catch idle client errors so they don't crash the Node.js process

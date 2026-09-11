@@ -59,7 +59,7 @@ import {
 import { getErrorMessage } from "./errors";
 import { getSocket, SOCKET_EVENTS } from "./socket";
 
-import { cn, toLocalISOString } from "@/lib/utils";
+import { cn, formatISTDate, toLocalISOString } from "@/lib/utils";
 
 interface ClubDashboardProps {
   user: User;
@@ -990,15 +990,33 @@ const ClubDashboard: React.FC<ClubDashboardProps> = ({ user }) => {
                           </div>
                           <div className="text-[11px] text-muted-foreground mt-0.5">
                             Date:{" "}
-                            {new Date(event.date).toLocaleDateString(
-                              undefined,
-                              {
-                                timeZone: "Asia/Kolkata",
+                            {formatISTDate(event.date, {
+                              year: "numeric",
+                              month: "short",
+                              day: "numeric",
+                            })}
+                            {event.end_date &&
+                              new Date(event.end_date).getTime() !==
+                                new Date(event.date).getTime() &&
+                              formatISTDate(event.date, {
                                 year: "numeric",
                                 month: "short",
                                 day: "numeric",
-                              },
-                            )}
+                              }) !==
+                                formatISTDate(event.end_date, {
+                                  year: "numeric",
+                                  month: "short",
+                                  day: "numeric",
+                                }) && (
+                                <>
+                                  {" – "}
+                                  {formatISTDate(event.end_date, {
+                                    year: "numeric",
+                                    month: "short",
+                                    day: "numeric",
+                                  })}
+                                </>
+                              )}
                           </div>
                         </div>
                         {(() => {

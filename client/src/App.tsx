@@ -22,7 +22,6 @@ const AdminEventRequests = React.lazy(() => import('./pages/AdminEventRequests')
 const PolicyPage = React.lazy(() => import('./pages/PolicyPage'));
 const MyBookings = React.lazy(() => import('./pages/MyBookings'));
 const ClubMembers = React.lazy(() => import('./pages/ClubMembers'));
-const ClubCommittee = React.lazy(() => import('./pages/ClubCommittee'));
 const ManageEvents = React.lazy(() => import('./pages/ManageEvents'));
 const EventReports = React.lazy(() => import('./pages/EventReports'));
 const AdminEventReports = React.lazy(() => import('./pages/AdminEventReports'));
@@ -161,7 +160,7 @@ const App: React.FC = () => {
     const location = import('react-router-dom').then(m => m.useLocation);
     // Actually we can just use window.location
     const path = window.location.pathname;
-    if (path.startsWith('/admin') || path.startsWith('/book') || path.startsWith('/my-bookings') || path.startsWith('/manage-events') || path.startsWith('/event-reports') || path.startsWith('/members') || path.startsWith('/committee')) {
+    if (path.startsWith('/admin') || path.startsWith('/book') || path.startsWith('/my-bookings') || path.startsWith('/manage-events') || path.startsWith('/event-reports') || path.startsWith('/members')) {
       return <Navigate to={`/login?redirect=${encodeURIComponent(path + window.location.search)}`} replace />;
     }
     return <Navigate to="/" replace />;
@@ -206,12 +205,10 @@ const App: React.FC = () => {
               <Route path="/manage-events" element={<PageTitleWrapper title="Manage Events | SBG DAU"><ManageEvents currentUser={user} /></PageTitleWrapper>} />
               <Route path="/event-reports" element={<PageTitleWrapper title="Event Reports | SBG DAU"><EventReports /></PageTitleWrapper>} />
               <Route path="/members" element={<PageTitleWrapper title="Members | SBG DAU"><ClubMembers user={user} /></PageTitleWrapper>} />
-              <Route path="/committee" element={<PageTitleWrapper title="Committee | SBG DAU">{user.role === 'club' ? <ClubCommittee user={user} /> : <Navigate to="/" replace />}</PageTitleWrapper>} />
               <Route path="/policy" element={<PageTitleWrapper title="Policy | SBG DAU"><PolicyPage /></PageTitleWrapper>} />
 
               <Route path="/admin/requests" element={<PageTitleWrapper title="Slot Requests | SBG DAU">{user.role === 'admin' ? <AdminRequests /> : <Navigate to="/" replace />}</PageTitleWrapper>} />
               <Route path="/admin/event-requests" element={<PageTitleWrapper title="Event Registrations | SBG DAU">{user.role === 'admin' ? <AdminEventRequests /> : <Navigate to="/" replace />}</PageTitleWrapper>} />
-
               <Route path="/admin/clubs" element={<PageTitleWrapper title="Clubs | SBG DAU">{user.role === 'admin' ? <AdminClubs /> : <Navigate to="/" replace />}</PageTitleWrapper>} />
               <Route path="/admin/venues" element={<PageTitleWrapper title="Venues | SBG DAU">{user.role === 'admin' ? <AdminVenues /> : <Navigate to="/" replace />}</PageTitleWrapper>} />
               <Route path="/admin/event-reports" element={<PageTitleWrapper title="All Reports | SBG DAU">{user.role === 'admin' ? <AdminEventReports /> : <Navigate to="/" replace />}</PageTitleWrapper>} />

@@ -644,7 +644,7 @@ router.post('/bookings', async (req, res) => {
 
     if (bookingMode === 'event') {
       const { rows: fetchedEventRows } = await db.query(
-        'SELECT name, event_type FROM events WHERE id = $1',
+        'SELECT name, event_type, date, end_date FROM events WHERE id = $1',
         [event_id]
       );
 
@@ -654,6 +654,18 @@ router.post('/bookings', async (req, res) => {
 
       event_name = fetchedEventRows[0].name;
       event_type = fetchedEventRows[0].event_type;
+
+      const eventEnd = new Date(fetchedEventRows[0].end_date || fetchedEventRows[0].date);
+
+      for (const slot of timeSlots) {
+        const end = new Date(slot.endTime);
+
+        if (end > eventEnd) {
+          return res.status(400).json({
+            error: `Cannot book venue slot after the event ends. Event ends at ${eventEnd.toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })}.`
+          });
+        }
+      }
     }
 
     // Admin endpoint bypasses co-curricular limits.

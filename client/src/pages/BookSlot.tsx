@@ -69,7 +69,8 @@ const BookSlot: React.FC<BookSlotProps> = ({ currentUser }) => {
     venue: '',
     venueType: '' as 'success' | 'warning' | 'info' | '',
     hours: '',
-    timeline: ''
+    timeline: '',
+    eventBoundary: ''
   });
 
   const [isAddEventOpen, setIsAddEventOpen] = useState(false);
@@ -195,15 +196,26 @@ const BookSlot: React.FC<BookSlotProps> = ({ currentUser }) => {
 
   useEffect(() => {
     if (isMeeting) {
-      setWarnings(prev => ({ ...prev, timeline: '' }));
+      setWarnings(prev => ({ ...prev, timeline: '', eventBoundary: '' }));
       return;
     }
     if (!formData.date || !formData.event_id) {
-      setWarnings(prev => ({ ...prev, timeline: '' }));
+      setWarnings(prev => ({ ...prev, timeline: '', eventBoundary: '' }));
       return;
     }
     const evt = events.find(e => e.id === formData.event_id);
-    if (!evt || !evt.event_type) return;
+    if (!evt) return;
+
+    // Check event boundaries
+    const eventEnd = new Date(evt.end_date || evt.date);
+    let boundaryWarning = '';
+    const endDates = formData.endDate || formData.date;
+    if (formData.startTime && formData.endTime) {
+      const slotEnd = new Date(`${endDates}T${formData.endTime}:00`);
+      if (slotEnd > eventEnd) {
+        boundaryWarning = `Slot ends after event scheduled end (${eventEnd.toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })}). Booking outside the event timeframe is not permitted.`;
+      }
+    }
 
     const eventDate = new Date(formData.date);
     const diffDays = (eventDate.getTime() - Date.now()) / (1000 * 60 * 60 * 24);
@@ -213,15 +225,17 @@ const BookSlot: React.FC<BookSlotProps> = ({ currentUser }) => {
     else if (evt.event_type === 'open_all') reqDays = 20;
     else if (evt.event_type === 'closed_club') reqDays = 0;
 
+    let timelineWarning = '';
     if (diffDays < reqDays) {
-      setWarnings(prev => ({
-        ...prev,
-        timeline: `Short notice booking (${Math.floor(diffDays)} days). Rule: ${reqDays} days advance notice. This booking will trigger the issue flag and require Admin Approval.`
-      }));
-    } else {
-      setWarnings(prev => ({ ...prev, timeline: '' }));
+      timelineWarning = `Short notice booking (${Math.floor(diffDays)} days). Rule: ${reqDays} days advance notice. This booking will trigger the issue flag and require Admin Approval.`;
     }
-  }, [formData.date, formData.event_id, events, isMeeting]);
+
+    setWarnings(prev => ({
+      ...prev,
+      timeline: timelineWarning,
+      eventBoundary: boundaryWarning
+    }));
+  }, [formData.date, formData.endDate, formData.startTime, formData.endTime, formData.event_id, events, isMeeting]);
 
   // Parse date string to Date object for Calendar
   useEffect(() => {
@@ -498,6 +512,23 @@ const BookSlot: React.FC<BookSlotProps> = ({ currentUser }) => {
 
       const timeSlots = generateTimeSlots();
 
+      if (!isMeeting && formData.event_id) {
+        const linkedEvent = events.find(e => e.id === formData.event_id);
+        if (linkedEvent) {
+          const eventStart = new Date(linkedEvent.date);
+          const eventEnd = new Date(linkedEvent.end_date || linkedEvent.date);
+
+          for (const slot of timeSlots) {
+            const end = new Date(slot.endTime);
+
+            if (end > eventEnd) {
+              toastError(`Booking slot cannot end after event ends (${eventEnd.toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })}).`);
+              return;
+            }
+          }
+        }
+      }
+
       const bookingMode = isMeeting ? 'meet' : 'event';
 
       const payload: any = {
@@ -541,7 +572,8 @@ const BookSlot: React.FC<BookSlotProps> = ({ currentUser }) => {
         venue: '',
         venueType: '',
         hours: '',
-        timeline: ''
+        timeline: '',
+        eventBoundary: ''
       });
 
     } catch (error) {
@@ -1039,31 +1071,55 @@ const BookSlot: React.FC<BookSlotProps> = ({ currentUser }) => {
                   </div>
 
                   {formData.date && formData.endDate && formData.date !== formData.endDate && (
-                    <div className="sm:col-span-2 p-4 bg-card rounded-xl border border-borderSoft shadow-sm space-y-3 mt-2">
-                      <Label className="text-textPrimary font-bold text-sm md:text-base">Multi-Day Booking Type</Label>
-                      <div className="flex flex-col sm:flex-row gap-3">
-                        <Button
+                    <div className="sm:col-span-2 p-4 sm:p-5 bg-hoverSoft/25 rounded-2xl border border-borderSoft/80 space-y-3.5">
+                      <div>
+                        <Label className="text-textPrimary font-bold text-sm sm:text-base">Multi-Day Booking Schedule</Label>
+                        <p className="text-xs text-textSecondary mt-0.5">Select how slots should be allocated across the chosen date range</p>
+                      </div>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <button
                           type="button"
-                          variant={bookingType === 'recurring' ? 'default' : 'outline'}
-                          className={cn("flex-1 justify-start h-auto py-3 px-4", bookingType === 'recurring' ? "bg-brand text-white border-transparent" : "border-borderSoft")}
+                          className={cn(
+                            "w-full text-left p-3.5 sm:p-4 rounded-xl border-2 transition-all duration-200 flex items-start gap-3 select-none cursor-pointer",
+                            bookingType === 'recurring'
+                              ? "bg-brand/8 border-brand ring-2 ring-brand/20 shadow-sm"
+                              : "bg-card hover:bg-hoverSoft/50 border-borderSoft hover:border-borderSoft/80"
+                          )}
                           onClick={() => setBookingType('recurring')}
                         >
-                          <div className="text-left whitespace-normal">
-                            <div className="font-bold text-sm md:text-base">Recurring Daily</div>
-                            <div className="text-xs font-normal opacity-80 mt-1">Book specific hours each day</div>
+                          <div className={cn(
+                            "h-4 w-4 rounded-full border-2 mt-0.5 flex items-center justify-center shrink-0 transition-all",
+                            bookingType === 'recurring' ? "border-brand bg-brand" : "border-textMuted/40"
+                          )}>
+                            {bookingType === 'recurring' && <div className="h-1.5 w-1.5 rounded-full bg-white" />}
                           </div>
-                        </Button>
-                        <Button
+                          <div className="flex-1 min-w-0">
+                            <div className="font-bold text-sm sm:text-base text-textPrimary leading-snug">Recurring Daily</div>
+                            <div className="text-xs text-textSecondary mt-1 leading-relaxed">Book the selected hours separately on each day</div>
+                          </div>
+                        </button>
+
+                        <button
                           type="button"
-                          variant={bookingType === 'continuous' ? 'default' : 'outline'}
-                          className={cn("flex-1 justify-start h-auto py-3 px-4", bookingType === 'continuous' ? "bg-brand text-white border-transparent" : "border-borderSoft")}
+                          className={cn(
+                            "w-full text-left p-3.5 sm:p-4 rounded-xl border-2 transition-all duration-200 flex items-start gap-3 select-none cursor-pointer",
+                            bookingType === 'continuous'
+                              ? "bg-brand/8 border-brand ring-2 ring-brand/20 shadow-sm"
+                              : "bg-card hover:bg-hoverSoft/50 border-borderSoft hover:border-borderSoft/80"
+                          )}
                           onClick={() => setBookingType('continuous')}
                         >
-                          <div className="text-left whitespace-normal">
-                            <div className="font-bold text-sm md:text-base">Continuous</div>
-                            <div className="text-xs font-normal opacity-80 mt-1">Book continuously from start to end</div>
+                          <div className={cn(
+                            "h-4 w-4 rounded-full border-2 mt-0.5 flex items-center justify-center shrink-0 transition-all",
+                            bookingType === 'continuous' ? "border-brand bg-brand" : "border-textMuted/40"
+                          )}>
+                            {bookingType === 'continuous' && <div className="h-1.5 w-1.5 rounded-full bg-white" />}
                           </div>
-                        </Button>
+                          <div className="flex-1 min-w-0">
+                            <div className="font-bold text-sm sm:text-base text-textPrimary leading-snug">Continuous Slot</div>
+                            <div className="text-xs text-textSecondary mt-1 leading-relaxed">Book non-stop from start date & time to end date & time</div>
+                          </div>
+                        </button>
                       </div>
                     </div>
                   )}
@@ -1094,8 +1150,14 @@ const BookSlot: React.FC<BookSlotProps> = ({ currentUser }) => {
                     />
                   </div>
 
-                  {(warnings.hours) && (
+                  {(warnings.hours || warnings.eventBoundary) && (
                     <div className="sm:col-span-2 space-y-3">
+                      {warnings.eventBoundary && (
+                        <Alert className="bg-error/5 border-2 border-error/30 text-error rounded-xl">
+                          <AlertTriangle size={16} className="shrink-0" />
+                          <AlertDescription className="font-semibold ml-2">{warnings.eventBoundary}</AlertDescription>
+                        </Alert>
+                      )}
                       {warnings.hours && (
                         <Alert className="bg-error/5 border-2 border-error/30 text-error rounded-xl">
                           <AlertTriangle size={16} className="shrink-0" />
