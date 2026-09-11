@@ -1,12 +1,8 @@
-import { AnimatePresence, motion } from 'framer-motion';
-import { AlertCircle, AlertTriangle, Calendar as CalendarIcon, Check, CheckCircle, ChevronDown, ChevronRight, Download, ExternalLink, MapPin, Pencil, Plus, RefreshCw, Settings, X, XCircle } from 'lucide-react';
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { toast } from 'sonner';
-import * as XLSX from 'xlsx';
-import AddBookingDialog from '../components/AddBookingDialog';
-import EditBookingDialog from '../components/EditBookingDialog';
-import RegisterEventDialog from '../components/RegisterEventDialog';
+import { AnimatePresence, motion } from 'framer-motion';
+import { AlertCircle, AlertTriangle, Calendar as CalendarIcon, Check, CheckCircle, ChevronDown, ChevronRight, Download, ExternalLink, Image as ImageIcon, MapPin, Pencil, Plus, RefreshCw, Settings, Trash2, Upload, X, XCircle } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '../components/ui/alert';
 import { Badge } from '../components/ui/badge';
 import { Button } from '../components/ui/button';
@@ -24,6 +20,10 @@ import { cn, getISTParts } from '../lib/utils';
 import { getSocket, SOCKET_EVENTS } from '../lib/socket';
 import { toastError, toastSuccess } from '../lib/toast';
 import { GroupedBooking, Booking, AppEvent } from '../types';
+import AddBookingDialog from '../components/AddBookingDialog';
+import EditBookingDialog from '../components/EditBookingDialog';
+import RegisterEventDialog from '../components/RegisterEventDialog';
+import * as XLSX from 'xlsx';
 
 const formatEventType = (eventType?: string) => {
   if (!eventType) return '';
@@ -59,10 +59,14 @@ const AdminDashboard: React.FC = () => {
   // SBG Settings State
   const [sbgSettingsOpen, setSbgSettingsOpen] = React.useState(false);
   const [isSavingSettings, setIsSavingSettings] = React.useState(false);
-  const [sbgSettings, setSbgSettings] = React.useState({
+  const [sbgSettings, setSbgSettings] = React.useState<Record<string, string>>({
     sbg_constitution_link: '',
     sbg_linkedin: '',
-    sbg_email: ''
+    sbg_email: '',
+    sbg_photo_convener: '',
+    sbg_photo_dy_convener: '',
+    sbg_photo_treasurer: '',
+    sbg_photo_secretary: '',
   });
 
   const fetchSbgSettings = async () => {
@@ -71,11 +75,56 @@ const AdminDashboard: React.FC = () => {
       setSbgSettings({
         sbg_constitution_link: config.sbg_constitution_link || '',
         sbg_linkedin: config.sbg_linkedin || '',
-        sbg_email: config.sbg_email || ''
+        sbg_email: config.sbg_email || '',
+        sbg_photo_convener: config.sbg_photo_convener || '',
+        sbg_photo_dy_convener: config.sbg_photo_dy_convener || '',
+        sbg_photo_treasurer: config.sbg_photo_treasurer || '',
+        sbg_photo_secretary: config.sbg_photo_secretary || '',
       });
     } catch (err) {
       console.error('Failed to fetch SBG settings', err);
     }
+  };
+
+  const handlePhotoUpload = (key: string, file: File) => {
+    if (!file.type.startsWith('image/')) {
+      toastError(new Error('Please select an image file'), 'Invalid file type');
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      if (typeof event.target?.result === 'string') {
+        const img = new Image();
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          const MAX_SIZE = 400;
+          const width = img.width;
+          const height = img.height;
+
+          const minDim = Math.min(width, height);
+          const startX = (width - minDim) / 2;
+          const startY = (height - minDim) / 2;
+
+          canvas.width = Math.min(minDim, MAX_SIZE);
+          canvas.height = Math.min(minDim, MAX_SIZE);
+
+          const ctx = canvas.getContext('2d');
+          if (ctx) {
+            ctx.imageSmoothingEnabled = true;
+            ctx.imageSmoothingQuality = 'high';
+            ctx.drawImage(img, startX, startY, minDim, minDim, 0, 0, canvas.width, canvas.height);
+            const dataUrl = canvas.toDataURL('image/jpeg', 0.88);
+            setSbgSettings(prev => ({
+              ...prev,
+              [key]: dataUrl,
+            }));
+            toastSuccess('Photo loaded! Click "Save Settings" to save to database.');
+          }
+        };
+        img.src = event.target.result;
+      }
+    };
+    reader.readAsDataURL(file);
   };
 
   const handleEventAction = async (ids: string[], action: 'active' | 'rejected') => {
@@ -1366,58 +1415,156 @@ const AdminDashboard: React.FC = () => {
 
       {/* SBG Settings Dialog */}
       <Dialog open={sbgSettingsOpen} onOpenChange={setSbgSettingsOpen}>
-        <DialogContent className="sm:max-w-md">
+        <DialogContent className="sm:max-w-xl max-h-[85vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>SBG Settings</DialogTitle>
+            <DialogTitle>SBG Settings & Photos</DialogTitle>
             <DialogDescription>
-              Manage public information shown on the About SBG page.
+              Manage public links and Executive Committee photos shown on the About SBG page.
             </DialogDescription>
           </DialogHeader>
 
-          <div className="space-y-4 py-4">
-            <div className="space-y-2">
-              <Label htmlFor="constitution-link">Constitution Link (URL)</Label>
-              <Input
-                id="constitution-link"
-                value={sbgSettings.sbg_constitution_link}
-                onChange={(e) =>
-                  setSbgSettings({
-                    ...sbgSettings,
-                    sbg_constitution_link: e.target.value,
-                  })
-                }
-                placeholder="https://..."
-              />
+          <div className="space-y-5 py-2">
+            {/* Core Links */}
+            <div className="space-y-4">
+              <h4 className="text-xs font-bold uppercase tracking-wider text-textMuted">Links & Contact</h4>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div className="space-y-1.5 sm:col-span-2">
+                  <Label htmlFor="constitution-link" className="text-xs font-semibold">Constitution Link (URL)</Label>
+                  <Input
+                    id="constitution-link"
+                    value={sbgSettings.sbg_constitution_link || ''}
+                    onChange={(e) =>
+                      setSbgSettings({
+                        ...sbgSettings,
+                        sbg_constitution_link: e.target.value,
+                      })
+                    }
+                    placeholder="https://..."
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <Label htmlFor="sbg-linkedin" className="text-xs font-semibold">SBG LinkedIn (URL)</Label>
+                  <Input
+                    id="sbg-linkedin"
+                    value={sbgSettings.sbg_linkedin || ''}
+                    onChange={(e) =>
+                      setSbgSettings({
+                        ...sbgSettings,
+                        sbg_linkedin: e.target.value,
+                      })
+                    }
+                    placeholder="https://linkedin.com/..."
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <Label htmlFor="sbg-email" className="text-xs font-semibold">SBG Contact Email</Label>
+                  <Input
+                    id="sbg-email"
+                    value={sbgSettings.sbg_email || ''}
+                    onChange={(e) =>
+                      setSbgSettings({ ...sbgSettings, sbg_email: e.target.value })
+                    }
+                    placeholder="sbg@dau.ac.in"
+                    type="email"
+                  />
+                </div>
+              </div>
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="sbg-linkedin">SBG LinkedIn (URL)</Label>
-              <Input
-                id="sbg-linkedin"
-                value={sbgSettings.sbg_linkedin}
-                onChange={(e) =>
-                  setSbgSettings({
-                    ...sbgSettings,
-                    sbg_linkedin: e.target.value,
-                  })
-                }
-                placeholder="https://linkedin.com/..."
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="sbg-email">SBG Contact Email</Label>
-              <Input
-                id="sbg-email"
-                value={sbgSettings.sbg_email}
-                onChange={(e) =>
-                  setSbgSettings({ ...sbgSettings, sbg_email: e.target.value })
-                }
-                placeholder="sbg@dau.ac.in"
-                type="email"
-              />
+
+            {/* Core Member Photos Section */}
+            <div className="space-y-3 pt-3 border-t border-borderSoft/60">
+              <div>
+                <h4 className="text-xs font-bold uppercase tracking-wider text-textMuted">Executive Committee Photos</h4>
+                <p className="text-xs text-textSecondary mt-0.5">Upload photos directly to database storage for the About SBG page.</p>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {[
+                  { key: 'sbg_photo_convener', label: 'Convener', initials: 'CO' },
+                  { key: 'sbg_photo_dy_convener', label: 'Dy. Convener', initials: 'DC' },
+                  { key: 'sbg_photo_treasurer', label: 'Treasurer', initials: 'TR' },
+                  { key: 'sbg_photo_secretary', label: 'Secretary', initials: 'SC' },
+                ].map((officer) => {
+                  const currentPhoto = sbgSettings[officer.key];
+                  const isCustom = !!currentPhoto;
+
+                  return (
+                    <div
+                      key={officer.key}
+                      className="p-3 rounded-xl border border-borderSoft/60 bg-hoverSoft/10 flex items-center gap-3"
+                    >
+                      <div className="relative shrink-0">
+                        {isCustom ? (
+                          <img
+                            src={currentPhoto}
+                            alt={officer.label}
+                            className="h-12 w-12 rounded-full object-cover border-2 border-brand/20 bg-card shadow-sm"
+                          />
+                        ) : (
+                          <div className="h-12 w-12 rounded-full bg-gradient-to-br from-brand/20 to-brand/5 border-2 border-dashed border-brand/30 flex items-center justify-center text-brand font-bold text-xs shadow-sm">
+                            {officer.initials}
+                          </div>
+                        )}
+                      </div>
+
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-center gap-1.5">
+                          <span className="font-semibold text-textPrimary text-xs truncate">{officer.label}</span>
+                          {isCustom && (
+                            <span className="px-1.5 py-0.5 rounded text-[9px] font-bold bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30">
+                              Database
+                            </span>
+                          )}
+                        </div>
+
+                        <div className="flex items-center gap-1.5 mt-2">
+                          <input
+                            id={`file-input-${officer.key}`}
+                            type="file"
+                            accept="image/*"
+                            className="hidden"
+                            onChange={(e) => {
+                              const file = e.target.files?.[0];
+                              if (file) handlePhotoUpload(officer.key, file);
+                              e.target.value = '';
+                            }}
+                          />
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            className="h-7 px-2 text-[11px] font-semibold rounded-lg"
+                            onClick={() => document.getElementById(`file-input-${officer.key}`)?.click()}
+                          >
+                            <Upload size={11} className="mr-1" />
+                            {isCustom ? 'Change' : 'Upload'}
+                          </Button>
+
+                          {isCustom && (
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="sm"
+                              className="h-7 px-2 text-[11px] text-error hover:bg-error/10 hover:text-error rounded-lg"
+                              onClick={() => {
+                                setSbgSettings(prev => ({ ...prev, [officer.key]: '' }));
+                                toastSuccess(`Cleared photo for ${officer.label}`);
+                              }}
+                            >
+                              <Trash2 size={11} className="mr-1" />
+                              Clear
+                            </Button>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
             </div>
           </div>
 
-          <DialogFooter>
+          <DialogFooter className="mt-2">
             <Button variant="outline" onClick={() => setSbgSettingsOpen(false)}>
               Cancel
             </Button>

@@ -18,7 +18,6 @@ Allow: /login
 # Allow assets required for proper page rendering & preview generation
 Allow: /assets/
 Allow: /icons/
-Allow: /sbg_photos/
 Allow: /sbg_logo.png
 Allow: /gdg-logo.png
 Allow: /favicon*.png
@@ -59,7 +58,6 @@ Disallow: /api/
 User-agent: Googlebot-Image
 Allow: /sbg_logo.png
 Allow: /gdg-logo.png
-Allow: /sbg_photos/
 Allow: /icons/
 Allow: /favicon*.png
 
