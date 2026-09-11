@@ -4,11 +4,10 @@ on:
   push:
     branches: [main]
   pull_request:
-  pull_request_target:
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: ${{ github.event_name == 'pull_request' || github.event_name == 'pull_request_target' }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 env:
   NODE_VERSION: "22"
@@ -175,7 +174,7 @@ jobs:
           build-args: |
             BUILD_ID=${{ github.sha }}
           cache-from: type=gha
-          cache-to: type=gha,mode=max
+          cache-to: type=gha,mode=max,ignore-error=true
           provenance: false
 
   # ─── Stage 4: Deploy to production ─────────────────────────
