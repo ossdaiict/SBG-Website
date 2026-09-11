@@ -78,13 +78,17 @@ const LandingPage: React.FC = () => {
     const [venues, setVenues] = useState<ApiVenue[]>([]);
     const [selectedEvent, setSelectedEvent] = useState<PublicEvent | null>(null);
     const [selectedDayInfo, setSelectedDayInfo] = useState<{ date: Date; events: PublicEvent[] } | null>(null);
-    const [isMobile, setIsMobile] = useState(() => window.innerWidth < 640);
+    const [windowWidth, setWindowWidth] = useState(() => typeof window !== 'undefined' ? window.innerWidth : 1200);
 
     useEffect(() => {
-        const onResize = () => setIsMobile(window.innerWidth < 640);
+        const onResize = () => setWindowWidth(window.innerWidth);
         window.addEventListener('resize', onResize);
         return () => window.removeEventListener('resize', onResize);
     }, []);
+
+    const isMobile = windowWidth < 640;
+    const isTablet = windowWidth >= 640 && windowWidth < 1024;
+    const isLargeScreen = windowWidth >= 1536;
 
     const fetchEvents = useCallback(async () => {
         try {
@@ -420,24 +424,24 @@ const LandingPage: React.FC = () => {
                             <div className="flex items-center justify-center py-32">
                                 <div className="h-8 w-8 border-3 border-brand/30 border-t-brand rounded-full animate-spin" />
                             </div>
-                        ) : (() => {
-                            // Centralized layout constants — compact and adaptive for laptops/MacBook
+                        ) : (() => {                            // Centralized layout constants — adaptive across mobile, tablet, laptop, and ultra-wide screens
                             const L = {
-                                cellPad:      isMobile ? 3 : 5,    // compact padding
-                                dayNumH:      isMobile ? 20 : 24,  // sleek day number
-                                dayNumMb:     2,                   // tight margin below number
-                                barH:         isMobile ? 20 : 22,  // event bar height
-                                barGap:       3,                   // gap between rows
-                                maxSlots:     2,
-                                barMargin:    isMobile ? 2 : 4,    // ml/mr on bars
-                                barFont:      isMobile ? 10 : 11,  // event name font
-                                barPadX:      isMobile ? 4 : 6,    // horizontal padding in bars
-                                overflowFont: isMobile ? 10 : 11,  // "+N more" font
+                                cellPad:      isMobile ? 3 : isLargeScreen ? 6 : 5,    // compact on mobile, spacious on large screens
+                                dayNumH:      isMobile ? 20 : isLargeScreen ? 26 : 24,  // sleek day number
+                                dayNumMb:     isMobile ? 2 : 3,                        // margin below number
+                                barH:         isMobile ? 20 : isLargeScreen ? 24 : 22,  // event bar height
+                                barGap:       3,                                       // gap between rows
+                                maxSlots:     isLargeScreen ? 3 : 2,                   // show 3 events on large screens before overflow
+                                barMargin:    isMobile ? 2 : 4,                        // ml/mr on bars
+                                barFont:      isMobile ? 10 : isLargeScreen ? 12 : 11, // event name font
+                                barPadX:      isMobile ? 4 : isLargeScreen ? 7 : 6,    // horizontal padding in bars
+                                overflowFont: isMobile ? 10 : 11,                      // "+N more" font
                             };
                             // Derived values
                             const overlayTop = L.cellPad + L.dayNumH + L.dayNumMb;
                             const rowH = L.barH + L.barGap;
                             const overflowH = isMobile ? 14 : 16;
+                            const emptyMinH = isMobile ? 46 : isTablet ? 72 : isLargeScreen ? 116 : 94;
 
                             return (
                             <div className="flex flex-col border-x border-borderSoft/30">
@@ -451,7 +455,6 @@ const LandingPage: React.FC = () => {
                                     const maxSlotUsedInWeek = visibleEvents.length > 0 ? Math.max(...visibleEvents.map(we => we.slot)) : -1;
                                     const weekEventsH = (maxSlotUsedInWeek + 1) * rowH;
                                     const weekOverflowH = weekHasOverflow ? overflowH : 0;
-                                    const emptyMinH = isMobile ? 44 : 54;
                                     const weekH = Math.max(emptyMinH, overlayTop + weekEventsH + weekOverflowH + L.cellPad);
 
                                     return (

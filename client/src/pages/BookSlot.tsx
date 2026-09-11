@@ -1081,28 +1081,6 @@ const BookSlot: React.FC<BookSlotProps> = ({ currentUser }) => {
                           type="button"
                           className={cn(
                             "w-full text-left p-3.5 sm:p-4 rounded-xl border-2 transition-all duration-200 flex items-start gap-3 select-none cursor-pointer",
-                            bookingType === 'recurring'
-                              ? "bg-brand/8 border-brand ring-2 ring-brand/20 shadow-sm"
-                              : "bg-card hover:bg-hoverSoft/50 border-borderSoft hover:border-borderSoft/80"
-                          )}
-                          onClick={() => setBookingType('recurring')}
-                        >
-                          <div className={cn(
-                            "h-4 w-4 rounded-full border-2 mt-0.5 flex items-center justify-center shrink-0 transition-all",
-                            bookingType === 'recurring' ? "border-brand bg-brand" : "border-textMuted/40"
-                          )}>
-                            {bookingType === 'recurring' && <div className="h-1.5 w-1.5 rounded-full bg-white" />}
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <div className="font-bold text-sm sm:text-base text-textPrimary leading-snug">Recurring Daily</div>
-                            <div className="text-xs text-textSecondary mt-1 leading-relaxed">Book the selected hours separately on each day</div>
-                          </div>
-                        </button>
-
-                        <button
-                          type="button"
-                          className={cn(
-                            "w-full text-left p-3.5 sm:p-4 rounded-xl border-2 transition-all duration-200 flex items-start gap-3 select-none cursor-pointer",
                             bookingType === 'continuous'
                               ? "bg-brand/8 border-brand ring-2 ring-brand/20 shadow-sm"
                               : "bg-card hover:bg-hoverSoft/50 border-borderSoft hover:border-borderSoft/80"
@@ -1118,6 +1096,28 @@ const BookSlot: React.FC<BookSlotProps> = ({ currentUser }) => {
                           <div className="flex-1 min-w-0">
                             <div className="font-bold text-sm sm:text-base text-textPrimary leading-snug">Continuous Slot</div>
                             <div className="text-xs text-textSecondary mt-1 leading-relaxed">Book non-stop from start date & time to end date & time</div>
+                          </div>
+                        </button>
+
+                        <button
+                          type="button"
+                          className={cn(
+                            "w-full text-left p-3.5 sm:p-4 rounded-xl border-2 transition-all duration-200 flex items-start gap-3 select-none cursor-pointer",
+                            bookingType === 'recurring'
+                              ? "bg-brand/8 border-brand ring-2 ring-brand/20 shadow-sm"
+                              : "bg-card hover:bg-hoverSoft/50 border-borderSoft hover:border-borderSoft/80"
+                          )}
+                          onClick={() => setBookingType('recurring')}
+                        >
+                          <div className={cn(
+                            "h-4 w-4 rounded-full border-2 mt-0.5 flex items-center justify-center shrink-0 transition-all",
+                            bookingType === 'recurring' ? "border-brand bg-brand" : "border-textMuted/40"
+                          )}>
+                            {bookingType === 'recurring' && <div className="h-1.5 w-1.5 rounded-full bg-white" />}
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <div className="font-bold text-sm sm:text-base text-textPrimary leading-snug">Recurring Daily</div>
+                            <div className="text-xs text-textSecondary mt-1 leading-relaxed">Book the selected hours separately on each day</div>
                           </div>
                         </button>
                       </div>

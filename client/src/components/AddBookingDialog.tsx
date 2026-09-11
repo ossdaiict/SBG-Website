@@ -491,28 +491,6 @@ const AddBookingDialog: React.FC<Props> = ({ open, onOpenChange, onCreated }) =>
                                             type="button"
                                             className={cn(
                                                 "w-full text-left p-3 rounded-xl border-2 transition-all duration-200 flex items-start gap-2.5 select-none cursor-pointer",
-                                                bookingType === 'recurring'
-                                                    ? "bg-brand/8 border-brand ring-2 ring-brand/20 shadow-sm"
-                                                    : "bg-card hover:bg-hoverSoft/50 border-borderSoft hover:border-borderSoft/80"
-                                            )}
-                                            onClick={() => setBookingType('recurring')}
-                                        >
-                                            <div className={cn(
-                                                "h-3.5 w-3.5 rounded-full border-2 mt-0.5 flex items-center justify-center shrink-0 transition-all",
-                                                bookingType === 'recurring' ? "border-brand bg-brand" : "border-textMuted/40"
-                                            )}>
-                                                {bookingType === 'recurring' && <div className="h-1 w-1 rounded-full bg-white" />}
-                                            </div>
-                                            <div className="flex-1 min-w-0">
-                                                <div className="font-bold text-xs sm:text-sm text-textPrimary leading-snug">Recurring Daily</div>
-                                                <div className="text-[11px] text-textSecondary mt-0.5 leading-tight">Book specific hours each day</div>
-                                            </div>
-                                        </button>
-
-                                        <button
-                                            type="button"
-                                            className={cn(
-                                                "w-full text-left p-3 rounded-xl border-2 transition-all duration-200 flex items-start gap-2.5 select-none cursor-pointer",
                                                 bookingType === 'continuous'
                                                     ? "bg-brand/8 border-brand ring-2 ring-brand/20 shadow-sm"
                                                     : "bg-card hover:bg-hoverSoft/50 border-borderSoft hover:border-borderSoft/80"
@@ -528,6 +506,28 @@ const AddBookingDialog: React.FC<Props> = ({ open, onOpenChange, onCreated }) =>
                                             <div className="flex-1 min-w-0">
                                                 <div className="font-bold text-xs sm:text-sm text-textPrimary leading-snug">Continuous Slot</div>
                                                 <div className="text-[11px] text-textSecondary mt-0.5 leading-tight">Book continuously start to end</div>
+                                            </div>
+                                        </button>
+                                        
+                                        <button
+                                            type="button"
+                                            className={cn(
+                                                "w-full text-left p-3 rounded-xl border-2 transition-all duration-200 flex items-start gap-2.5 select-none cursor-pointer",
+                                                bookingType === 'recurring'
+                                                    ? "bg-brand/8 border-brand ring-2 ring-brand/20 shadow-sm"
+                                                    : "bg-card hover:bg-hoverSoft/50 border-borderSoft hover:border-borderSoft/80"
+                                            )}
+                                            onClick={() => setBookingType('recurring')}
+                                        >
+                                            <div className={cn(
+                                                "h-3.5 w-3.5 rounded-full border-2 mt-0.5 flex items-center justify-center shrink-0 transition-all",
+                                                bookingType === 'recurring' ? "border-brand bg-brand" : "border-textMuted/40"
+                                            )}>
+                                                {bookingType === 'recurring' && <div className="h-1 w-1 rounded-full bg-white" />}
+                                            </div>
+                                            <div className="flex-1 min-w-0">
+                                                <div className="font-bold text-xs sm:text-sm text-textPrimary leading-snug">Recurring Daily</div>
+                                                <div className="text-[11px] text-textSecondary mt-0.5 leading-tight">Book specific hours each day</div>
                                             </div>
                                         </button>
                                     </div>
