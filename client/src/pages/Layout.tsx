@@ -275,14 +275,15 @@ const Layout: React.FC<LayoutProps> = ({ children, user, onLogout }) => {
           </div>
 
           <div className="flex items-center gap-2 shrink-0">
-            <ThemeToggle />
+            <ThemeToggle className="h-9 w-9" />
             <Button
               variant="ghost"
               size="sm"
               onClick={onLogout}
-              className="flex items-center gap-2 text-textMuted hover:text-error hover:bg-error/10 rounded-lg h-9 px-2.5 sm:px-3 font-medium transition-all border border-borderSoft/60 shadow-sm bg-card/80 backdrop-blur cursor-pointer"
+              className="flex items-center justify-center gap-2 text-textMuted hover:text-error hover:bg-error/10 rounded-lg h-9 w-9 sm:w-auto px-0 sm:px-3 font-medium transition-all border border-borderSoft/60 shadow-sm bg-card/80 backdrop-blur cursor-pointer"
+              aria-label="Logout"
             >
-              <LogOut size={15} />
+              <LogOut className="h-4 w-4 shrink-0" />
               <span className="hidden sm:inline">Logout</span>
             </Button>
           </div>

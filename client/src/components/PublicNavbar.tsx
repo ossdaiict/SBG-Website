@@ -118,7 +118,7 @@ export const PublicNavbar: React.FC<PublicNavbarProps> = ({ onGoToLogin }) => {
 
         {/* Right: Utilities */}
         <div className="flex items-center gap-1.5 xs:gap-2 sm:gap-3 shrink-0">
-          <ThemeToggle />
+          <ThemeToggle className="h-11 w-11 lg:h-10 lg:w-10 rounded-xl" iconClassName="h-5 w-5 lg:h-4 lg:w-4" />
 
           {/* Sign In (Desktop Only) */}
           <Button

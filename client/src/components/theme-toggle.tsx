@@ -11,8 +11,14 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import { cn } from "@/lib/utils"
 
-export function ThemeToggle() {
+interface ThemeToggleProps {
+  className?: string
+  iconClassName?: string
+}
+
+export function ThemeToggle({ className, iconClassName }: ThemeToggleProps = {}) {
   const { theme, setTheme, resolvedTheme } = useTheme()
   const [mounted, setMounted] = React.useState(false)
 
@@ -20,10 +26,19 @@ export function ThemeToggle() {
     setMounted(true)
   }, [])
 
+  const defaultButtonClass =
+    "h-9 w-9 rounded-lg text-textMuted hover:text-textMuted cursor-pointer bg-card/80 backdrop-blur border border-borderSoft/60 hover:bg-hoverSoft shadow-sm transition-all flex items-center justify-center shrink-0"
+  const defaultIconClass = "h-4 w-4 shrink-0"
+
   if (!mounted) {
     return (
-      <Button variant="ghost" size="icon" aria-label="Toggle theme" className="h-11 w-11 lg:h-9 lg:w-9 rounded-lg cursor-pointer bg-card/80 backdrop-blur border border-borderSoft/60 hover:bg-hoverSoft shadow-sm transition-all text-textMuted flex items-center justify-center">
-        <Sun className="h-4 w-4" />
+      <Button
+        variant="ghost"
+        size="icon"
+        aria-label="Toggle theme"
+        className={cn(defaultButtonClass, className)}
+      >
+        <Sun className={cn(defaultIconClass, iconClassName)} />
       </Button>
     )
   }
@@ -31,11 +46,16 @@ export function ThemeToggle() {
   return (
     <DropdownMenu modal={false}>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="icon" aria-label="Toggle theme" className="h-11 w-11 lg:h-9 lg:w-9 rounded-lg text-textMuted hover:text-textMuted cursor-pointer bg-card/80 backdrop-blur border border-borderSoft/60 hover:bg-hoverSoft shadow-sm transition-all flex items-center justify-center">
+        <Button
+          variant="ghost"
+          size="icon"
+          aria-label="Toggle theme"
+          className={cn(defaultButtonClass, className)}
+        >
           {resolvedTheme === "dark" ? (
-            <Moon className="h-4 w-4" />
+            <Moon className={cn(defaultIconClass, iconClassName)} />
           ) : (
-            <Sun className="h-4 w-4" />
+            <Sun className={cn(defaultIconClass, iconClassName)} />
           )}
         </Button>
       </DropdownMenuTrigger>
