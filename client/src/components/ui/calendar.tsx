@@ -113,79 +113,72 @@ function CalendarDayButton({
   const isOutside = modifiers?.outside;
 
   return (
-    <motion.div
+    <DayButton
+      day={day}
+      modifiers={modifiers}
+      {...props}
       className={cn(
-        "w-full h-full min-w-0",
-        "flex items-center justify-center",
-        "rounded-full transition-shadow duration-300",
+        className,
+        /* -------------------------------------------------------------- */
+        /* IMPORTANT: fluid date button                                  */
+        /* -------------------------------------------------------------- */
+
+        "w-[90%]",
+        "max-w-[var(--cell-size)]",
+        "aspect-square",
+        "h-auto",
+        "mx-auto",
+
+        "flex flex-col",
+        "justify-center",
+        "items-center",
+        "gap-0.5",
+
+        "font-medium",
+        "leading-none",
+        "rounded-full",
+        "transition-all",
+        "duration-200",
+        "relative",
+        "active:scale-95",
+
+        "text-textPrimary",
+
         hasEvents &&
           !isDisabled &&
           "cursor-pointer hover:shadow-[0_0_0_1px_hsl(var(--primary)/0.35)]",
+
+        /* Selected */
+        isSelected && "bg-brand text-white hover:bg-brand hover:text-white",
+
+        /* Today */
+        isToday && !isSelected && "ring-1 ring-brand/60 text-brand",
+
+        /* Outside days */
+        isOutside && "text-textMuted/40",
+
+        /* Disabled */
+        isDisabled && "text-textMuted/40 opacity-50 cursor-not-allowed",
       )}
-      whileTap={!isDisabled ? { scale: 0.96 } : undefined}
     >
-      <DayButton
-        day={day}
-        modifiers={modifiers}
-        {...props}
-        className={cn(
-          className,
-          /* -------------------------------------------------------------- */
-          /* IMPORTANT: fluid date button                                  */
-          /* -------------------------------------------------------------- */
+      {props.children}
 
-          "w-[90%]",
-          "max-w-[var(--cell-size)]",
-          "aspect-square",
-          "h-auto",
-          "mx-auto",
-
-          "flex flex-col",
-          "justify-center",
-          "items-center",
-          "gap-0.5",
-
-          "font-medium",
-          "leading-none",
-          "rounded-full",
-          "transition-all",
-          "duration-200",
-          "relative",
-
-          "text-textPrimary",
-
-          /* Selected */
-          isSelected && "bg-brand text-white hover:bg-brand hover:text-white",
-
-          /* Today */
-          isToday && !isSelected && "ring-1 ring-brand/60 text-brand",
-
-          /* Outside days */
-          isOutside && "text-textMuted/40",
-
-          /* Disabled */
-          isDisabled && "text-textMuted/40 opacity-50 cursor-not-allowed",
-        )}
-      >
-        {props.children}
-
-        {/* Event indicator */}
-        {hasEvents && !isDisabled && (
-          <span
-            className={cn(
-              "absolute",
-              "bottom-[8%]",
-              "left-1/2",
-              "-translate-x-1/2",
-              "w-1.5",
-              "h-1.5",
-              "rounded-full",
-              isSelected ? "bg-white" : "bg-primary",
-            )}
-          />
-        )}
-      </DayButton>
-    </motion.div>
+      {/* Event indicator */}
+      {hasEvents && !isDisabled && (
+        <span
+          className={cn(
+            "absolute",
+            "bottom-[8%]",
+            "left-1/2",
+            "-translate-x-1/2",
+            "w-1.5",
+            "h-1.5",
+            "rounded-full",
+            isSelected ? "bg-white" : "bg-primary",
+          )}
+        />
+      )}
+    </DayButton>
   );
 }
 

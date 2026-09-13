@@ -1,4 +1,3 @@
-import { motion } from 'framer-motion';
 import {
   Archive as ArchiveIcon,
   Calendar,
@@ -274,30 +273,15 @@ const Archives: React.FC = () => {
     return pages;
   };
 
-  if (isLoading) {
-    return (
-      <div className="space-y-4 p-4">
-        <Skeleton className="h-10 w-48 rounded-xl" />
-        <Skeleton className="h-32 w-full rounded-2xl" />
-        <Skeleton className="h-32 w-full rounded-2xl" />
-      </div>
-    );
-  }
-
   return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.3 }}
-      className="space-y-6"
-    >
+    <div className="space-y-6">
       <div ref={listTopRef} className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="min-w-0 flex items-center gap-3">
           <ArchiveIcon className="text-textSecondary" size={32} />
           <div>
-            <motion.h1 className="text-3xl sm:text-4xl font-extrabold text-textPrimary tracking-tighter">
+            <h1 className="text-3xl sm:text-4xl font-extrabold text-textPrimary tracking-tighter">
               Database Archives
-            </motion.h1>
+            </h1>
             <p className="text-textSecondary mt-1 text-sm font-medium leading-relaxed max-w-xl">
               Historical records of deleted events, meetings, slot bookings, and reports.
             </p>
@@ -368,7 +352,13 @@ const Archives: React.FC = () => {
         </div>
       </div>
 
-      {!error && allItems.length === 0 && (
+      {isLoading ? (
+        <div className="grid grid-cols-1 gap-5">
+          {[1, 2, 3].map((i) => (
+            <Skeleton key={i} className="h-36 w-full rounded-2xl" />
+          ))}
+        </div>
+      ) : !error && allItems.length === 0 ? (
         <div className="flex flex-col items-center justify-center p-12 text-center bg-card border border-borderSoft rounded-2xl shadow-sm">
           <ArchiveIcon size={48} className="text-textMuted mb-4 opacity-50" />
           <h2 className="text-lg font-bold text-textPrimary">No Archives Found</h2>
@@ -378,25 +368,19 @@ const Archives: React.FC = () => {
               : 'When events, meetings, or members are removed, their historical records will appear here.'}
           </p>
         </div>
-      )}
+      ) : (
+        <div className="grid grid-cols-1 gap-5">
+          {(() => {
+            const startIndex = (currentPage - 1) * itemsPerPage;
+            const paginatedItems = allItems.slice(startIndex, startIndex + itemsPerPage);
 
-      <div className="grid grid-cols-1 gap-5">
-        {(() => {
-          const startIndex = (currentPage - 1) * itemsPerPage;
-          const paginatedItems = allItems.slice(startIndex, startIndex + itemsPerPage);
-
-          return (
-            <>
-              {paginatedItems.map((item, i) => {
+            return (
+              <>
+              {paginatedItems.map((item) => {
                 if (item.type === 'event') {
                   const event = item.data;
                   return (
-                    <motion.div
-                      key={`event-${event.id}`}
-                      initial={{ opacity: 0, y: 16 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: i * 0.05 }}
-                    >
+                    <div key={`event-${event.id}`}>
                       <Card className="border border-borderSoft rounded-xl overflow-hidden shadow-sm">
                         <CardHeader className="bg-bgMain border-b border-borderSoft p-4">
                           <div className="flex flex-col sm:flex-row justify-between items-start gap-4">
@@ -457,9 +441,9 @@ const Archives: React.FC = () => {
                         <CardContent className="p-0">
                           {event.bookings.length > 0 && (
                             <div className="p-4 border-b border-borderSoft/50 bg-card">
-                              <h4 className="text-sm font-semibold mb-2 text-textPrimary flex items-center gap-2">
+                              <h3 className="text-sm font-semibold mb-2 text-textPrimary flex items-center gap-2">
                                 <ArchiveIcon size={14} className="text-brand" /> Associated Bookings ({event.bookings.length})
-                              </h4>
+                              </h3>
                               <div className="space-y-2">
                                 {event.bookings.map((b) => (
                                   <div
@@ -483,9 +467,9 @@ const Archives: React.FC = () => {
                           )}
                           {event.report && (
                             <div className="p-4 bg-card">
-                              <h4 className="text-sm font-semibold mb-2 text-textPrimary flex items-center gap-2">
+                              <h3 className="text-sm font-semibold mb-2 text-textPrimary flex items-center gap-2">
                                 <ArchiveIcon size={14} className="text-brand" /> Associated Event Report
-                              </h4>
+                              </h3>
                               <div className="text-xs text-textSecondary flex flex-wrap gap-x-4 gap-y-2">
                                 <span className="shrink-0">Level: {event.report.level}</span>
                                 <a
@@ -511,17 +495,12 @@ const Archives: React.FC = () => {
                           )}
                         </CardContent>
                       </Card>
-                    </motion.div>
+                    </div>
                   );
                 } else if (item.type === 'booking') {
                   const booking = item.data;
                   return (
-                    <motion.div
-                      key={`booking-${booking.id}`}
-                      initial={{ opacity: 0, y: 16 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: i * 0.05 }}
-                    >
+                    <div key={`booking-${booking.id}`}>
                       <Card className="border border-borderSoft rounded-xl overflow-hidden shadow-sm">
                         <CardHeader className="bg-bgMain border-b border-borderSoft p-4">
                           <div className="flex flex-col sm:flex-row justify-between items-start gap-4">
@@ -604,17 +583,12 @@ const Archives: React.FC = () => {
                           </div>
                         </CardHeader>
                       </Card>
-                    </motion.div>
+                    </div>
                   );
                 } else if (item.type === 'member') {
                   const member = item.data;
                   return (
-                    <motion.div
-                      key={`member-${member.id}`}
-                      initial={{ opacity: 0, y: 16 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: i * 0.05 }}
-                    >
+                    <div key={`member-${member.id}`}>
                       <Card className="border border-borderSoft rounded-xl overflow-hidden shadow-sm">
                         <CardHeader className="bg-bgMain border-b border-borderSoft p-4">
                           <div className="flex flex-col sm:flex-row justify-between items-start gap-4">
@@ -664,7 +638,7 @@ const Archives: React.FC = () => {
                           </div>
                         </CardHeader>
                       </Card>
-                    </motion.div>
+                    </div>
                   );
                 }
               })}
@@ -729,6 +703,7 @@ const Archives: React.FC = () => {
           </div>
         )}
       </div>
+      )}
 
       <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
         <DialogContent className="sm:max-w-[400px] rounded-2xl">
@@ -796,7 +771,7 @@ const Archives: React.FC = () => {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-    </motion.div>
+    </div>
   );
 };
 

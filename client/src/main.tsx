@@ -1,5 +1,4 @@
 import React from 'react';
-import 'react-day-picker/style.css';
 import ReactDOM from 'react-dom/client';
 import { Toaster } from 'sonner';
 import App from './App';

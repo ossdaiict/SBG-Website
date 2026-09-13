@@ -1,4 +1,3 @@
-import { motion } from "framer-motion";
 import {
   AlertTriangle,
   CalendarPlus,
@@ -159,12 +158,9 @@ const ScheduleCalendarCard = ({
               {selectedDate
                 ? (() => {
                     return selectedDateEvents.length > 0 ? (
-                      selectedDateEvents.map((event, index) => (
-                        <motion.div
-                          key={event.batchId || event.ids?.[0] || index}
-                          initial={{ opacity: 0, scale: 0.95 }}
-                          animate={{ opacity: 1, scale: 1 }}
-                          transition={{ duration: 0.3, delay: index * 0.05 }}
+                      selectedDateEvents.map((event) => (
+                        <div
+                          key={event.batchId || event.ids?.[0]}
                         >
                           <Card className="border border-borderSoft rounded-xl transition-colors">
                             <CardContent className="p-4">
@@ -228,7 +224,7 @@ const ScheduleCalendarCard = ({
                               )}
                             </CardContent>
                           </Card>
-                        </motion.div>
+                        </div>
                       ))
                     ) : (
                       <div className="text-center py-8 text-muted-foreground text-sm">
@@ -674,71 +670,27 @@ const ClubDashboard: React.FC<ClubDashboardProps> = ({ user }) => {
     );
   }
 
-  if (isLoading) {
-    return (
-      <div className="space-y-6 sm:space-y-8">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div className="flex items-center gap-4 min-w-0">
-            <Avatar
-              className={cn(
-                "h-16 w-16 border-2 border-brand/20 ring-4 ring-brand/5 shrink-0 rounded-2xl bg-white",
-              )}
-            >
-              <AvatarFallback className="bg-brand text-white font-bold text-xl rounded-2xl flex items-center justify-center">
-                {user.name.charAt(0).toUpperCase()}
-              </AvatarFallback>
-            </Avatar>
-            <div className="min-w-0">
-              <h1 className="text-xl sm:text-3xl lg:text-4xl font-bold text-foreground tracking-tight leading-tight">
-                Welcome, {user.name}
-              </h1>
-              <p className="text-muted-foreground mt-2 text-sm sm:text-base font-medium">
-                Manage your events and venue bookings efficiently.
-              </p>
-            </div>
-          </div>
-          <Skeleton className="h-11 w-full sm:w-40 rounded-xl" />
-        </div>
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8">
-          <div className="lg:col-span-2">
-            <Skeleton className="h-[420px] w-full rounded-2xl" />
-          </div>
-          <Skeleton className="h-[320px] w-full rounded-2xl" />
-        </div>
-        <Skeleton className="h-24 w-full rounded-2xl" />
-      </div>
-    );
-  }
-
   return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.4 }}
-      className="space-y-6 sm:space-y-8"
-    >
-      {/* Welcome Section */}
-      <motion.div
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] }}
-        className="flex flex-col sm:flex-row sm:items-center justify-between gap-4"
-      >
+    <div className="space-y-6 sm:space-y-8">
+      {/* Welcome Section - Painted immediately on frame 1 */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="flex items-center gap-4 min-w-0">
           <Avatar
             className={cn(
               "h-16 w-16 border border-borderSoft shrink-0 rounded-2xl",
-              clubDetails?.logo_bg === "white"
+              (clubDetails?.logo_bg || user.logoBg) === "white"
                 ? "bg-white"
-                : clubDetails?.logo_bg === "dark"
+                : (clubDetails?.logo_bg || user.logoBg) === "dark"
                   ? "bg-slate-900"
                   : "bg-transparent",
             )}
           >
             <AvatarImage
-              src={clubDetails?.logo_url || ""}
+              src={clubDetails?.logo_url || user.logoUrl || ""}
               alt={user.name}
-              className="object-contain drop-shadow-[0_1px_1px_rgba(0,0,0,0.12)]"
+              width={64}
+              height={64}
+              className="object-contain drop-shadow-[0_1px_1px_rgba(0,0,0,0.12)] aspect-square"
             />
             <AvatarFallback className="bg-brand text-white font-bold text-xl rounded-2xl flex items-center justify-center">
               {user.name.charAt(0).toUpperCase()}
@@ -772,18 +724,24 @@ const ClubDashboard: React.FC<ClubDashboardProps> = ({ user }) => {
             </Link>
           </Button>
         </div>
-      </motion.div>
+      </div>
 
-      <div className="grid grid-cols-1 xl:grid-cols-[minmax(0,1fr)_360px] gap-4 sm:gap-6">
-        {/* Schedule Calendar */}
-        <motion.div
-          initial={{ opacity: 0, x: -20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.5, delay: 0.2 }}
-          className="min-w-0"
-        >
-          <ScheduleCalendarCard
-            title={activeCalendar.title}
+      {isLoading ? (
+        <div className="space-y-6">
+          <div className="grid grid-cols-1 xl:grid-cols-[minmax(0,1fr)_360px] gap-4 sm:gap-6">
+            <Skeleton className="h-[460px] w-full rounded-2xl" />
+            <div className="space-y-6">
+              <Skeleton className="h-[220px] w-full rounded-xl" />
+              <Skeleton className="h-[220px] w-full rounded-xl" />
+            </div>
+          </div>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 xl:grid-cols-[minmax(0,1fr)_360px] gap-4 sm:gap-6">
+          {/* Schedule Calendar */}
+          <div className="min-w-0">
+            <ScheduleCalendarCard
+              title={activeCalendar.title}
             headerAction={
               <Tabs
                 value={calendarView}
@@ -828,15 +786,10 @@ const ClubDashboard: React.FC<ClubDashboardProps> = ({ user }) => {
             venues={venues}
             emptyMessage={activeCalendar.emptyMessage}
           />
-        </motion.div>
+        </div>
 
         {/* Your Upcoming Events & Registered Events (Sidebar) */}
-        <motion.div
-          initial={{ opacity: 0, x: 20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.5, delay: 0.3 }}
-          className="space-y-6"
-        >
+        <div className="space-y-6">
           {/* Card 1: My Club Bookings */}
           <Card className="border border-borderSoft rounded-xl xl:max-h-[250px]">
             <CardHeader className="border-b border-borderSoft p-3.5">
@@ -869,12 +822,9 @@ const ClubDashboard: React.FC<ClubDashboardProps> = ({ user }) => {
                       new Date(b.startTimeISO || b.date).getTime(),
                   )
                   .slice(0, 5)
-                  .map((event, index) => (
-                    <motion.div
-                      key={event.batchId || event.ids?.[0] || index}
-                      initial={{ opacity: 0, x: 20 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ duration: 0.3, delay: index * 0.1 }}
+                  .map((event) => (
+                    <div
+                      key={event.batchId || event.ids?.[0]}
                       className="p-2 hover:bg-hoverSoft transition-colors"
                     >
                       <div className="font-semibold text-foreground text-sm">
@@ -935,7 +885,7 @@ const ClubDashboard: React.FC<ClubDashboardProps> = ({ user }) => {
                           </span>
                         </Badge>
                       </div>
-                    </motion.div>
+                    </div>
                   ))}
                 {myEvents.length === 0 && (
                   <div className="p-2 text-center text-muted-foreground text-sm">
@@ -977,12 +927,9 @@ const ClubDashboard: React.FC<ClubDashboardProps> = ({ user }) => {
                       new Date(a.date).getTime() - new Date(b.date).getTime(),
                   )
                   .slice(0, 5)
-                  .map((event, index) => (
-                    <motion.div
+                  .map((event) => (
+                    <div
                       key={event.id}
-                      initial={{ opacity: 0, x: 20 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ duration: 0.3, delay: index * 0.05 }}
                       className="p-4 hover:bg-hoverSoft/40 transition-colors flex flex-col gap-2"
                     >
                       <div className="flex items-start justify-between gap-2">
@@ -1053,7 +1000,7 @@ const ClubDashboard: React.FC<ClubDashboardProps> = ({ user }) => {
                           ) : null;
                         })()}
                       </div>
-                    </motion.div>
+                    </div>
                   ))}
                 {registeredEvents.length === 0 && (
                   <div className="p-2 text-center text-muted-foreground text-sm">
@@ -1063,19 +1010,12 @@ const ClubDashboard: React.FC<ClubDashboardProps> = ({ user }) => {
               </div>
             </CardContent>
           </Card>
-        </motion.div>
+        </div>
       </div>
+      )}
 
       {/* Upcoming Events */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{
-          duration: 0.5,
-          delay: 0.35,
-          ease: [0.25, 0.46, 0.45, 0.94],
-        }}
-      >
+      <div>
         <Card className="border border-borderSoft rounded-xl">
           <CardHeader className="border-b border-borderSoft">
             <div className="flex items-center justify-between">
@@ -1093,7 +1033,7 @@ const ClubDashboard: React.FC<ClubDashboardProps> = ({ user }) => {
           <CardContent className="p-2 sm:p-3">
             {upcomingEvents.length > 0 ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                {upcomingEvents.map((event, index) => {
+                {upcomingEvents.map((event) => {
                   const startDate = new Date(event.date);
                   const endDate = event.end_date
                     ? new Date(event.end_date)
@@ -1102,11 +1042,8 @@ const ClubDashboard: React.FC<ClubDashboardProps> = ({ user }) => {
                     endDate.toDateString() !== startDate.toDateString();
                   const clubName = event.clubs?.name || event.club_name;
                   return (
-                    <motion.div
+                    <div
                       key={event.id}
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ duration: 0.3, delay: index * 0.05 }}
                     >
                       <Card className="border border-borderSoft rounded-xl h-full">
                         <CardContent className="p-4">
@@ -1162,7 +1099,7 @@ const ClubDashboard: React.FC<ClubDashboardProps> = ({ user }) => {
                           </div>
                         </CardContent>
                       </Card>
-                    </motion.div>
+                    </div>
                   );
                 })}
               </div>
@@ -1173,7 +1110,7 @@ const ClubDashboard: React.FC<ClubDashboardProps> = ({ user }) => {
             )}
           </CardContent>
         </Card>
-      </motion.div>
+      </div>
 
       {/* Dialog for Edit About & Socials */}
       <Dialog open={isEditAboutOpen} onOpenChange={setIsEditAboutOpen}>
@@ -1482,7 +1419,7 @@ const ClubDashboard: React.FC<ClubDashboardProps> = ({ user }) => {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-    </motion.div>
+    </div>
   );
 };
 

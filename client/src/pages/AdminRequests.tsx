@@ -370,9 +370,9 @@ const AdminRequests: React.FC = () => {
             <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-hoverSoft text-textMuted mb-4">
               <Filter size={24} />
             </div>
-            <h3 className="text-lg font-medium text-textPrimary">
+            <h2 className="text-lg font-semibold text-textPrimary">
               No requests found
-            </h3>
+            </h2>
             <p className="text-textMuted mt-1">
               Try adjusting your search or filters.
             </p>

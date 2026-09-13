@@ -111,6 +111,7 @@ export default defineConfig(({ mode }) => {
         })
       ],
       define: {
+        'process.env.NODE_ENV': JSON.stringify(isProduction ? 'production' : 'development'),
         '__APP_VERSION__': JSON.stringify(appVersion),
       },
       build: {
@@ -125,22 +126,54 @@ export default defineConfig(({ mode }) => {
           output: {
             manualChunks(id) {
               if (id.includes('node_modules')) {
-                // Core React & routing runtime
+                // Core React & scheduler
                 if (
+                  id.includes('/react/') ||
                   id.includes('react-dom') ||
-                  id.includes('react-router') ||
-                  id.includes('/react/')
+                  id.includes('scheduler')
                 ) {
                   return 'vendor-react';
+                }
+                // Routing
+                if (
+                  id.includes('react-router') ||
+                  id.includes('@remix-run/router')
+                ) {
+                  return 'vendor-router';
+                }
+                // Form validation & schemas
+                if (
+                  id.includes('react-hook-form') ||
+                  id.includes('@hookform') ||
+                  id.includes('zod')
+                ) {
+                  return 'vendor-forms';
+                }
+                // UI primitives (Radix, Floating UI)
+                if (id.includes('@radix-ui') || id.includes('@floating-ui')) {
+                  return 'vendor-ui';
+                }
+                // Icons
+                if (id.includes('lucide-react') || id.includes('react-icons')) {
+                  return 'vendor-icons';
+                }
+                // Animation library
+                if (id.includes('framer-motion')) {
+                  return 'vendor-framer';
+                }
+                // Calendar and date libraries
+                if (
+                  id.includes('react-big-calendar') ||
+                  id.includes('react-day-picker') ||
+                  id.includes('date-fns')
+                ) {
+                  return 'vendor-calendar';
                 }
                 // Heavy standalone utilities deferred until explicitly needed
                 if (id.includes('xlsx')) {
                   return 'vendor-xlsx';
                 }
-                if (id.includes('react-big-calendar') || id.includes('react-day-picker')) {
-                  return 'vendor-calendar';
-                }
-                if (id.includes('socket.io-client')) {
+                if (id.includes('socket.io-client') || id.includes('engine.io-client')) {
                   return 'vendor-socket';
                 }
               }

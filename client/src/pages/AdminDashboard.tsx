@@ -640,7 +640,7 @@ const AdminDashboard: React.FC = () => {
               </div>
 
               <div className="flex w-full min-w-0 flex-1 flex-col border-t border-borderSoft pt-4 lg:border-l lg:border-t-0 lg:pl-6 lg:pt-0">
-                <h4 className="mb-4 text-sm font-semibold uppercase tracking-wider text-textMuted">
+                <h3 className="mb-4 text-sm font-semibold uppercase tracking-wider text-textMuted">
                   {selectedDate
                     ? selectedDate.toLocaleDateString("en-US", {
                         timeZone: "Asia/Kolkata",
@@ -649,7 +649,7 @@ const AdminDashboard: React.FC = () => {
                         day: "numeric",
                       })
                     : "Select a date"}
-                </h4>
+                </h3>
 
                 <div className="max-h-[280px] min-w-0 flex-1 space-y-3 overflow-y-auto pr-1">
                   <AnimatePresence mode="wait">
@@ -973,9 +973,9 @@ const AdminDashboard: React.FC = () => {
                             {req.clubName}
                           </Badge>
                         </div>
-                        <h4 className="text-base sm:text-lg font-medium text-foreground">
+                        <h3 className="text-base sm:text-lg font-medium text-foreground">
                           {req.bookingName || req.eventName}
-                        </h4>
+                        </h3>
                         {req.bookingName &&
                         req.bookingName !== req.eventName ? (
                           <div className="text-xs text-textMuted mt-0.5 font-medium">
@@ -1252,12 +1252,12 @@ const AdminDashboard: React.FC = () => {
                             {evt.clubName}
                           </Badge>
                         </div>
-                        <h4 className="text-base sm:text-lg font-medium text-foreground">
+                        <h3 className="text-base sm:text-lg font-medium text-foreground">
                           <span className="text-sm text-textMuted font-normal mr-2">
                             Event Name:
                           </span>
                           {evt.name}
-                        </h4>
+                        </h3>
 
                         <div className="mt-2 flex flex-col gap-2 text-xs mb-2">
                           <div className="flex items-center gap-1.5 text-textMuted text-sm">
@@ -1403,7 +1403,7 @@ const AdminDashboard: React.FC = () => {
           <div className="space-y-5 py-2">
             {/* Core Links */}
             <div className="space-y-4">
-              <h4 className="text-xs font-bold uppercase tracking-wider text-textMuted">Links & Contact</h4>
+              <h3 className="text-xs font-bold uppercase tracking-wider text-textMuted">Links & Contact</h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div className="space-y-1.5 sm:col-span-2">
                   <Label htmlFor="constitution-link" className="text-xs font-semibold">Constitution Link (URL)</Label>
@@ -1451,7 +1451,7 @@ const AdminDashboard: React.FC = () => {
             {/* Core Member Photos Section */}
             <div className="space-y-3 pt-3 border-t border-borderSoft/60">
               <div>
-                <h4 className="text-xs font-bold uppercase tracking-wider text-textMuted">Executive Committee Photos</h4>
+                <h3 className="text-xs font-bold uppercase tracking-wider text-textMuted">Executive Committee Photos</h3>
                 <p className="text-xs text-textSecondary mt-0.5">Upload photos directly to database storage for the About SBG page.</p>
               </div>
 
