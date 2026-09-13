@@ -8,15 +8,17 @@ import {
   Download,
   MapPin,
   RefreshCw,
+  Search,
   Trash2,
   Users,
 } from 'lucide-react';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState, useRef } from 'react';
 import { Alert, AlertDescription, AlertTitle } from '../components/ui/alert';
 import { Badge } from '../components/ui/badge';
 import { Button } from '../components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '../components/ui/dialog';
+import { Input } from '../components/ui/input';
 import { Skeleton } from '../components/ui/skeleton';
 import { Tabs, TabsList, TabsTrigger } from '../components/ui/tabs';
 import { apiRequest } from '../lib/api';
@@ -94,6 +96,7 @@ const Archives: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
 
   const [activeTab, setActiveTab] = useState<'all' | 'events' | 'bookings' | 'members'>('all');
+  const [searchQuery, setSearchQuery] = useState('');
 
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [itemToDelete, setItemToDelete] = useState<{ type: 'event' | 'booking' | 'member'; id: string } | null>(null);
@@ -106,7 +109,8 @@ const Archives: React.FC = () => {
   const isAdmin = user?.role === 'admin';
 
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 10;
+  const [itemsPerPage, setItemsPerPage] = useState(8);
+  const listTopRef = useRef<HTMLDivElement>(null);
 
   const fetchArchives = React.useCallback(async () => {
     setIsLoading(true);
@@ -181,7 +185,7 @@ const Archives: React.FC = () => {
     }
   };
 
-  const allItems: ArchiveItem[] = React.useMemo(() => {
+  const allItems: ArchiveItem[] = useMemo(() => {
     const eventItems: ArchiveItem[] = events.map((e) => ({
       type: 'event',
       data: e,
@@ -207,17 +211,68 @@ const Archives: React.FC = () => {
       combined = memberItems;
     }
 
+    if (searchQuery.trim()) {
+      const q = searchQuery.toLowerCase().trim();
+      combined = combined.filter((item) => {
+        if (item.type === 'event') {
+          return (
+            item.data.name?.toLowerCase().includes(q) ||
+            item.data.club_name?.toLowerCase().includes(q) ||
+            item.data.venue?.toLowerCase().includes(q)
+          );
+        } else if (item.type === 'booking') {
+          return (
+            item.data.booking_name?.toLowerCase().includes(q) ||
+            item.data.event_name?.toLowerCase().includes(q) ||
+            item.data.club_name?.toLowerCase().includes(q) ||
+            item.data.venue_name?.toLowerCase().includes(q)
+          );
+        } else if (item.type === 'member') {
+          return (
+            item.data.full_name?.toLowerCase().includes(q) ||
+            item.data.club_name?.toLowerCase().includes(q) ||
+            item.data.designation?.toLowerCase().includes(q) ||
+            item.data.roll_number?.toLowerCase().includes(q)
+          );
+        }
+        return true;
+      });
+    }
+
     return combined.sort((a, b) => new Date(b.archivedAt).getTime() - new Date(a.archivedAt).getTime());
-  }, [events, standaloneBookings, archivedMembers, activeTab]);
+  }, [events, standaloneBookings, archivedMembers, activeTab, searchQuery]);
 
   const totalItemsCount = events.length + standaloneBookings.length + archivedMembers.length;
+  const totalPages = Math.max(1, Math.ceil(allItems.length / itemsPerPage));
 
   useEffect(() => {
-    const maxPage = Math.max(1, Math.ceil(allItems.length / itemsPerPage));
-    if (currentPage > maxPage) {
-      setCurrentPage(maxPage);
+    if (currentPage > totalPages) {
+      setCurrentPage(totalPages);
     }
-  }, [allItems.length, currentPage, itemsPerPage]);
+  }, [totalPages, currentPage]);
+
+  const handlePageChange = (newPage: number) => {
+    setCurrentPage(newPage);
+    if (listTopRef.current) {
+      listTopRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  };
+
+  const getPageNumbers = () => {
+    const pages: (number | string)[] = [];
+    if (totalPages <= 7) {
+      for (let i = 1; i <= totalPages; i++) pages.push(i);
+    } else {
+      pages.push(1);
+      if (currentPage > 3) pages.push('...');
+      const start = Math.max(2, currentPage - 1);
+      const end = Math.min(totalPages - 1, currentPage + 1);
+      for (let i = start; i <= end; i++) pages.push(i);
+      if (currentPage < totalPages - 2) pages.push('...');
+      pages.push(totalPages);
+    }
+    return pages;
+  };
 
   if (isLoading) {
     return (
@@ -233,10 +288,10 @@ const Archives: React.FC = () => {
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      transition={{ duration: 0.4 }}
-      className="space-y-8"
+      transition={{ duration: 0.3 }}
+      className="space-y-6"
     >
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div ref={listTopRef} className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="min-w-0 flex items-center gap-3">
           <ArchiveIcon className="text-textSecondary" size={32} />
           <div>
@@ -272,17 +327,17 @@ const Archives: React.FC = () => {
         </Alert>
       )}
 
-      {/* Filter Tabs */}
-      <div className="flex items-center justify-between">
+      {/* Filter Tabs & Search Bar */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <Tabs
           value={activeTab}
           onValueChange={(val) => {
             setActiveTab(val as 'all' | 'events' | 'bookings' | 'members');
             setCurrentPage(1);
           }}
-          className="w-full sm:w-auto"
+          className="w-full md:w-auto"
         >
-          <TabsList aria-label="Archive filters" className="grid grid-cols-4 w-full sm:w-auto sm:inline-flex">
+          <TabsList aria-label="Archive filters" className="grid grid-cols-4 w-full md:w-auto md:inline-flex">
             <TabsTrigger value="all" className="text-xs sm:text-sm">
               All ({totalItemsCount})
             </TabsTrigger>
@@ -297,21 +352,57 @@ const Archives: React.FC = () => {
             </TabsTrigger>
           </TabsList>
         </Tabs>
+
+        <div className="flex items-center gap-2 w-full md:w-auto">
+          <div className="relative flex-1 md:w-64">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-textMuted h-4 w-4 pointer-events-none" />
+            <Input
+              placeholder="Search archives..."
+              value={searchQuery}
+              onChange={(e) => {
+                setSearchQuery(e.target.value);
+                setCurrentPage(1);
+              }}
+              className="pl-9 h-10 text-sm"
+              aria-label="Search archives"
+            />
+          </div>
+          <div className="flex items-center gap-1.5 shrink-0">
+            <span className="text-xs text-textMuted hidden sm:inline">Per page:</span>
+            {[6, 12, 24].map((size) => (
+              <Button
+                key={size}
+                variant={itemsPerPage === size ? 'default' : 'outline'}
+                size="sm"
+                onClick={() => {
+                  setItemsPerPage(size);
+                  setCurrentPage(1);
+                }}
+                className={`h-9 px-2.5 text-xs font-semibold rounded-lg ${
+                  itemsPerPage === size ? 'bg-brand text-white' : ''
+                }`}
+              >
+                {size}
+              </Button>
+            ))}
+          </div>
+        </div>
       </div>
 
       {!error && allItems.length === 0 && (
         <div className="flex flex-col items-center justify-center p-12 text-center bg-card border border-borderSoft rounded-2xl shadow-sm">
           <ArchiveIcon size={48} className="text-textMuted mb-4 opacity-50" />
-          <h3 className="text-lg font-bold text-textPrimary">No Archives Found</h3>
+          <h2 className="text-lg font-bold text-textPrimary">No Archives Found</h2>
           <p className="text-textSecondary max-w-sm mt-2 text-sm">
-            When events, meetings, or members are removed, their historical records will appear here.
+            {searchQuery
+              ? 'No archived items match your search filter. Try a different query.'
+              : 'When events, meetings, or members are removed, their historical records will appear here.'}
           </p>
         </div>
       )}
 
-      <div className="grid grid-cols-1 gap-6">
+      <div className="grid grid-cols-1 gap-5">
         {(() => {
-          const totalPages = Math.ceil(allItems.length / itemsPerPage);
           const startIndex = (currentPage - 1) * itemsPerPage;
           const paginatedItems = allItems.slice(startIndex, startIndex + itemsPerPage);
 
@@ -602,37 +693,62 @@ const Archives: React.FC = () => {
           );
         })()}
 
-        {allItems.length > 0 && Math.ceil(allItems.length / itemsPerPage) > 1 && (() => {
-          const totalPages = Math.ceil(allItems.length / itemsPerPage);
-          const startIndex = (currentPage - 1) * itemsPerPage;
-          return (
-            <div className="flex flex-col sm:flex-row items-center justify-between mt-8 pt-4 border-t border-borderSoft gap-4">
-              <div className="flex items-center text-sm text-textMuted">
-                Showing <span className="font-medium mx-1">{startIndex + 1}</span> to{' '}
-                <span className="font-medium mx-1">{Math.min(startIndex + itemsPerPage, allItems.length)}</span> of{' '}
-                <span className="font-medium mx-1">{allItems.length}</span> results
-              </div>
-              <div className="flex gap-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-                  disabled={currentPage === 1}
-                >
-                  <ChevronLeft size={16} className="mr-1" /> Previous
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
-                  disabled={currentPage === totalPages}
-                >
-                  Next <ChevronRight size={16} className="ml-1" />
-                </Button>
-              </div>
+        {allItems.length > 0 && totalPages > 1 && (
+          <div className="flex flex-col sm:flex-row items-center justify-between mt-8 pt-4 border-t border-borderSoft gap-4">
+            <div className="flex items-center text-xs sm:text-sm text-textMuted">
+              Showing <span className="font-semibold text-textPrimary mx-1">{((currentPage - 1) * itemsPerPage) + 1}</span> to{' '}
+              <span className="font-semibold text-textPrimary mx-1">{Math.min(currentPage * itemsPerPage, allItems.length)}</span> of{' '}
+              <span className="font-semibold text-textPrimary mx-1">{allItems.length}</span> archives
             </div>
-          );
-        })()}
+            <div className="flex items-center gap-1.5 flex-wrap justify-center">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => handlePageChange(Math.max(currentPage - 1, 1))}
+                disabled={currentPage === 1}
+                className="h-9 px-2.5 rounded-lg text-xs"
+                aria-label="Previous Page"
+              >
+                <ChevronLeft size={15} className="mr-1" /> Prev
+              </Button>
+
+              <div className="flex items-center gap-1">
+                {getPageNumbers().map((page, idx) =>
+                  typeof page === 'number' ? (
+                    <Button
+                      key={`page-${page}`}
+                      variant={currentPage === page ? 'default' : 'outline'}
+                      size="sm"
+                      onClick={() => handlePageChange(page)}
+                      className={`h-9 w-9 p-0 text-xs font-semibold rounded-lg ${
+                        currentPage === page ? 'bg-brand text-white shadow-sm' : 'hover:bg-bgMain'
+                      }`}
+                      aria-label={`Go to page ${page}`}
+                      aria-current={currentPage === page ? 'page' : undefined}
+                    >
+                      {page}
+                    </Button>
+                  ) : (
+                    <span key={`dots-${idx}`} className="px-1 text-xs text-textMuted select-none">
+                      •••
+                    </span>
+                  )
+                )}
+              </div>
+
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => handlePageChange(Math.min(currentPage + 1, totalPages))}
+                disabled={currentPage === totalPages}
+                className="h-9 px-2.5 rounded-lg text-xs"
+                aria-label="Next Page"
+              >
+                Next <ChevronRight size={15} className="ml-1" />
+              </Button>
+            </div>
+          </div>
+        )}
       </div>
 
       <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
