@@ -146,7 +146,7 @@ export async function sendBookingApprovedEmailToClub(
       detailRow('Event', eventName) +
       detailRow('Venue', venueName) +
       detailRow('Date', date) +
-      detailRow('Time', `${startTime} &ndash; ${endTime}`)
+      detailRow('Time', `${startTime} – ${endTime}`)
     )}
     <p style="margin:16px 0 0 0; font-size: 14px; color:${MUTED_COLOR};">
       Please check your dashboard for further details or any additional instructions.
@@ -192,7 +192,7 @@ export async function sendBookingCancelledEmailToClub(
       detailRow('Event', eventName) +
       detailRow('Venue', venueName) +
       detailRow('Date', date) +
-      detailRow('Time', `${startTime} &ndash; ${endTime}`)
+      detailRow('Time', `${startTime} – ${endTime}`)
     )}
     <p style="margin:16px 0 0 0; font-size: 14px; color:${MUTED_COLOR};">
       If you believe this was a mistake, please reach out to the admin team or check your dashboard for more information.
@@ -284,7 +284,7 @@ export async function sendPendingBookingEmailToAdmin(
           ${formatDateLabel(item.startTime)}
         </td>
         <td style="padding: 12px 14px; border-bottom: 1px solid ${BORDER_COLOR}; font-size: 13px; color: ${MUTED_COLOR}; text-align: right; white-space: nowrap;">
-          ${formatTimeLabel(item.startTime)} &ndash; ${formatTimeLabel(item.endTime)}
+          ${formatTimeLabel(item.startTime)} – ${formatTimeLabel(item.endTime)}
         </td>
       </tr>`
     )
@@ -406,7 +406,7 @@ export async function sendBulkBookingProcessedEmail(
     ${detailsCard(
       detailRow('Event', eventName) +
       detailRow('Date', date) +
-      detailRow('Time', `${startTime} &ndash; ${endTime}`)
+      detailRow('Time', `${startTime} – ${endTime}`)
     )}
     ${venueList(approvedVenues, 'success')}
     ${venueList(rejectedVenues, 'danger')}
