@@ -252,7 +252,8 @@
     backdrop-filter: blur(var(--glass-blur));
     -webkit-backdrop-filter: blur(var(--glass-blur));
     border: 1px solid var(--glass-border);
-    @apply rounded-2xl transition-all duration-300;
+    @apply rounded-2xl;
+    transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
     box-shadow: 0 8px 30px rgba(0, 0, 0, 0.04);
   }
 

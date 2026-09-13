@@ -506,14 +506,14 @@ const ClubsCommitteesPage: React.FC = () => {
                                             <div className="space-y-3">
                                                 <div className="flex items-center gap-3">
                                                     <Avatar className={cn("h-10 w-10 border border-borderSoft rounded-xl shrink-0", club.logo_bg === 'white' ? 'bg-white' : club.logo_bg === 'dark' ? 'bg-slate-900' : 'bg-transparent')}>
-                                                        <AvatarImage src={club.logo_url || ''} alt={club.name} className="object-contain drop-shadow-[0_1px_1px_rgba(0,0,0,0.12)]" />
+                                                        <AvatarImage src={club.logo_url || ''} alt={club.name} loading="lazy" decoding="async" className="object-contain drop-shadow-[0_1px_1px_rgba(0,0,0,0.12)]" />
                                                         <AvatarFallback className="bg-brand/10 text-brand font-bold text-sm rounded-xl flex items-center justify-center">
                                                             {club.name.charAt(0).toUpperCase()}
                                                         </AvatarFallback>
                                                     </Avatar>
                                                     <div className="min-w-0 flex-1">
                                                         <div className="flex items-center justify-between gap-2">
-                                                            <h3 className="font-bold text-base text-textPrimary tracking-tight transition-colors">{club.name}</h3>
+                                                            <h2 className="font-bold text-base text-textPrimary tracking-tight transition-colors">{club.name}</h2>
                                                         </div>
                                                     </div>
                                                 </div>

@@ -37,6 +37,7 @@ Thumbs.db
 # Temporary files
 *.tmp
 .cache/
+.unlighthouse/
 
 # Sensitive files
 *.pem

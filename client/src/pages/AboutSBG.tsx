@@ -105,7 +105,7 @@ const Panel: React.FC<{
                 <span className="h-8 w-8 shrink-0 rounded-lg bg-brand/10 text-brand flex items-center justify-center">
                     {icon}
                 </span>
-                <h3 className="font-bold text-textPrimary text-sm sm:text-base truncate">{title}</h3>
+                <h2 className="font-bold text-textPrimary text-sm sm:text-base truncate">{title}</h2>
             </div>
             {action}
         </div>

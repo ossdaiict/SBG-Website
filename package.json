@@ -3,7 +3,9 @@
   "version": "2.2.0",
   "private": true,
   "scripts": {
-    "prepare": "husky"
+    "prepare": "husky",
+    "lighthouse": "unlighthouse --config-file unlighthouse.config.ts",
+    "lighthouse:clean": "node -e \"require('fs').rmSync('.unlighthouse', { recursive: true, force: true })\""
   },
   "devDependencies": {
     "@commitlint/cli": "^19.8.1",

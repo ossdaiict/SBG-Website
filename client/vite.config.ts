@@ -114,7 +114,25 @@ export default defineConfig(({ mode }) => {
         '__APP_VERSION__': JSON.stringify(appVersion),
       },
       build: {
-        sourcemap: true
+        sourcemap: true,
+        rollupOptions: {
+          output: {
+            manualChunks: {
+              'vendor-react': ['react', 'react-dom', 'react-router-dom'],
+              'vendor-framer': ['framer-motion'],
+              'vendor-icons': ['lucide-react'],
+              'vendor-ui': [
+                '@radix-ui/react-dialog',
+                '@radix-ui/react-dropdown-menu',
+                '@radix-ui/react-tabs',
+                '@radix-ui/react-select',
+                '@radix-ui/react-avatar',
+                '@radix-ui/react-popover',
+                '@radix-ui/react-label',
+              ],
+            },
+          },
+        },
       },
       resolve: {
         alias: {
