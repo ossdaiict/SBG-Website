@@ -290,17 +290,16 @@ const ClubMembers: React.FC<ClubMembersProps> = ({ user }) => {
     }
   };
 
-  const DEFAULT_BADGE_STYLE = 'bg-slate-500/10 text-slate-700 dark:text-slate-300 border-slate-500/20 font-medium';
+  const DEFAULT_BADGE_STYLE = 'bg-slate-500/10 text-slate-800 dark:text-slate-200 border-slate-500/20 font-medium';
 
   const getDesignationBadgeStyle = (des?: string) => {
     if (!des) return DEFAULT_BADGE_STYLE;
     const d = des.toLowerCase().trim();
-    if (d === 'convener') return 'bg-brand/10 text-brand border-brand/20 font-semibold';
-    if (d === 'dy. convener' || d === 'dy convener') return 'bg-orange-500/10 text-orange-700 dark:text-orange-400 border-orange-500/20 font-medium';
-    if (d === 'core') return 'bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border-emerald-500/20 font-medium';
-    if (d === 'extended core' || d === 'associate core') return DEFAULT_BADGE_STYLE;
-    if (d === 'others') return DEFAULT_BADGE_STYLE;
-    return 'bg-cyan-500/10 text-cyan-800 dark:text-cyan-300 border-cyan-500/20 font-medium'; // Special tags
+    if (d === 'convener') return 'bg-brand/10 text-brand dark:text-brandLink border-brand/20 font-semibold';
+    if (d === 'dy. convener' || d === 'dy convener') return 'bg-orange-500/10 text-orange-800 dark:text-orange-300 border-orange-500/20 font-medium';
+    if (d === 'core') return 'bg-emerald-500/10 text-emerald-800 dark:text-emerald-300 border-emerald-500/20 font-medium';
+    if (d === 'extended core' || d === 'associate core'|| d === 'others') return DEFAULT_BADGE_STYLE;
+    return 'bg-cyan-500/10 text-cyan-900 dark:text-cyan-200 border-cyan-500/20 font-medium'; // Special tags
   };
 
   const MemberRow = ({ member, editable }: { member: ClubMember; editable: boolean }) => (

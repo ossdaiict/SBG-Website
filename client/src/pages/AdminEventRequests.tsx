@@ -151,12 +151,7 @@ const AdminEventRequests: React.FC = () => {
   const paginatedEvents = filteredEvents.slice(startIndex, startIndex + itemsPerPage);
 
   return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.4 }}
-      className="space-y-6"
-    >
+    <div className="space-y-6">
       <div className="flex flex-col justify-between gap-4">
         <div className="min-w-0 flex-1">
           <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-textPrimary tracking-tight leading-tight">Event Registrations</h1>
@@ -165,7 +160,7 @@ const AdminEventRequests: React.FC = () => {
 
         <div className="flex flex-col sm:flex-row sm:flex-wrap items-center gap-3 w-full xl:w-auto mt-4 xl:mt-0">
           <Select value={filterClub} onValueChange={setFilterClub}>
-            <SelectTrigger className="w-full sm:flex-1 sm:min-w-[140px] rounded-xl">
+            <SelectTrigger id="admin-events-filter-club" aria-label="Filter by Club" className="w-full sm:flex-1 sm:min-w-[140px] rounded-xl">
               <SelectValue placeholder="All Clubs" />
             </SelectTrigger>
             <SelectContent>
@@ -177,7 +172,7 @@ const AdminEventRequests: React.FC = () => {
           </Select>
 
           <Select value={filterType} onValueChange={setFilterType}>
-            <SelectTrigger className="w-full sm:flex-1 sm:min-w-[140px] rounded-xl">
+            <SelectTrigger id="admin-events-filter-type" aria-label="Filter by Event Type" className="w-full sm:flex-1 sm:min-w-[140px] rounded-xl">
               <SelectValue placeholder="All Types" />
             </SelectTrigger>
             <SelectContent>
@@ -189,7 +184,7 @@ const AdminEventRequests: React.FC = () => {
           </Select>
 
           <Select value={filterStatus} onValueChange={setFilterStatus}>
-            <SelectTrigger className="w-full sm:flex-1 sm:min-w-[140px] rounded-xl">
+            <SelectTrigger id="admin-events-filter-status" aria-label="Filter by Status" className="w-full sm:flex-1 sm:min-w-[140px] rounded-xl">
               <SelectValue placeholder="All Status" />
             </SelectTrigger>
             <SelectContent>
@@ -203,7 +198,10 @@ const AdminEventRequests: React.FC = () => {
           <div className="relative w-full sm:flex-1 sm:min-w-[250px] xl:flex-none xl:w-64 shrink-0">
             <Search className="absolute left-3 top-2.5 text-textMuted pointer-events-none z-10" size={18} />
             <Input
+              id="admin-events-search"
+              name="searchEvents"
               type="text"
+              aria-label="Search events"
               placeholder="Search events..."
               className="pl-10 w-full rounded-xl"
               value={searchTerm}
@@ -319,7 +317,7 @@ const AdminEventRequests: React.FC = () => {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-    </motion.div>
+    </div>
   );
 };
 

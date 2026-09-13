@@ -51,13 +51,14 @@ const useFormField = () => {
   }
 
   const { id } = itemContext
+  const safeId = id ? id.replace(/:/g, '') : fieldContext.name
 
   return {
     id,
     name: fieldContext.name,
-    formItemId: `${id}-form-item`,
-    formDescriptionId: `${id}-form-item-description`,
-    formMessageId: `${id}-form-item-message`,
+    formItemId: `${safeId}-form-item`,
+    formDescriptionId: `${safeId}-form-item-description`,
+    formMessageId: `${safeId}-form-item-message`,
     ...fieldState,
   }
 }

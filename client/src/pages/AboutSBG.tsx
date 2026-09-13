@@ -133,8 +133,10 @@ const MemberAvatar = ({ member, settings }: { member: Member; settings?: Record<
         <img
             src={dbPhoto}
             alt={member.full_name}
+            width="44"
+            height="44"
             onError={() => setImgError(true)}
-            className="h-11 w-11 rounded-full object-cover border border-borderSoft/60 shrink-0 bg-card shadow-sm"
+            className="h-11 w-11 rounded-full object-cover border border-borderSoft/60 shrink-0 bg-card shadow-sm aspect-square"
         />
     );
 };
@@ -476,7 +478,7 @@ const AboutSBG: React.FC = () => {
                         <DialogHeader className="mb-6 space-y-1 pr-8">
                             <div className="flex items-center gap-3 mb-2">
                                 {ecClub?.logo_url ? (
-                                    <img src={ecClub.logo_url} alt="EC Logo" className="h-10 w-10 shrink-0 rounded-xl object-cover bg-card border border-borderSoft/60 shadow-sm overflow-hidden" />
+                                    <img src={ecClub.logo_url} alt="EC Logo" width="40" height="40" className="h-10 w-10 shrink-0 rounded-xl object-cover bg-card border border-borderSoft/60 shadow-sm overflow-hidden aspect-square" />
                                 ) : (
                                     <span className="h-10 w-10 shrink-0 rounded-xl bg-violet-500/15 text-violet-600 dark:text-violet-400 flex items-center justify-center">
                                         <Building2 size={20} />
@@ -524,7 +526,7 @@ const AboutSBG: React.FC = () => {
                                             <div key={member.id} className="flex items-center gap-3 p-2.5 rounded-xl bg-hoverSoft/20 border border-borderSoft/40">
                                                 <div className="h-9 w-9 rounded-full bg-violet-500/15 border border-violet-500/20 flex items-center justify-center shrink-0 overflow-hidden">
                                                     {((member as any).profile_picture_url || (member as any).photo_url) ? (
-                                                        <img src={(member as any).profile_picture_url || (member as any).photo_url} alt={member.full_name} className="h-full w-full object-cover" />
+                                                        <img src={(member as any).profile_picture_url || (member as any).photo_url} alt={member.full_name} width="36" height="36" className="h-full w-full object-cover aspect-square" />
                                                     ) : (
                                                         <span className="text-xs font-bold text-violet-600 dark:text-violet-400">{initials(member.full_name)}</span>
                                                     )}

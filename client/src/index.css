@@ -297,7 +297,7 @@
   }
 
   button, input, select, textarea {
-    @apply transition-all duration-200;
+    @apply transition-colors duration-200;
   }
 
   input[type="text"],

@@ -31,7 +31,9 @@ export function Logo({ size = 'md', showText = true, className }: LogoProps) {
         alt="SBG logo"
         width={px}
         height={px}
-        className={cn('shrink-0 object-contain rounded-full', box)}
+        fetchPriority="high"
+        decoding="sync"
+        className={cn('shrink-0 object-contain rounded-full aspect-square', box)}
       />
       {showText && (
         <span

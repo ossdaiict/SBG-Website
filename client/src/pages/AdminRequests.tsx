@@ -226,12 +226,7 @@ const AdminRequests: React.FC = () => {
   );
 
   return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.4 }}
-      className="space-y-6"
-    >
+    <div className="space-y-6">
       <div className="flex flex-col justify-between gap-4">
         <div className="min-w-0 flex-1">
           <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-textPrimary tracking-tight leading-tight">
@@ -244,7 +239,7 @@ const AdminRequests: React.FC = () => {
 
         <div className="flex flex-col sm:flex-row sm:flex-wrap items-center gap-3 w-full xl:w-auto mt-4 xl:mt-0">
           <Select value={filterClub} onValueChange={setFilterClub}>
-            <SelectTrigger className="w-full sm:flex-1 sm:min-w-[140px] rounded-xl">
+            <SelectTrigger id="admin-requests-filter-club" aria-label="Filter by Club" className="w-full sm:flex-1 sm:min-w-[140px] rounded-xl">
               <SelectValue placeholder="All Clubs" />
             </SelectTrigger>
             <SelectContent>
@@ -258,7 +253,7 @@ const AdminRequests: React.FC = () => {
           </Select>
 
           <Select value={filterVenue} onValueChange={setFilterVenue}>
-            <SelectTrigger className="w-full sm:flex-1 sm:min-w-[140px] rounded-xl">
+            <SelectTrigger id="admin-requests-filter-venue" aria-label="Filter by Venue" className="w-full sm:flex-1 sm:min-w-[140px] rounded-xl">
               <SelectValue placeholder="All Venues" />
             </SelectTrigger>
             <SelectContent>
@@ -272,7 +267,7 @@ const AdminRequests: React.FC = () => {
           </Select>
 
           <Select value={filterStatus} onValueChange={setFilterStatus}>
-            <SelectTrigger className="w-full sm:flex-1 sm:min-w-[140px] rounded-xl">
+            <SelectTrigger id="admin-requests-filter-status" aria-label="Filter by Status" className="w-full sm:flex-1 sm:min-w-[140px] rounded-xl">
               <SelectValue placeholder="All Status" />
             </SelectTrigger>
             <SelectContent>
@@ -290,7 +285,10 @@ const AdminRequests: React.FC = () => {
               size={18}
             />
             <Input
+              id="admin-requests-search"
+              name="searchRequests"
               type="text"
+              aria-label="Search requests"
               placeholder="Search requests..."
               className="pl-10 w-full rounded-xl"
               value={searchTerm}
@@ -461,7 +459,7 @@ const AdminRequests: React.FC = () => {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-    </motion.div>
+    </div>
   );
 };
 

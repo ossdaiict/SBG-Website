@@ -340,9 +340,9 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
                         name="clubName"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel className="text-textSecondary font-semibold text-sm">Club Name</FormLabel>
+                            <FormLabel htmlFor="login-clubName" className="text-textSecondary font-semibold text-sm">Club Name</FormLabel>
                             <FormControl>
-                              <Input placeholder="e.g. AI Club" className="h-11 rounded-xl" {...field} />
+                              <Input id="login-clubName" placeholder="e.g. AI Club" className="h-11 rounded-xl" {...field} />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -353,10 +353,10 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
                         name="groupCategory"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel className="text-textSecondary font-semibold text-sm">Group Category</FormLabel>
+                            <FormLabel htmlFor="login-groupCategory" className="text-textSecondary font-semibold text-sm">Group Category</FormLabel>
                             <Select onValueChange={field.onChange} defaultValue={field.value}>
                               <FormControl>
-                                <SelectTrigger className="h-11 rounded-xl border border-borderSoft bg-transparent px-3 py-2 text-sm text-textPrimary placeholder:text-textMuted focus:outline-none focus:ring-2 focus:ring-brand/30 focus:border-brand w-full">
+                                <SelectTrigger id="login-groupCategory" className="h-11 rounded-xl border border-borderSoft bg-transparent px-3 py-2 text-sm text-textPrimary placeholder:text-textMuted focus:outline-none focus:ring-2 focus:ring-brand/30 focus:border-brand w-full">
                                   <SelectValue placeholder="Select group category" />
                                 </SelectTrigger>
                               </FormControl>
@@ -379,12 +379,14 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
                     name="email"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-textSecondary font-semibold text-sm">Email Address</FormLabel>
+                        <FormLabel htmlFor="login-email" className="text-textSecondary font-semibold text-sm">Email Address</FormLabel>
                         <div className="relative">
                           <Mail size={18} className="absolute left-3.5 top-3 text-textMuted z-10" />
                           <FormControl>
                             <Input
+                              id="login-email"
                               type="email"
+                              autoComplete="username email"
                               className="pl-11 h-11 rounded-md border-borderSoft bg-transparent focus:ring-2 focus:ring-brand/20 transition-all"
                               placeholder="club_name@dau.ac.in"
                               {...field}
@@ -402,7 +404,7 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
                     render={({ field }) => (
                       <FormItem>
                         <div className="flex justify-between items-center">
-                          <FormLabel className="text-textSecondary font-semibold text-sm">Password</FormLabel>
+                          <FormLabel htmlFor="login-password" className="text-textSecondary font-semibold text-sm">Password</FormLabel>
                           {!isRegistering && (
                             <button
                               type="button"
@@ -426,7 +428,9 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
                           <Lock size={18} className="absolute left-3.5 top-3 text-textMuted z-10" />
                           <FormControl>
                             <Input
+                              id="login-password"
                               type="password"
+                              autoComplete="current-password"
                               className="pl-11 h-11 rounded-md border-borderSoft bg-transparent focus:ring-2 focus:ring-brand/20 transition-all"
                               placeholder="Enter your password"
                               {...field}

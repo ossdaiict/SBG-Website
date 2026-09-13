@@ -28,13 +28,13 @@ export function GdgFooterCredit({ className, compact }: GdgFooterCreditProps) {
       <span className="inline-flex items-center gap-2">
         <img
           src="/gdg-logo.webp"
-          alt=""
+          alt="GDG On Campus DAU Logo"
           width="120"
           height="24"
-          aria-hidden
+          aria-hidden="true"
           className={cn(
-            'h-auto w-auto shrink-0 object-contain object-center',
-            compact ? 'max-h-4 max-w-[100px] sm:max-h-5 sm:max-w-[120px]' : 'max-h-5 max-w-[120px] sm:max-h-6 sm:max-w-[140px]'
+            'shrink-0 object-contain object-center aspect-[5/1]',
+            compact ? 'h-4 w-auto sm:h-5' : 'h-5 w-auto sm:h-6'
           )}
           loading="lazy"
           decoding="async"

@@ -23,7 +23,6 @@ import { GroupedBooking, Booking, AppEvent } from '../types';
 import AddBookingDialog from '../components/AddBookingDialog';
 import EditBookingDialog from '../components/EditBookingDialog';
 import RegisterEventDialog from '../components/RegisterEventDialog';
-import * as XLSX from 'xlsx';
 
 const formatEventType = (eventType?: string) => {
   if (!eventType) return '';
@@ -195,6 +194,7 @@ const AdminDashboard: React.FC = () => {
         };
       });
 
+      const XLSX = await import('xlsx');
       const worksheet = XLSX.utils.json_to_sheet(rows);
       const workbook = XLSX.utils.book_new();
       XLSX.utils.book_append_sheet(workbook, worksheet, 'Events');
@@ -419,51 +419,6 @@ const AdminDashboard: React.FC = () => {
     [activeSourceEvents, venues]
   );
 
-  if (error) {
-    return (
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        className="space-y-6 sm:space-y-8"
-      >
-        <div className="min-w-0">
-          <h2 className="text-2xl sm:text-3xl font-bold text-textPrimary tracking-tight leading-tight">Admin Dashboard</h2>
-        </div>
-        <Alert variant="destructive" className="rounded-xl">
-          <AlertTriangle size={16} />
-          <AlertTitle>Could not load dashboard</AlertTitle>
-          <AlertDescription className="mt-1">{error}</AlertDescription>
-          <Button variant="outline" size="sm" className="mt-3 gap-2" onClick={fetchData}>
-            <RefreshCw size={14} />
-            Retry
-          </Button>
-        </Alert>
-      </motion.div>
-    );
-  }
-
-  if (isLoading) {
-    return (
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        className="space-y-6 sm:space-y-8"
-      >
-        <div className="space-y-2">
-          <Skeleton className="h-10 w-64 sm:w-80" />
-          <Skeleton className="h-5 w-80 sm:w-96" />
-        </div>
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3 w-full">
-          {[1, 2, 3, 4].map(i => (
-            <Skeleton key={i} className="h-14 sm:h-16 w-full rounded-xl" />
-          ))}
-        </div>
-        <Skeleton className="h-[400px] w-full rounded-2xl" />
-        <Skeleton className="h-48 w-full rounded-2xl" />
-      </motion.div>
-    );
-  }
-
   return (
     <motion.div
       initial={{ opacity: 0 }}
@@ -471,14 +426,9 @@ const AdminDashboard: React.FC = () => {
       transition={{ duration: 0.4 }}
       className="space-y-6 sm:space-y-8"
     >
-      {/* Enhanced Header */}
+      {/* Enhanced Header - Painted immediately on first frame for 0ms LCP delay */}
       <div className="px-1 sm:px-4">
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.05 }}
-          className="flex flex-col sm:flex-row sm:items-center justify-between gap-4"
-        >
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
             <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-foreground tracking-tighter leading-tight">
               Admin Dashboard
@@ -532,10 +482,34 @@ const AdminDashboard: React.FC = () => {
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
-        </motion.div>
+        </div>
       </div>
 
-      {/* Mini Stats Grid */}
+      {error ? (
+        <div className="px-1 sm:px-4">
+          <Alert variant="destructive" className="rounded-xl">
+            <AlertTriangle size={16} />
+            <AlertTitle>Could not load dashboard</AlertTitle>
+            <AlertDescription className="mt-1">{error}</AlertDescription>
+            <Button variant="outline" size="sm" className="mt-3 gap-2" onClick={fetchData}>
+              <RefreshCw size={14} />
+              Retry
+            </Button>
+          </Alert>
+        </div>
+      ) : isLoading ? (
+        <div className="space-y-6 sm:space-y-8 px-1 sm:px-4">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3 w-full">
+            {[1, 2, 3, 4].map(i => (
+              <Skeleton key={i} className="h-14 sm:h-16 w-full rounded-xl" />
+            ))}
+          </div>
+          <Skeleton className="h-[400px] w-full rounded-2xl" />
+          <Skeleton className="h-48 w-full rounded-2xl" />
+        </div>
+      ) : (
+        <>
+          {/* Mini Stats Grid */}
       <motion.div
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
@@ -1410,6 +1384,8 @@ const AdminDashboard: React.FC = () => {
           </CardContent>
         </Card>
       </motion.div>
+      </>
+      )}
 
       <AddBookingDialog
         open={addDialogOpen}
@@ -1508,7 +1484,9 @@ const AdminDashboard: React.FC = () => {
                           <img
                             src={currentPhoto}
                             alt={officer.label}
-                            className="h-12 w-12 rounded-full object-cover border-2 border-brand/20 bg-card shadow-sm"
+                            width="48"
+                            height="48"
+                            className="h-12 w-12 rounded-full object-cover border-2 border-brand/20 bg-card shadow-sm aspect-square"
                           />
                         ) : (
                           <div className="h-12 w-12 rounded-full bg-gradient-to-br from-brand/20 to-brand/5 border-2 border-dashed border-brand/30 flex items-center justify-center text-brand font-bold text-xs shadow-sm">

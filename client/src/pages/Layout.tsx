@@ -172,7 +172,7 @@ const Layout: React.FC<LayoutProps> = ({ children, user, onLogout }) => {
           >
             <div className="flex items-center gap-2.5 p-2 rounded-xl hover:bg-hoverSoft transition-colors group">
                <Avatar className={cn("h-10 w-10 border border-borderSoft shrink-0 shadow-sm transition-all group-hover:border-brand/50 ring-2 ring-brand/10", user.logoBg === 'white' ? 'bg-white' : user.logoBg === 'dark' ? 'bg-slate-900' : 'bg-transparent')}>
-                <AvatarImage src={user.logoUrl || ''} alt={user.name} className="object-contain drop-shadow-[0_1px_1px_rgba(0,0,0,0.12)]" />
+                <AvatarImage src={user.logoUrl || ''} alt={user.name} width={40} height={40} className="object-contain drop-shadow-[0_1px_1px_rgba(0,0,0,0.12)] aspect-square" />
                 <AvatarFallback className="bg-brand text-white font-semibold text-sm flex items-center justify-center">
                   {user.name.charAt(0).toUpperCase()}
                 </AvatarFallback>
@@ -258,7 +258,7 @@ const Layout: React.FC<LayoutProps> = ({ children, user, onLogout }) => {
                   <div className="p-3 border-t border-borderSoft">
                     <div className="flex items-center gap-3 p-2 rounded-xl bg-hoverSoft/50">
                       <Avatar className={cn("h-9 w-9 border border-borderSoft shrink-0 shadow-sm", user.logoBg === 'white' ? 'bg-white' : user.logoBg === 'dark' ? 'bg-slate-900' : 'bg-transparent')}>
-                        <AvatarImage src={user.logoUrl || ''} alt={user.name} className="object-contain" />
+                        <AvatarImage src={user.logoUrl || ''} alt={user.name} width={36} height={36} className="object-contain aspect-square" />
                         <AvatarFallback className="bg-brand text-white font-semibold text-xs flex items-center justify-center">
                           {user.name.charAt(0).toUpperCase()}
                         </AvatarFallback>
@@ -292,13 +292,13 @@ const Layout: React.FC<LayoutProps> = ({ children, user, onLogout }) => {
         {/* Page Content */}
         <main className="flex-1 p-4 sm:p-6 lg:p-8 3xl:p-12 mb-bottom-nav">
           <div className="max-w-7xl 3xl:max-w-[1800px] 4k:max-w-[2400px] uhd:max-w-[3200px] mx-auto w-full flex flex-col h-full">
-            <AnimatePresence mode="wait">
+            <AnimatePresence mode="wait" initial={false}>
               <motion.div
                 key={location.pathname}
                 initial={{ opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -8 }}
-                transition={{ duration: 0.25, ease: [0.25, 0.46, 0.45, 0.94] }}
+                transition={{ duration: 0.2, ease: [0.25, 0.46, 0.45, 0.94] }}
               >
                 {children}
               </motion.div>

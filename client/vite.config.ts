@@ -123,25 +123,27 @@ export default defineConfig(({ mode }) => {
         },
         rollupOptions: {
           output: {
-            manualChunks: {
-              'vendor-react': ['react', 'react-dom', 'react-router-dom'],
-              'vendor-framer': ['framer-motion'],
-              'vendor-icons': ['lucide-react'],
-              'vendor-ui': [
-                '@radix-ui/react-dialog',
-                '@radix-ui/react-dropdown-menu',
-                '@radix-ui/react-tabs',
-                '@radix-ui/react-select',
-                '@radix-ui/react-avatar',
-                '@radix-ui/react-popover',
-                '@radix-ui/react-label',
-                '@radix-ui/react-switch',
-                '@radix-ui/react-slot',
-              ],
-              'vendor-forms': ['react-hook-form', 'zod', '@hookform/resolvers'],
-              'vendor-calendar': ['react-big-calendar', 'date-fns', 'react-day-picker'],
-              'vendor-xlsx': ['xlsx'],
-              'vendor-socket': ['socket.io-client'],
+            manualChunks(id) {
+              if (id.includes('node_modules')) {
+                // Core React & routing runtime
+                if (
+                  id.includes('react-dom') ||
+                  id.includes('react-router') ||
+                  id.includes('/react/')
+                ) {
+                  return 'vendor-react';
+                }
+                // Heavy standalone utilities deferred until explicitly needed
+                if (id.includes('xlsx')) {
+                  return 'vendor-xlsx';
+                }
+                if (id.includes('react-big-calendar') || id.includes('react-day-picker')) {
+                  return 'vendor-calendar';
+                }
+                if (id.includes('socket.io-client')) {
+                  return 'vendor-socket';
+                }
+              }
             },
           },
         },

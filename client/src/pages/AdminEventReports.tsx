@@ -153,15 +153,13 @@ export default function AdminEventReports() {
   const paginatedData = currentData.slice(startIndex, startIndex + itemsPerPage);
 
   return (
-    <div className="relative min-h-dvh">
-      <GradientBackground />
-      <div className="relative z-10 space-y-6">
-        <div className="w-full flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
-          {/* Title */}
-          <div className="min-w-0 lg:flex-1">
-            <h1 className="text-2xl sm:text-3xl font-bold text-textPrimary leading-tight">
-              Event Reports
-            </h1>
+    <div className="space-y-6">
+      <div className="w-full flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
+        {/* Title */}
+        <div className="min-w-0 lg:flex-1">
+          <h1 className="text-2xl sm:text-3xl font-bold text-textPrimary leading-tight">
+            Event Reports
+          </h1>
 
             <p className="mt-1 text-sm sm:text-base text-textMuted max-w-md">
               Manage and export all club/committee event reports.
@@ -479,7 +477,6 @@ export default function AdminEventReports() {
             </div>
           </div>
         )}
-      </div>
 
       <Dialog open={isSettingsOpen} onOpenChange={setIsSettingsOpen}>
         <DialogContent className="sm:max-w-[500px]">
@@ -493,6 +490,7 @@ export default function AdminEventReports() {
               </Label>
               <Input
                 id="event-report-link"
+                name="event_report_format_link"
                 type="url"
                 value={settings.event_report_format_link}
                 onChange={(e) =>
@@ -508,6 +506,7 @@ export default function AdminEventReports() {
               <Label htmlFor="awards-link">Awards Format Link</Label>
               <Input
                 id="awards-link"
+                name="awards_format_link"
                 type="url"
                 value={settings.awards_format_link}
                 onChange={(e) =>
@@ -533,6 +532,7 @@ export default function AdminEventReports() {
                 </p>
                 <Input
                   id="webhook-url"
+                  name="google_sheet_webhook_url"
                   type="url"
                   value={settings.google_sheet_webhook_url}
                   onChange={(e) =>

@@ -65,7 +65,7 @@ const PolicyPage: React.FC = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-2">
                 <Card className="border border-border">
                   <CardHeader>
-                    <CardTitle className="text-base">Category A (Auto-Approval)</CardTitle>
+                    <CardTitle as="h3" className="text-base">Category A (Auto-Approval)</CardTitle>
                     <CardDescription className="text-xs">CEP 103, CEP 104, CEP 105, CEP 106, CEP 107, CEP 202, CEP 203, CEP 205, OAT, Cafeteria Entrance</CardDescription>
                   </CardHeader>
                   <CardContent>
@@ -74,7 +74,7 @@ const PolicyPage: React.FC = () => {
                 </Card>
                 <Card className="border border-border">
                   <CardHeader>
-                    <CardTitle className="text-base">Category B (Restricted)</CardTitle>
+                    <CardTitle as="h3" className="text-base">Category B (Restricted)</CardTitle>
                     <CardDescription className="text-xs">Lecture Theatres (LT), CEP 102, CEP 110, SAC Ground</CardDescription>
                   </CardHeader>
                   <CardContent>
