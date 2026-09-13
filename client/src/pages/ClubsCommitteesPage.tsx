@@ -247,7 +247,7 @@ const ClubsCommitteesPage: React.FC = () => {
 
                         {/* Search filter input */}
                         <div className="relative w-full sm:w-72">
-                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-textMuted z-99 h-4 w-4" />
+                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-textMuted z-10 pointer-events-none h-4 w-4" />
                             <Input
                                 placeholder={`Search ${activeTab}s...`}
                                 className="pl-9 bg-card border-borderSoft/60 focus:border-brand rounded-xl h-10 w-full"

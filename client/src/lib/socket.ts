@@ -61,6 +61,7 @@ class SocketService {
 
         this.connectionPromise = new Promise((resolve, reject) => {
             this.socket = io(getSocketUrl(), {
+                transports: ['websocket', 'polling'],
                 reconnectionAttempts: this.maxReconnectAttempts,
                 timeout: 10000,
                 withCredentials: true, // Crucial for HttpOnly cookies!

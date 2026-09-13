@@ -1,4 +1,3 @@
-import { motion } from 'framer-motion';
 import { Clock, FileText, ShieldAlert, Users } from 'lucide-react';
 import React from 'react';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '../components/ui/accordion';
@@ -9,28 +8,14 @@ const PolicyPage: React.FC = () => {
   const getClubsByGroup = (group: 'A' | 'B' | 'C') => CLUBS.filter(c => c.group === group);
 
   return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.4 }}
-      className="max-w-4xl 3xl:max-w-6xl 4k:max-w-7xl mx-auto space-y-6 sm:space-y-8 w-full px-1 3xl:px-4"
-    >
-      <motion.div
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] }}
-        className="text-center pb-6 sm:pb-8 border-b border-borderSoft"
-      >
+    <div className="max-w-4xl 3xl:max-w-6xl 4k:max-w-7xl mx-auto space-y-6 sm:space-y-8 w-full px-1 3xl:px-4">
+      <div className="text-center pb-6 sm:pb-8 border-b border-borderSoft">
         <h1 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-foreground tracking-tighter">Slot Booking Policy</h1>
         <p className="text-muted-foreground mt-2 text-sm sm:text-base font-medium max-w-lg mx-auto">Guidelines for venue reservation and campus event conduct</p>
-      </motion.div>
+      </div>
 
       <Accordion type="single" collapsible defaultValue="item-0" className="space-y-3 sm:space-y-4">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.1 }}
-        >
+        <div>
           <AccordionItem value="item-0" className="border border-borderSoft rounded-lg bg-card shadow-sm overflow-hidden">
             <AccordionTrigger className="px-5 py-4 hover:no-underline">
               <div className="flex items-center gap-3">
@@ -47,13 +32,9 @@ const PolicyPage: React.FC = () => {
               </ul>
             </AccordionContent>
           </AccordionItem>
-        </motion.div>
+        </div>
 
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.2 }}
-        >
+        <div>
           <AccordionItem value="item-1" className="border border-borderSoft rounded-lg bg-card shadow-sm overflow-hidden">
             <AccordionTrigger className="px-5 py-4 hover:no-underline">
               <div className="flex items-center gap-3">
@@ -70,13 +51,9 @@ const PolicyPage: React.FC = () => {
               </ul>
             </AccordionContent>
           </AccordionItem>
-        </motion.div>
+        </div>
 
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.3 }}
-        >
+        <div>
           <AccordionItem value="item-2" className="border border-borderSoft rounded-lg bg-card shadow-sm overflow-hidden">
             <AccordionTrigger className="px-5 py-4 hover:no-underline">
               <div className="flex items-center gap-3">
@@ -107,13 +84,9 @@ const PolicyPage: React.FC = () => {
               </div>
             </AccordionContent>
           </AccordionItem>
-        </motion.div>
+        </div>
 
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.4 }}
-        >
+        <div>
           <AccordionItem value="item-3" className="border border-borderSoft rounded-lg bg-card shadow-sm overflow-hidden">
             <AccordionTrigger className="px-5 py-4 hover:no-underline">
               <div className="flex items-center gap-3">
@@ -124,19 +97,19 @@ const PolicyPage: React.FC = () => {
             <AccordionContent className="px-5 pb-5 pt-0">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6 mt-2">
                 <div>
-                  <h4 className="font-bold text-brand mb-2 border-b border-brand/30 pb-1">Group A (Tech)</h4>
+                  <h3 className="font-bold text-brand mb-2 border-b border-brand/30 pb-1">Group A (Tech)</h3>
                   <ul className="space-y-1 text-xs text-muted-foreground">
                     {getClubsByGroup('A').map(c => <li key={c.name}>{c.name}</li>)}
                   </ul>
                 </div>
                 <div>
-                  <h4 className="font-bold text-brand mb-2 border-b border-brand/30 pb-1">Group B (Cultural)</h4>
+                  <h3 className="font-bold text-brand mb-2 border-b border-brand/30 pb-1">Group B (Cultural)</h3>
                   <ul className="space-y-1 text-xs text-muted-foreground">
                     {getClubsByGroup('B').map(c => <li key={c.name}>{c.name}</li>)}
                   </ul>
                 </div>
                 <div>
-                  <h4 className="font-bold text-brand mb-2 border-b border-brand/30 pb-1">Group C (Sports)</h4>
+                  <h3 className="font-bold text-brand mb-2 border-b border-brand/30 pb-1">Group C (Sports)</h3>
                   <ul className="space-y-1 text-xs text-muted-foreground">
                     {getClubsByGroup('C').map(c => <li key={c.name}>{c.name}</li>)}
                   </ul>
@@ -144,9 +117,9 @@ const PolicyPage: React.FC = () => {
               </div>
             </AccordionContent>
           </AccordionItem>
-        </motion.div>
+        </div>
       </Accordion>
-    </motion.div>
+    </div>
   );
 };
 

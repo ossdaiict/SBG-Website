@@ -8,7 +8,7 @@ import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '
 import { Input } from '../components/ui/input';
 import { Label } from '../components/ui/label';
 import { Skeleton } from '../components/ui/skeleton';
-import { Tabs, TabsList, TabsTrigger } from '../components/ui/tabs';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '../components/ui/tabs';
 import { apiRequest } from '../lib/api';
 import { toastError } from '../lib/toast';
 import { DatePicker } from '../components/ui/date-picker';
@@ -207,9 +207,9 @@ export default function AdminEventReports() {
             setTab(v as "submitted" | "tracking" | "exempt");
             setCurrentPage(1);
           }}
-          className="w-full"
+          className="w-full space-y-4"
         >
-          <TabsList className="grid w-full grid-cols-3">
+          <TabsList aria-label="Event report tabs" className="grid w-full grid-cols-3">
             <TabsTrigger value="submitted">
               Submitted ({reports.length})
             </TabsTrigger>
@@ -225,211 +225,222 @@ export default function AdminEventReports() {
               Exempt ({pastEvents.filter((e) => e.report_exempt).length})
             </TabsTrigger>
           </TabsList>
-        </Tabs>
 
-        {loading ? (
-          <div className="space-y-4">
-            {[1, 2, 3].map((i) => (
-              <GlassCard
-                key={i}
-                className="p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4"
-              >
-                <div className="space-y-2 w-full max-w-sm">
-                  <Skeleton className="h-6 w-3/4 rounded-md" />
-                  <Skeleton className="h-4 w-1/2 rounded-md" />
-                  <Skeleton className="h-4 w-1/3 rounded-md" />
-                </div>
-                <Skeleton className="h-10 w-32 rounded-md shrink-0" />
-              </GlassCard>
-            ))}
-          </div>
-        ) : (
-          <>
-            {tab === "submitted" && (
-              <div className="space-y-4">
-                {paginatedData.map((r) => (
-                  <GlassCard key={r.id} className="p-4 space-y-2">
-                    <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2">
-                      <h3 className="font-semibold text-lg leading-tight">
-                        {r.event_name}
-                        <span className="block sm:inline text-sm font-normal text-textMuted sm:ml-2">
-                          by {r.club_name}
+          {loading ? (
+            <div className="space-y-4">
+              {[1, 2, 3].map((i) => (
+                <GlassCard
+                  key={i}
+                  className="p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4"
+                >
+                  <div className="space-y-2 w-full max-w-sm">
+                    <Skeleton className="h-6 w-3/4 rounded-md" />
+                    <Skeleton className="h-4 w-1/2 rounded-md" />
+                    <Skeleton className="h-4 w-1/3 rounded-md" />
+                  </div>
+                  <Skeleton className="h-10 w-32 rounded-md shrink-0" />
+                </GlassCard>
+              ))}
+            </div>
+          ) : (
+            <>
+              <TabsContent value="submitted" className="mt-0 space-y-4 focus-visible:outline-none">
+                <div className="space-y-4">
+                  {paginatedData.map((r) => (
+                    <GlassCard key={r.id} className="p-4 space-y-2">
+                      <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2">
+                        <h2 className="font-semibold text-lg leading-tight">
+                          {r.event_name}
+                          <span className="block sm:inline text-sm font-normal text-textMuted sm:ml-2">
+                            by {r.club_name}
+                          </span>
+                        </h2>
+                        <span className="text-sm bg-brand/10 text-brand px-2 py-1 rounded-md capitalize self-start shrink-0">
+                          {r.level}
                         </span>
-                      </h3>
-                      <span className="text-sm bg-brand/10 text-brand px-2 py-1 rounded-md capitalize self-start shrink-0">
-                        {r.level}
-                      </span>
-                    </div>
-                    <p className="text-sm text-textMuted mt-1">
-                      Submitted:{" "}
-                      {new Date(r.created_at).toLocaleDateString("en-GB", {
-                        timeZone: "Asia/Kolkata",
-                      })}{" "}
-                      | Event:{" "}
-                      {new Date(r.date).toLocaleDateString("en-GB", {
-                        timeZone: "Asia/Kolkata",
-                      })}
-                    </p>
-                    <div className="flex flex-wrap gap-4 text-sm mt-2">
-                      <a
-                        href={r.report_doc_link}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="text-brand hover:underline"
-                      >
-                        Report Doc
-                      </a>
-                      <a
-                        href={r.photos_drive_link}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="text-brand hover:underline"
-                      >
-                        Photos
-                      </a>
-                      {r.participants_sheet_link && (
+                      </div>
+                      <p className="text-sm text-textMuted mt-1">
+                        Submitted:{" "}
+                        {new Date(r.created_at).toLocaleDateString("en-GB", {
+                          timeZone: "Asia/Kolkata",
+                        })}{" "}
+                        | Event:{" "}
+                        {new Date(r.date).toLocaleDateString("en-GB", {
+                          timeZone: "Asia/Kolkata",
+                        })}
+                      </p>
+                      <div className="flex flex-wrap gap-4 text-sm mt-2">
                         <a
-                          href={r.participants_sheet_link}
+                          href={r.report_doc_link}
                           target="_blank"
-                          rel="noreferrer"
+                          rel="noopener noreferrer"
+                          aria-label={`Report document for ${r.event_name}`}
                           className="text-brand hover:underline"
                         >
-                          Participants
+                          Report Doc
                         </a>
-                      )}
-                      {r.awards_doc_link && (
                         <a
-                          href={r.awards_doc_link}
+                          href={r.photos_drive_link}
                           target="_blank"
-                          rel="noreferrer"
+                          rel="noopener noreferrer"
+                          aria-label={`Photos drive folder for ${r.event_name}`}
                           className="text-brand hover:underline"
                         >
-                          Awards
+                          Photos
                         </a>
+                        {r.participants_sheet_link && (
+                          <a
+                            href={r.participants_sheet_link}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            aria-label={`Participants spreadsheet for ${r.event_name}`}
+                            className="text-brand hover:underline"
+                          >
+                            Participants
+                          </a>
+                        )}
+                        {r.awards_doc_link && (
+                          <a
+                            href={r.awards_doc_link}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            aria-label={`Awards document for ${r.event_name}`}
+                            className="text-brand hover:underline"
+                          >
+                            Awards
+                          </a>
+                        )}
+                      </div>
+                    </GlassCard>
+                  ))}
+                  {paginatedData.length === 0 && (
+                    <GlassCard className="p-8 text-center text-textMuted">
+                      No submitted event reports yet.
+                    </GlassCard>
+                  )}
+                </div>
+              </TabsContent>
+
+              <TabsContent value="tracking" className="mt-0 focus-visible:outline-none">
+                <div className="overflow-x-auto bg-white dark:bg-card border border-borderSoft rounded-xl">
+                  <table className="min-w-full text-left text-sm">
+                    <thead className="bg-gray-50 dark:bg-gray-800/50">
+                      <tr>
+                        <th className="px-4 py-3 font-semibold w-[30%] text-textSecondary text-center">
+                          Event
+                        </th>
+                        <th className="px-4 py-3 font-semibold w-[30%] text-textSecondary text-center">
+                          Club / Committee
+                        </th>
+                        <th className="px-4 py-3 font-semibold w-[15%] text-textSecondary text-center">
+                          End Date
+                        </th>
+                        <th className="px-4 py-3 font-semibold w-[25%] text-textSecondary text-center">
+                          Actions
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-borderSoft">
+                      {paginatedData.map((e) => (
+                        <tr key={e.id}>
+                          <td className="px-4 py-3 font-medium">{e.name}</td>
+                          <td className="px-4 py-3 text-textMuted">
+                            {e.club_name}
+                          </td>
+                          <td className="px-4 py-3 text-textMuted text-center">
+                            {new Date(e.end_date || e.date).toLocaleDateString(
+                              "en-GB",
+                              { timeZone: "Asia/Kolkata" },
+                            )}
+                          </td>
+                          <td className="px-4 py-3 text-center">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              aria-label={`Mark ${e.name} as report exempt`}
+                              onClick={() => toggleExempt(e.id, e.report_exempt)}
+                            >
+                              Mark Exempt
+                            </Button>
+                          </td>
+                        </tr>
+                      ))}
+                      {paginatedData.length === 0 && (
+                        <tr>
+                          <td
+                            colSpan={4}
+                            className="text-center text-textMuted py-8"
+                          >
+                            No pending events require a report.
+                          </td>
+                        </tr>
                       )}
-                    </div>
-                  </GlassCard>
-                ))}
-              </div>
-            )}
+                    </tbody>
+                  </table>
+                </div>
+              </TabsContent>
 
-            {tab === "tracking" && (
-              <div className="overflow-x-auto bg-white dark:bg-card border border-borderSoft rounded-xl">
-                <table className="min-w-full text-left text-sm">
-                  <thead className="bg-gray-50 dark:bg-gray-800/50">
-                    <tr>
-                      <th className="px-4 py-3 font-semibold w-[30%] text-textSecondary text-center">
-                        Event
-                      </th>
-                      <th className="px-4 py-3 font-semibold w-[30%] text-textSecondary text-center">
-                        Club / Committee
-                      </th>
-                      <th className="px-4 py-3 font-semibold w-[15%] text-textSecondary text-center">
-                        End Date
-                      </th>
-                      <th className="px-4 py-3 font-semibold w-[25%] text-textSecondary text-center">
-                        Actions
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-borderSoft">
-                    {paginatedData.map((e) => (
-                      <tr key={e.id}>
-                        <td className="px-4 py-3 font-medium">{e.name}</td>
-                        <td className="px-4 py-3 text-textMuted">
-                          {e.club_name}
-                        </td>
-                        <td className="px-4 py-3 text-textMuted text-center">
-                          {new Date(e.end_date || e.date).toLocaleDateString(
-                            "en-GB",
-                            { timeZone: "Asia/Kolkata" },
-                          )}
-                        </td>
-                        <td className="px-4 py-3 text-center">
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => toggleExempt(e.id, e.report_exempt)}
-                          >
-                            Mark Exempt
-                          </Button>
-                        </td>
-                      </tr>
-                    ))}
-                    {paginatedData.length === 0 && (
+              <TabsContent value="exempt" className="mt-0 focus-visible:outline-none">
+                <div className="overflow-x-auto bg-white dark:bg-card border border-borderSoft rounded-xl">
+                  <table className="min-w-full text-left text-sm">
+                    <thead className="bg-gray-50 dark:bg-gray-800/50">
                       <tr>
-                        <td
-                          colSpan={4}
-                          className="text-center text-textMuted py-8"
-                        >
-                          No pending events require a report.
-                        </td>
+                        <th className="px-4 py-3 font-semibold w-[30%] text-textSecondary text-center">
+                          Event
+                        </th>
+                        <th className="px-4 py-3 font-semibold w-[30%] text-textSecondary text-center">
+                          Club / Committee
+                        </th>
+                        <th className="px-4 py-3 font-semibold w-[15%] text-textSecondary text-center">
+                          End Date
+                        </th>
+                        <th className="px-4 py-3 font-semibold w-[25%] text-textSecondary text-center">
+                          Actions
+                        </th>
                       </tr>
-                    )}
-                  </tbody>
-                </table>
-              </div>
-            )}
-
-            {tab === "exempt" && (
-              <div className="overflow-x-auto bg-white dark:bg-card border border-borderSoft rounded-xl">
-                <table className="min-w-full text-left text-sm">
-                  <thead className="bg-gray-50 dark:bg-gray-800/50">
-                    <tr>
-                      <th className="px-4 py-3 font-semibold w-[30%] text-textSecondary text-center">
-                        Event
-                      </th>
-                      <th className="px-4 py-3 font-semibold w-[30%] text-textSecondary text-center">
-                        Club / Committee
-                      </th>
-                      <th className="px-4 py-3 font-semibold w-[15%] text-textSecondary text-center">
-                        End Date
-                      </th>
-                      <th className="px-4 py-3 font-semibold w-[25%] text-textSecondary text-center">
-                        Actions
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-borderSoft">
-                    {paginatedData.map((e) => (
-                      <tr key={e.id}>
-                        <td className="px-4 py-3 font-medium">{e.name}</td>
-                        <td className="px-4 py-3 text-textMuted">
-                          {e.club_name}
-                        </td>
-                        <td className="px-4 py-3 text-textMuted text-center">
-                          {new Date(e.end_date || e.date).toLocaleDateString(
-                            "en-GB",
-                            { timeZone: "Asia/Kolkata" },
-                          )}
-                        </td>
-                        <td className="px-4 py-3 text-center">
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => toggleExempt(e.id, e.report_exempt)}
+                    </thead>
+                    <tbody className="divide-y divide-borderSoft">
+                      {paginatedData.map((e) => (
+                        <tr key={e.id}>
+                          <td className="px-4 py-3 font-medium">{e.name}</td>
+                          <td className="px-4 py-3 text-textMuted">
+                            {e.club_name}
+                          </td>
+                          <td className="px-4 py-3 text-textMuted text-center">
+                            {new Date(e.end_date || e.date).toLocaleDateString(
+                              "en-GB",
+                              { timeZone: "Asia/Kolkata" },
+                            )}
+                          </td>
+                          <td className="px-4 py-3 text-center">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              aria-label={`Clear exemption for ${e.name}`}
+                              onClick={() => toggleExempt(e.id, e.report_exempt)}
+                            >
+                              Clear Exemption
+                            </Button>
+                          </td>
+                        </tr>
+                      ))}
+                      {paginatedData.length === 0 && (
+                        <tr>
+                          <td
+                            colSpan={4}
+                            className="text-center text-textMuted py-8"
                           >
-                            Clear Exemption
-                          </Button>
-                        </td>
-                      </tr>
-                    ))}
-                    {paginatedData.length === 0 && (
-                      <tr>
-                        <td
-                          colSpan={4}
-                          className="text-center text-textMuted py-8"
-                        >
-                          No exempt events.
-                        </td>
-                      </tr>
-                    )}
-                  </tbody>
-                </table>
-              </div>
-            )}
-          </>
-        )}
+                            No exempt events.
+                          </td>
+                        </tr>
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              </TabsContent>
+            </>
+          )}
+        </Tabs>
 
         {currentData.length > 0 && totalPages > 1 && (
           <div className="flex flex-col sm:flex-row items-center justify-between mt-6 p-4 border-t border-borderSoft bg-card rounded-xl shadow-sm gap-4">
@@ -448,6 +459,7 @@ export default function AdminEventReports() {
                 size="sm"
                 onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
                 disabled={currentPage === 1}
+                aria-label="Previous Page"
               >
                 <ChevronLeft size={16} className="mr-1" />
                 Previous
@@ -459,6 +471,7 @@ export default function AdminEventReports() {
                   setCurrentPage((prev) => Math.min(prev + 1, totalPages))
                 }
                 disabled={currentPage === totalPages}
+                aria-label="Next Page"
               >
                 Next
                 <ChevronRight size={16} className="ml-1" />

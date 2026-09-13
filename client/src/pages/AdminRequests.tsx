@@ -728,6 +728,7 @@ const AdminRequestRow: React.FC<AdminRequestRowProps> = ({
                       ? "Cannot reject past bookings whose end time has already elapsed"
                       : "Reject this venue"
                   }
+                  aria-label="Reject this venue booking"
                   disabled={isProcessingAction || isPast}
                 >
                   <XCircle size={18} />
@@ -747,6 +748,7 @@ const AdminRequestRow: React.FC<AdminRequestRowProps> = ({
                       ? "Cannot reject past bookings whose end time has already elapsed"
                       : "Reject all venues"
                   }
+                  aria-label="Reject all venue bookings in this request"
                   disabled={isProcessingAction || isPast}
                 >
                   <XCircle size={18} />
@@ -767,6 +769,7 @@ const AdminRequestRow: React.FC<AdminRequestRowProps> = ({
                       ? "Cannot approve past bookings whose end time has already elapsed"
                       : "Approve this venue"
                   }
+                  aria-label="Approve this venue booking"
                   disabled={isProcessingAction || isPast}
                 >
                   <CheckCircle size={18} />
@@ -786,6 +789,7 @@ const AdminRequestRow: React.FC<AdminRequestRowProps> = ({
                       ? "Cannot approve past bookings whose end time has already elapsed"
                       : "Approve all venues"
                   }
+                  aria-label="Approve all venue bookings in this request"
                   disabled={isProcessingAction || isPast}
                 >
                   <CheckCircle size={18} />
@@ -802,6 +806,7 @@ const AdminRequestRow: React.FC<AdminRequestRowProps> = ({
                   }}
                   className="text-textMuted hover:text-primary h-8 w-8 rounded-full"
                   title="Edit booking timings"
+                  aria-label="Edit booking timings"
                   disabled={isProcessingAction}
                 >
                   <Pencil size={16} />
@@ -822,6 +827,7 @@ const AdminRequestRow: React.FC<AdminRequestRowProps> = ({
                       ? "Cannot change status of past bookings"
                       : "Move to pending"
                   }
+                  aria-label="Move booking to pending"
                   disabled={isProcessingAction || isPast}
                 >
                   <RotateCcw size={18} />
@@ -841,6 +847,7 @@ const AdminRequestRow: React.FC<AdminRequestRowProps> = ({
                       ? "Cannot change status of past bookings"
                       : "Move all to pending"
                   }
+                  aria-label="Move all bookings in this request to pending"
                   disabled={isProcessingAction || isPast}
                 >
                   <RotateCcw size={18} />
@@ -857,6 +864,7 @@ const AdminRequestRow: React.FC<AdminRequestRowProps> = ({
                   }}
                   className="text-textMuted hover:text-error h-8 w-8 rounded-full"
                   title="Delete this booking permanently"
+                  aria-label="Delete this booking permanently"
                   disabled={isProcessingAction}
                 >
                   <Trash2 size={16} />
@@ -872,6 +880,7 @@ const AdminRequestRow: React.FC<AdminRequestRowProps> = ({
                   }}
                   className="text-textMuted hover:text-error h-8 w-8 rounded-full"
                   title="Delete all venues in this booking"
+                  aria-label="Delete all venues in this booking"
                   disabled={isProcessingAction}
                 >
                   <Trash2 size={16} />
@@ -991,6 +1000,7 @@ const AdminRequestRow: React.FC<AdminRequestRowProps> = ({
                                   ? "Cannot reject past bookings whose end time has already elapsed"
                                   : "Reject this venue"
                               }
+                              aria-label="Reject this venue booking"
                               disabled={isProcessingAction || isBookingPast}
                             >
                               <X size={16} />
@@ -1010,6 +1020,7 @@ const AdminRequestRow: React.FC<AdminRequestRowProps> = ({
                                   ? "Cannot approve past bookings whose end time has already elapsed"
                                   : "Approve this venue"
                               }
+                              aria-label="Approve this venue booking"
                               disabled={isProcessingAction || isBookingPast}
                             >
                               <Check size={16} />
@@ -1022,6 +1033,7 @@ const AdminRequestRow: React.FC<AdminRequestRowProps> = ({
                             onClick={() => onEdit(booking)}
                             className="h-8 w-8 p-0 text-textMuted hover:text-primary"
                             title="Edit booking timings"
+                            aria-label="Edit venue booking timings"
                             disabled={isProcessingAction}
                           >
                             <Pencil size={14} />
@@ -1039,6 +1051,7 @@ const AdminRequestRow: React.FC<AdminRequestRowProps> = ({
                                   ? "Cannot change status of past bookings"
                                   : "Move to pending"
                               }
+                              aria-label="Move venue booking to pending"
                               disabled={isProcessingAction || isBookingPast}
                             >
                               <RotateCcw size={16} />
@@ -1050,6 +1063,7 @@ const AdminRequestRow: React.FC<AdminRequestRowProps> = ({
                             onClick={() => handleDelete([booking.id])}
                             className="h-8 w-8 p-0 text-textMuted hover:text-error"
                             title="Delete this venue booking"
+                            aria-label="Delete this venue booking"
                             disabled={isProcessingAction}
                           >
                             <Trash2 size={14} />

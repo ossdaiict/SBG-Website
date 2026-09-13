@@ -830,13 +830,13 @@ const AdminDashboard: React.FC = () => {
               </div>
               <div className="flex gap-2">
                 <Button variant="outline" size="sm" asChild className="hidden sm:flex whitespace-nowrap border-[1.5px]">
-                  <Link to="/admin/requests?status=pending">View All</Link>
+                  <Link to="/admin/requests?status=pending" aria-label="View all booking requests">View All</Link>
                 </Button>
               </div>
             </div>
             <div className="sm:hidden px-4 pt-4 pb-2">
               <Button variant="outline" size="sm" asChild className="w-full border-[1.5px]">
-                <Link to="/admin/requests?status=pending">View All</Link>
+                <Link to="/admin/requests?status=pending" aria-label="View all booking requests">View All</Link>
               </Button>
             </div>
           </CardHeader>
@@ -1241,7 +1241,7 @@ const AdminDashboard: React.FC = () => {
                   asChild
                   className="hidden sm:flex whitespace-nowrap border-[1.5px]"
                 >
-                  <Link to="/admin/event-requests?status=pending">
+                  <Link to="/admin/event-requests?status=pending" aria-label="View all pending event registration requests">
                     View All
                   </Link>
                 </Button>
@@ -1254,7 +1254,7 @@ const AdminDashboard: React.FC = () => {
                 asChild
                 className="w-full border-[1.5px]"
               >
-                <Link to="/admin/event-requests?status=pending">View All</Link>
+                <Link to="/admin/event-requests?status=pending" aria-label="View all pending event registration requests">View All</Link>
               </Button>
             </div>
           </CardHeader>

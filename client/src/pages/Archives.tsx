@@ -109,7 +109,7 @@ const Archives: React.FC = () => {
   const isAdmin = user?.role === 'admin';
 
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage, setItemsPerPage] = useState(8);
+  const itemsPerPage = 10;
   const listTopRef = useRef<HTMLDivElement>(null);
 
   const fetchArchives = React.useCallback(async () => {
@@ -339,53 +339,32 @@ const Archives: React.FC = () => {
         >
           <TabsList aria-label="Archive filters" className="grid grid-cols-4 w-full md:w-auto md:inline-flex">
             <TabsTrigger value="all" className="text-xs sm:text-sm">
-              All ({totalItemsCount})
+              All({totalItemsCount})
             </TabsTrigger>
             <TabsTrigger value="events" className="text-xs sm:text-sm">
-              Events ({events.length})
+              Events({events.length})
             </TabsTrigger>
             <TabsTrigger value="bookings" className="text-xs sm:text-sm">
-              Meetings ({standaloneBookings.length})
+              Meetings({standaloneBookings.length})
             </TabsTrigger>
             <TabsTrigger value="members" className="text-xs sm:text-sm">
-              Members ({archivedMembers.length})
+              Members({archivedMembers.length})
             </TabsTrigger>
           </TabsList>
         </Tabs>
 
-        <div className="flex items-center gap-2 w-full md:w-auto">
-          <div className="relative flex-1 md:w-64">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-textMuted h-4 w-4 pointer-events-none" />
-            <Input
-              placeholder="Search archives..."
-              value={searchQuery}
-              onChange={(e) => {
-                setSearchQuery(e.target.value);
-                setCurrentPage(1);
-              }}
-              className="pl-9 h-10 text-sm"
-              aria-label="Search archives"
-            />
-          </div>
-          <div className="flex items-center gap-1.5 shrink-0">
-            <span className="text-xs text-textMuted hidden sm:inline">Per page:</span>
-            {[6, 12, 24].map((size) => (
-              <Button
-                key={size}
-                variant={itemsPerPage === size ? 'default' : 'outline'}
-                size="sm"
-                onClick={() => {
-                  setItemsPerPage(size);
-                  setCurrentPage(1);
-                }}
-                className={`h-9 px-2.5 text-xs font-semibold rounded-lg ${
-                  itemsPerPage === size ? 'bg-brand text-white' : ''
-                }`}
-              >
-                {size}
-              </Button>
-            ))}
-          </div>
+        <div className="relative w-full md:w-72">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-textMuted h-4 w-4 pointer-events-none z-10" />
+          <Input
+            placeholder="Search archives..."
+            value={searchQuery}
+            onChange={(e) => {
+              setSearchQuery(e.target.value);
+              setCurrentPage(1);
+            }}
+            className="pl-9 h-10 text-sm"
+            aria-label="Search archives"
+          />
         </div>
       </div>
 

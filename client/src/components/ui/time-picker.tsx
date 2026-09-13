@@ -61,7 +61,7 @@ export function TimePicker({ value, onChange, className, hideIcon = false, id }:
                  {!hideIcon && <Clock className="mr-1.5 sm:mr-2 h-4 w-4 text-brand shrink-0" />}
                  <div className="flex items-center gap-1 w-full justify-between">
                      <Select value={hour} onValueChange={(v) => handleTimeChange(v, minute, period)}>
-                         <SelectTrigger className="h-8 sm:h-8 py-0 border-0 bg-transparent dark:bg-transparent px-0 focus:ring-0 focus:ring-offset-0 text-textPrimary font-semibold flex-1 shadow-none hover:bg-hoverSoft rounded-md transition-none text-center justify-center [&>svg]:hidden">
+                         <SelectTrigger aria-label="Select hour" className="h-8 sm:h-8 py-0 border-0 bg-transparent dark:bg-transparent px-0 focus:ring-0 focus:ring-offset-0 text-textPrimary font-semibold flex-1 shadow-none hover:bg-hoverSoft rounded-md transition-none text-center justify-center [&>svg]:hidden">
                              <SelectValue placeholder="HH" />
                          </SelectTrigger>
                          <SelectContent hideScrollButtons className="max-h-[200px]">
@@ -71,10 +71,10 @@ export function TimePicker({ value, onChange, className, hideIcon = false, id }:
                          </SelectContent>
                      </Select>
                      
-                     <span className="text-textMuted font-bold">:</span>
+                     <span className="text-textMuted font-bold" aria-hidden="true">:</span>
                      
                      <Select value={minute} onValueChange={(v) => handleTimeChange(hour, v, period)}>
-                         <SelectTrigger className="h-8 sm:h-8 py-0 border-0 bg-transparent dark:bg-transparent px-0 focus:ring-0 focus:ring-offset-0 text-textPrimary font-semibold flex-1 shadow-none hover:bg-hoverSoft rounded-md transition-none text-center justify-center [&>svg]:hidden">
+                         <SelectTrigger aria-label="Select minute" className="h-8 sm:h-8 py-0 border-0 bg-transparent dark:bg-transparent px-0 focus:ring-0 focus:ring-offset-0 text-textPrimary font-semibold flex-1 shadow-none hover:bg-hoverSoft rounded-md transition-none text-center justify-center [&>svg]:hidden">
                              <SelectValue placeholder="MM" />
                          </SelectTrigger>
                          <SelectContent hideScrollButtons className="max-h-[200px]">
@@ -84,10 +84,10 @@ export function TimePicker({ value, onChange, className, hideIcon = false, id }:
                          </SelectContent>
                      </Select>
                      
-                     <div className="w-px h-4 bg-borderSoft mx-1" />
+                     <div className="w-px h-4 bg-borderSoft mx-1" aria-hidden="true" />
                      
                      <Select value={period} onValueChange={(v) => handleTimeChange(hour, minute, v)}>
-                         <SelectTrigger className="h-8 sm:h-8 py-0 border-0 bg-transparent dark:bg-transparent px-0 focus:ring-0 focus:ring-offset-0 text-brand font-bold flex-1 shadow-none hover:bg-brand/10 rounded-md transition-none text-center justify-center [&>svg]:hidden">
+                         <SelectTrigger aria-label="Select AM or PM" className="h-8 sm:h-8 py-0 border-0 bg-transparent dark:bg-transparent px-0 focus:ring-0 focus:ring-offset-0 text-brand font-bold flex-1 shadow-none hover:bg-brand/10 rounded-md transition-none text-center justify-center [&>svg]:hidden">
                              <SelectValue placeholder="AM" />
                          </SelectTrigger>
                          <SelectContent hideScrollButtons>

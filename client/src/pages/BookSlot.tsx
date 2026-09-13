@@ -847,6 +847,7 @@ const BookSlot: React.FC<BookSlotProps> = ({ currentUser }) => {
                         type="button"
                         variant="ghost"
                         size="sm"
+                        aria-label="Register a new event"
                         className="h-7 px-2 text-xs text-brand hover:text-brand/80 hover:bg-brand/10 gap-1 rounded-lg font-semibold"
                       >
                         <Plus size={13} />
@@ -858,7 +859,7 @@ const BookSlot: React.FC<BookSlotProps> = ({ currentUser }) => {
                       onValueChange={(v) => handleChange('event_id', v)}
                       disabled={isMeeting}
                     >
-                      <SelectTrigger id="event_id" className="h-11 border-borderSoft hover:bg-hoverSoft/50 focus:border-brand focus:ring-4 focus:ring-brand/20 transition-all rounded-xl">
+                      <SelectTrigger id="event_id" aria-label="Link to Event" className="h-11 border-borderSoft hover:bg-hoverSoft/50 focus:border-brand focus:ring-4 focus:ring-brand/20 transition-all rounded-xl">
                         <SelectValue placeholder={selectableEvents.length > 0 ? 'Select an event… (optional)' : 'No events registered yet'} />
                       </SelectTrigger>
                       <SelectContent className="rounded-xl">
@@ -899,6 +900,7 @@ const BookSlot: React.FC<BookSlotProps> = ({ currentUser }) => {
                       <button
                         type="button"
                         onClick={() => handleChange('event_id', '')}
+                        aria-label="Clear linked event"
                         className="text-xs text-textMuted hover:text-error transition-colors underline underline-offset-2"
                       >
                         Clear event link
@@ -952,7 +954,7 @@ const BookSlot: React.FC<BookSlotProps> = ({ currentUser }) => {
                   <div className="space-y-2.5">
                     <Label htmlFor="expectedAttendees" className="text-textSecondary font-semibold text-sm">Expected Attendees *</Label>
                     <Select value={formData.expectedAttendees} onValueChange={(v) => handleChange('expectedAttendees', v)}>
-                      <SelectTrigger className="h-12 border-borderSoft hover:bg-hoverSoft/50 focus:border-brand focus:ring-4 focus:ring-brand/20 transition-all rounded-xl">
+                      <SelectTrigger id="expectedAttendees" aria-label="Expected Attendees" className="h-12 border-borderSoft hover:bg-hoverSoft/50 focus:border-brand focus:ring-4 focus:ring-brand/20 transition-all rounded-xl">
                         <div className="flex items-center gap-2">
                           <Users size={16} className="text-brand" />
                           <SelectValue placeholder="Count" />
@@ -986,6 +988,7 @@ const BookSlot: React.FC<BookSlotProps> = ({ currentUser }) => {
                       <PopoverTrigger asChild>
                         <Button
                           variant="outline"
+                          aria-label="Select start date"
                           className={cn(
                             "w-full h-10 justify-start text-left font-medium border-borderSoft hover:bg-hoverSoft/50 transition-all bg-card text-textPrimary rounded-md shadow-sm",
                             !formData.date && "text-textMuted",
@@ -1030,6 +1033,7 @@ const BookSlot: React.FC<BookSlotProps> = ({ currentUser }) => {
                       <PopoverTrigger asChild>
                         <Button
                           variant="outline"
+                          aria-label="Select end date"
                           className={cn(
                             "w-full h-10 justify-start text-left font-medium border-borderSoft hover:bg-hoverSoft/50 transition-all bg-card text-textPrimary rounded-md shadow-sm",
                             !formData.endDate && "text-textMuted"
@@ -1185,6 +1189,7 @@ const BookSlot: React.FC<BookSlotProps> = ({ currentUser }) => {
                       <Button
                         variant="outline"
                         role="combobox"
+                        aria-label="Select venues"
                         className={cn(
                           "w-full h-11 justify-between border-borderSoft hover:bg-hoverSoft/50 transition-all bg-card text-textPrimary rounded-xl shadow-sm font-bold text-sm",
                           formData.venueIds.length === 0 && "text-textMuted"

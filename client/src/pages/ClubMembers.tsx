@@ -1,4 +1,3 @@
-import { motion } from 'framer-motion';
 import { Edit2, Lock, Plus, Trash2, Users, UserMinus } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
@@ -291,17 +290,17 @@ const ClubMembers: React.FC<ClubMembersProps> = ({ user }) => {
     }
   };
 
-  const DEFAULT_BADGE_STYLE = 'bg-slate-500/10 text-slate-500 border-slate-500/20';
+  const DEFAULT_BADGE_STYLE = 'bg-slate-500/10 text-slate-700 dark:text-slate-300 border-slate-500/20 font-medium';
 
   const getDesignationBadgeStyle = (des?: string) => {
     if (!des) return DEFAULT_BADGE_STYLE;
     const d = des.toLowerCase().trim();
-    if (d === 'convener') return 'bg-brand/10 text-brand border-brand/20';
-    if (d === 'dy. convener' || d === 'dy convener') return 'bg-orange-500/10 text-orange-600 border-orange-500/20';
-    if (d === 'core') return 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20';
+    if (d === 'convener') return 'bg-brand/10 text-brand border-brand/20 font-semibold';
+    if (d === 'dy. convener' || d === 'dy convener') return 'bg-orange-500/10 text-orange-700 dark:text-orange-400 border-orange-500/20 font-medium';
+    if (d === 'core') return 'bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border-emerald-500/20 font-medium';
     if (d === 'extended core' || d === 'associate core') return DEFAULT_BADGE_STYLE;
     if (d === 'others') return DEFAULT_BADGE_STYLE;
-    return 'bg-cyan-500/10 text-cyan-600 border-cyan-500/20'; // Special tags
+    return 'bg-cyan-500/10 text-cyan-800 dark:text-cyan-300 border-cyan-500/20 font-medium'; // Special tags
   };
 
   const MemberRow = ({ member, editable }: { member: ClubMember; editable: boolean }) => (
@@ -342,7 +341,14 @@ const ClubMembers: React.FC<ClubMembersProps> = ({ user }) => {
       {editable ? (
         <div className="flex items-center gap-2 shrink-0 self-end sm:self-center mt-2 sm:mt-0">
           {isClubUser && (
-            <Button variant="outline" size="sm" onClick={() => openEdit(member)} className="rounded-lg h-9 w-9 p-0" title="Edit Member">
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={() => openEdit(member)} 
+              className="rounded-lg h-9 w-9 p-0" 
+              title="Edit Member"
+              aria-label={`Edit ${member.full_name}`}
+            >
               <Edit2 size={14} />
             </Button>
           )}
@@ -353,6 +359,7 @@ const ClubMembers: React.FC<ClubMembersProps> = ({ user }) => {
               onClick={() => handleEndTenureClick(member)}
               className="rounded-lg h-9 w-9 p-0 text-brand hover:text-brand hover:bg-brand/10 border-brand/20"
               title="End Tenure"
+              aria-label={`End tenure for ${member.full_name}`}
             >
               <UserMinus size={14} />
             </Button>
@@ -363,6 +370,7 @@ const ClubMembers: React.FC<ClubMembersProps> = ({ user }) => {
             onClick={() => handleDeleteClick(member)}
             className="rounded-lg h-9 w-9 p-0 text-error hover:text-error hover:bg-error/10 border-error/20"
             title="Delete Member"
+            aria-label={`Delete ${member.full_name}`}
           >
             <Trash2 size={14} />
           </Button>
@@ -396,11 +404,7 @@ const ClubMembers: React.FC<ClubMembersProps> = ({ user }) => {
 
   return (
     <div className="space-y-6">
-      <motion.div
-        initial={{ opacity: 0, y: 8 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="flex flex-col sm:flex-row sm:items-center justify-between gap-4"
-      >
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl sm:text-3xl font-bold text-textPrimary tracking-tight flex items-center gap-2 leading-tight">
             <Users className="text-brand shrink-0" size={28} />
@@ -418,7 +422,7 @@ const ClubMembers: React.FC<ClubMembersProps> = ({ user }) => {
             <div className="flex items-center gap-2 w-full sm:w-auto max-w-full">
               <Label htmlFor="club-select" className="text-xs text-textMuted shrink-0 font-medium">{entityType}:</Label>
               <Select value={selectedClubId} onValueChange={handleClubChange}>
-                <SelectTrigger id="club-select" className="h-9 w-full sm:w-[200px] bg-card border-borderSoft focus:ring-brand/30">
+                <SelectTrigger id="club-select" aria-label={`Select ${entityType}`} className="h-9 w-full sm:w-[200px] bg-card border-borderSoft focus:ring-brand/30">
                   <SelectValue placeholder={`Select a ${entityType.toLowerCase()}`} />
                 </SelectTrigger>
                 <SelectContent className="bg-popover border-borderSoft max-h-[300px]">
@@ -433,20 +437,20 @@ const ClubMembers: React.FC<ClubMembersProps> = ({ user }) => {
           )}
 
           {members.length > 0 && (user?.role === 'admin' || isClubUser) && (
-            <Button variant="destructive" onClick={() => setEmptyDialogOpen(true)} className="w-full sm:w-auto rounded-xl font-semibold gap-1.5 whitespace-nowrap">
+            <Button variant="destructive" onClick={() => setEmptyDialogOpen(true)} aria-label="Empty all members" className="w-full sm:w-auto rounded-xl font-semibold gap-1.5 whitespace-nowrap">
               <Trash2 size={16} />
               Empty All
             </Button>
           )}
 
           {isClubUser && (
-            <Button onClick={openAdd} className="w-full sm:w-auto rounded-xl bg-brand hover:bg-brand/90 text-white font-semibold whitespace-nowrap">
+            <Button onClick={openAdd} aria-label="Add Member" className="w-full sm:w-auto rounded-xl bg-brand hover:bg-brand/90 text-white font-semibold whitespace-nowrap">
               <Plus size={16} className="mr-1.5" />
               Add Member
             </Button>
           )}
         </div>
-      </motion.div>
+      </div>
 
       {isLoading ? (
         <div className="space-y-3">

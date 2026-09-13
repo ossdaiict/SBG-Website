@@ -24,6 +24,8 @@ export function GradientBackground({ className = '', children, forceDark = false
         className="hidden dark:block absolute -top-1/2 -left-1/4 w-[80%] aspect-square rounded-full opacity-40 blur-[120px] pointer-events-none"
         style={{
           background: 'radial-gradient(circle, rgba(44, 62, 138, 0.4) 0%, rgba(232, 78, 54, 0.2) 40%, transparent 70%)',
+          willChange: 'transform',
+          transform: 'translate3d(0, 0, 0)',
         }}
         animate={{
           x: [0, 30, 0],
@@ -40,6 +42,8 @@ export function GradientBackground({ className = '', children, forceDark = false
         className="hidden dark:block absolute top-1/2 -right-1/4 w-[60%] aspect-square rounded-full opacity-30 blur-[100px] pointer-events-none"
         style={{
           background: 'radial-gradient(circle, rgba(232, 78, 54, 0.35) 0%, rgba(253, 192, 47, 0.15) 50%, transparent 70%)',
+          willChange: 'transform',
+          transform: 'translate3d(0, 0, 0)',
         }}
         animate={{
           x: [0, -25, 0],
@@ -57,6 +61,8 @@ export function GradientBackground({ className = '', children, forceDark = false
         className="hidden dark:block absolute -bottom-1/4 left-1/3 w-[50%] aspect-square rounded-full opacity-25 blur-[80px] pointer-events-none"
         style={{
           background: 'radial-gradient(circle, rgba(253, 192, 47, 0.3) 0%, rgba(44, 62, 138, 0.1) 50%, transparent 70%)',
+          willChange: 'transform',
+          transform: 'translate3d(0, 0, 0)',
         }}
         animate={{
           x: [0, 20, 0],

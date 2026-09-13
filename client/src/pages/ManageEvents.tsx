@@ -155,20 +155,15 @@ const ManageEvents: React.FC<ManageEventsProps> = ({ currentUser }) => {
   };
 
   return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.4 }}
-      className="space-y-8 px-4"
-    >
+    <div className="space-y-8 px-4">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="min-w-0">
-          <motion.h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-textPrimary tracking-tighter">Manage Events</motion.h1>
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-textPrimary tracking-tighter">Manage Events</h1>
           <p className="text-textSecondary mt-2 sm:mt-3 text-sm sm:text-base font-medium leading-relaxed max-w-xl">
             View, edit, or delete your registered events.
           </p>
         </div>
-        <Button onClick={() => setIsAddEventOpen(true)} className="rounded-xl bg-brand text-white hover:bg-brand/90 gap-2 shrink-0">
+        <Button onClick={() => setIsAddEventOpen(true)} aria-label="Register Event" className="rounded-xl bg-brand text-white hover:bg-brand/90 gap-2 shrink-0">
           <Plus size={18} /> Register Event
         </Button>
       </div>
@@ -199,10 +194,13 @@ const ManageEvents: React.FC<ManageEventsProps> = ({ currentUser }) => {
         </Card>
       ) : (
         <div className="space-y-6">
-          <div className="flex bg-hoverSoft/80 p-1 gap-1 rounded-xl border border-borderSoft w-fit items-center">
+          <div className="flex bg-hoverSoft/80 p-1 gap-1 rounded-xl border border-borderSoft w-fit items-center" role="tablist" aria-label="Event status tabs">
             {(['upcoming', 'ongoing', 'past'] as const).map(tab => (
               <button
                 key={tab}
+                role="tab"
+                aria-selected={activeTab === tab}
+                aria-label={`Show ${tab} events`}
                 onClick={() => setActiveTab(tab)}
                 className={cn(
                   "px-4 sm:px-5 py-1.5 rounded-lg text-xs sm:text-sm font-medium border border-transparent transition-all flex items-center justify-center cursor-pointer capitalize",
@@ -222,29 +220,24 @@ const ManageEvents: React.FC<ManageEventsProps> = ({ currentUser }) => {
             </Card>
           ) : (
             <div className="grid gap-4">
-              {displayedEvents.map((event, index) => {
+              {displayedEvents.map((event) => {
                 const startDate = new Date(event.date);
             const endDate = event.dynamic_end_date ? new Date(event.dynamic_end_date) : startDate;
             const hasStarted = startDate <= new Date();
             const isPast = endDate < new Date();
             
             return (
-              <motion.div
-                key={event.id}
-                initial={{ opacity: 0, y: 16 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.05 }}
-              >
+              <div key={event.id}>
                 <Card className="border border-borderSoft rounded-lg hover:border-brand/50 transition-colors shadow-sm bg-card">
                   <CardContent className="p-4 sm:p-6 flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
                     <div>
                       <div className="flex items-center gap-2 mb-1">
-                        <h3 className="text-lg font-bold text-textPrimary">{event.name}</h3>
+                        <h2 className="text-lg font-bold text-textPrimary">{event.name}</h2>
                         {event.status === 'pending' && (
-                          <Badge variant="outline" className="bg-warning/10 text-warning border-warning/30 text-xs px-2 py-0">Pending Approval</Badge>
+                          <Badge variant="outline" className="bg-warning/10 text-warning font-semibold border-warning/30 text-xs px-2 py-0">Pending Approval</Badge>
                         )}
                         {event.status === 'rejected' && (
-                          <Badge variant="outline" className="bg-error/10 text-error border-error/30 text-xs px-2 py-0">Rejected</Badge>
+                          <Badge variant="outline" className="bg-error/10 text-error font-semibold border-error/30 text-xs px-2 py-0">Rejected</Badge>
                         )}
                       </div>
                       <div className="flex flex-wrap gap-4 text-sm text-textMuted">
@@ -264,7 +257,13 @@ const ManageEvents: React.FC<ManageEventsProps> = ({ currentUser }) => {
                     </div>
                     <div className="flex items-center gap-2 shrink-0">
                       {(!hasStarted || currentUser?.role === 'admin') && (
-                        <Button variant="outline" size="sm" onClick={() => handleEditClick(event)} className="gap-2">
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          onClick={() => handleEditClick(event)} 
+                          aria-label={`Edit event ${event.name}`}
+                          className="gap-2"
+                        >
                           <Edit size={14} /> Edit
                         </Button>
                       )}
@@ -274,6 +273,7 @@ const ManageEvents: React.FC<ManageEventsProps> = ({ currentUser }) => {
                           size="sm" 
                           onClick={() => handleDeleteClick(event.id)} 
                           disabled={deletingEventId === event.id}
+                          aria-label={`Delete event ${event.name}`}
                           className="gap-2 text-error border-error/30 hover:bg-error/10 hover:border-error disabled:opacity-50"
                         >
                           {deletingEventId === event.id ? (
@@ -290,7 +290,7 @@ const ManageEvents: React.FC<ManageEventsProps> = ({ currentUser }) => {
                     </div>
                   </CardContent>
                 </Card>
-              </motion.div>
+              </div>
             );
           })}
         </div>
@@ -462,7 +462,7 @@ const ManageEvents: React.FC<ManageEventsProps> = ({ currentUser }) => {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-    </motion.div>
+    </div>
   );
 };
 

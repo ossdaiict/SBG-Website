@@ -277,6 +277,7 @@ const AdminEventRequests: React.FC = () => {
                 size="sm"
                 onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
                 disabled={currentPage === 1}
+                aria-label="Previous Page"
               >
                 <ChevronLeft size={16} className="mr-1" />
                 Previous
@@ -286,6 +287,7 @@ const AdminEventRequests: React.FC = () => {
                 size="sm"
                 onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
                 disabled={currentPage === totalPages}
+                aria-label="Next Page"
               >
                 Next
                 <ChevronRight size={16} className="ml-1" />

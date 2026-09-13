@@ -114,7 +114,13 @@ export default defineConfig(({ mode }) => {
         '__APP_VERSION__': JSON.stringify(appVersion),
       },
       build: {
+        target: 'es2022',
         sourcemap: true,
+        cssCodeSplit: true,
+        cssMinify: true,
+        modulePreload: {
+          polyfill: false,
+        },
         rollupOptions: {
           output: {
             manualChunks: {
@@ -129,7 +135,13 @@ export default defineConfig(({ mode }) => {
                 '@radix-ui/react-avatar',
                 '@radix-ui/react-popover',
                 '@radix-ui/react-label',
+                '@radix-ui/react-switch',
+                '@radix-ui/react-slot',
               ],
+              'vendor-forms': ['react-hook-form', 'zod', '@hookform/resolvers'],
+              'vendor-calendar': ['react-big-calendar', 'date-fns', 'react-day-picker'],
+              'vendor-xlsx': ['xlsx'],
+              'vendor-socket': ['socket.io-client'],
             },
           },
         },

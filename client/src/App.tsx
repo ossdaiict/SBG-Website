@@ -77,10 +77,15 @@ const App: React.FC = () => {
     return !!getCachedUser();
   });
 
-  // Establish the socket on every load (even anonymous) so the build-version
-  // handshake can detect and recover from a stale, cached frontend bundle.
+  // Establish the socket during idle time so it does not compete with critical initial page render (FCP/LCP)
   useEffect(() => {
-    getSocket();
+    if (typeof window !== 'undefined' && 'requestIdleCallback' in window) {
+      const handle = (window as Window & { requestIdleCallback: (cb: () => void, opts?: { timeout: number }) => number; cancelIdleCallback: (id: number) => void }).requestIdleCallback(() => getSocket(), { timeout: 1000 });
+      return () => (window as Window & { cancelIdleCallback: (id: number) => void }).cancelIdleCallback(handle);
+    } else {
+      const timer = setTimeout(() => getSocket(), 300);
+      return () => clearTimeout(timer);
+    }
   }, []);
 
   useEffect(() => {

@@ -144,7 +144,7 @@ const ScheduleCalendarCard = ({
           </div>
 
           <div className="flex w-full min-w-0 flex-1 flex-col border-t border-borderSoft pt-5 xl:border-l xl:border-t-0 xl:pl-6 xl:pt-1">
-            <h4 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-4">
+            <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-4">
               {selectedDate
                 ? selectedDate.toLocaleDateString("en-US", {
                     timeZone: "Asia/Kolkata",
@@ -153,7 +153,7 @@ const ScheduleCalendarCard = ({
                     day: "numeric",
                   })
                 : "Select a date"}
-            </h4>
+            </h3>
 
             <div className="space-y-3 max-h-[280px] overflow-y-auto pr-1 xl:max-h-[320px]">
               {selectedDate
@@ -852,6 +852,7 @@ const ClubDashboard: React.FC<ClubDashboardProps> = ({ user }) => {
                 >
                   <Link
                     to="/my-bookings"
+                    aria-label={`View all ${entityType.toLowerCase()} bookings`}
                     className="text-xs text-brand font-semibold hover:text-brand/80"
                   >
                     View All
@@ -960,6 +961,7 @@ const ClubDashboard: React.FC<ClubDashboardProps> = ({ user }) => {
                 >
                   <Link
                     to="/manage-events"
+                    aria-label={`View all registered ${entityType.toLowerCase()} events`}
                     className="text-xs text-brand font-semibold hover:text-brand/80"
                   >
                     View All
@@ -1043,6 +1045,7 @@ const ClubDashboard: React.FC<ClubDashboardProps> = ({ user }) => {
                               }
                               size="sm"
                               variant="outline"
+                              aria-label={`Book slot for ${event.name}`}
                               className="h-7 text-[11px] rounded-lg bg-brand/10 hover:bg-brand/20 border-brand/20 text-brand font-bold shrink-0 px-2.5 py-0"
                             >
                               Book Slot

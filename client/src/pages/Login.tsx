@@ -354,21 +354,19 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
                         render={({ field }) => (
                           <FormItem>
                             <FormLabel className="text-textSecondary font-semibold text-sm">Group Category</FormLabel>
-                            <FormControl>
-                              <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                <FormControl>
-                                  <SelectTrigger className="h-11 rounded-xl border border-borderSoft bg-transparent px-3 py-2 text-sm text-textPrimary placeholder:text-textMuted focus:outline-none focus:ring-2 focus:ring-brand/30 focus:border-brand w-full">
-                                    <SelectValue placeholder="Select group category" />
-                                  </SelectTrigger>
-                                </FormControl>
-                                <SelectContent className="bg-popover border-borderSoft">
-                                  <SelectItem value="A">Group A (Academic/Tech)</SelectItem>
-                                  <SelectItem value="B">Group B (Cultural)</SelectItem>
-                                  <SelectItem value="C">Group C (Sports)</SelectItem>
-                                  <SelectItem value="other">Others</SelectItem>
-                                </SelectContent>
-                              </Select>
-                            </FormControl>
+                            <Select onValueChange={field.onChange} defaultValue={field.value}>
+                              <FormControl>
+                                <SelectTrigger className="h-11 rounded-xl border border-borderSoft bg-transparent px-3 py-2 text-sm text-textPrimary placeholder:text-textMuted focus:outline-none focus:ring-2 focus:ring-brand/30 focus:border-brand w-full">
+                                  <SelectValue placeholder="Select group category" />
+                                </SelectTrigger>
+                              </FormControl>
+                              <SelectContent className="bg-popover border-borderSoft">
+                                <SelectItem value="A">Group A (Academic/Tech)</SelectItem>
+                                <SelectItem value="B">Group B (Cultural)</SelectItem>
+                                <SelectItem value="C">Group C (Sports)</SelectItem>
+                                <SelectItem value="other">Others</SelectItem>
+                              </SelectContent>
+                            </Select>
                             <FormMessage />
                           </FormItem>
                         )}
@@ -382,17 +380,17 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel className="text-textSecondary font-semibold text-sm">Email Address</FormLabel>
-                        <FormControl>
-                          <div className="relative">
-                            <Mail size={18} className="absolute left-3.5 top-3 text-textMuted z-10" />
+                        <div className="relative">
+                          <Mail size={18} className="absolute left-3.5 top-3 text-textMuted z-10" />
+                          <FormControl>
                             <Input
                               type="email"
                               className="pl-11 h-11 rounded-md border-borderSoft bg-transparent focus:ring-2 focus:ring-brand/20 transition-all"
                               placeholder="club_name@dau.ac.in"
                               {...field}
                             />
-                          </div>
-                        </FormControl>
+                          </FormControl>
+                        </div>
                         <FormMessage />
                       </FormItem>
                     )}
@@ -424,17 +422,17 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
                             </button>
                           )}
                         </div>
-                        <FormControl>
-                          <div className="relative">
-                            <Lock size={18} className="absolute left-3.5 top-3 text-textMuted z-10" />
+                        <div className="relative">
+                          <Lock size={18} className="absolute left-3.5 top-3 text-textMuted z-10" />
+                          <FormControl>
                             <Input
                               type="password"
                               className="pl-11 h-11 rounded-md border-borderSoft bg-transparent focus:ring-2 focus:ring-brand/20 transition-all"
                               placeholder="Enter your password"
                               {...field}
                             />
-                          </div>
-                        </FormControl>
+                          </FormControl>
+                        </div>
                         <FormMessage />
                       </FormItem>
                     )}
@@ -542,6 +540,7 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
                   {[0, 1, 2, 3, 4, 5].map((index) => (
                     <Input
                       key={index}
+                      id={index === 0 ? "forgot-otp" : undefined}
                       type="text"
                       inputMode="numeric"
                       maxLength={1}
