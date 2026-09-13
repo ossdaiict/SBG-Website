@@ -420,12 +420,7 @@ const AdminDashboard: React.FC = () => {
   );
 
   return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.4 }}
-      className="space-y-6 sm:space-y-8"
-    >
+    <div className="space-y-6 sm:space-y-8">
       {/* Enhanced Header - Painted immediately on first frame for 0ms LCP delay */}
       <div className="px-1 sm:px-4">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -1164,9 +1159,7 @@ const AdminDashboard: React.FC = () => {
                           disabled={isProcessingAction}
                         >
                           <XCircle size={16} />
-                          <span className="hidden sm:inline">
-                            {req.bookings.length > 1 ? "Reject All" : "Reject"}
-                          </span>
+                          Reject All
                         </Button>
                         <Button
                           size="sm"
@@ -1176,9 +1169,7 @@ const AdminDashboard: React.FC = () => {
                         >
                           <CheckCircle size={16} />
                           <span className="hidden sm:inline">
-                            {req.bookings.length > 1
-                              ? "Approve All"
-                              : "Approve"}
+                            Approve All
                           </span>
                         </Button>
                       </div>
@@ -1573,7 +1564,7 @@ const AdminDashboard: React.FC = () => {
         booking={editingBooking}
         onUpdated={fetchData}
       />
-    </motion.div>
+    </div>
   );
 };
 

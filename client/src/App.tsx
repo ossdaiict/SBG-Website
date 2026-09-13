@@ -69,13 +69,7 @@ const cacheUser = (nextUser: User | null) => {
 
 const App: React.FC = () => {
   const [user, setUser] = useState<User | null>(() => getCachedUser());
-  const [isInitializing, setIsInitializing] = useState(() => {
-    if (typeof window === 'undefined') return false;
-    // Only block the initial render if we have a cached user in localStorage.
-    // If they are a new visitor (no cache), we should immediately render the public Landing Page
-    // so they don't stare at a loading screen while we check their session!
-    return !!getCachedUser();
-  });
+  const [isInitializing, setIsInitializing] = useState(false);
 
   // Establish the socket during idle time so it does not compete with critical initial page render (FCP/LCP)
   useEffect(() => {
@@ -162,10 +156,6 @@ const App: React.FC = () => {
       socket.emit(SOCKET_EVENTS.JOIN_CLUB, user.clubId);
     }
   }, [user]);
-
-  if (isInitializing) {
-    return <LoadingScreen />;
-  }
 
   const ProtectedRouteRedirect = () => {
     const location = import('react-router-dom').then(m => m.useLocation);
