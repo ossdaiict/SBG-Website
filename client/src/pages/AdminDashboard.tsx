@@ -1,7 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { toast } from 'sonner';
-import { AnimatePresence, motion } from 'framer-motion';
 import { AlertCircle, AlertTriangle, Calendar as CalendarIcon, Check, CheckCircle, ChevronDown, ChevronRight, Download, ExternalLink, Image as ImageIcon, MapPin, Pencil, Plus, RefreshCw, Settings, Trash2, Upload, X, XCircle } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '../components/ui/alert';
 import { Badge } from '../components/ui/badge';
@@ -244,7 +243,6 @@ const AdminDashboard: React.FC = () => {
 
   React.useEffect(() => {
     fetchData();
-    fetchSbgSettings();
   }, [fetchData]);
 
   // Socket.io: join admin room and listen for new booking requests
@@ -468,7 +466,10 @@ const AdminDashboard: React.FC = () => {
                   Events Excel
                 </DropdownMenuItem>
                 <DropdownMenuItem
-                  onClick={() => setSbgSettingsOpen(true)}
+                  onClick={() => {
+                    fetchSbgSettings();
+                    setSbgSettingsOpen(true);
+                  }}
                   className="gap-2 cursor-pointer font-medium"
                 >
                   <Settings size={16} className="text-textSecondary" /> SBG
@@ -505,10 +506,7 @@ const AdminDashboard: React.FC = () => {
       ) : (
         <>
           {/* Mini Stats Grid */}
-      <motion.div
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.1 }}
+      <div
         className="px-1 sm:px-4"
       >
         <div className="grid grid-cols-2 md:grid-cols-4 gap-2 sm:gap-3 w-full items-stretch">
@@ -588,13 +586,10 @@ const AdminDashboard: React.FC = () => {
             </div>
           </Link>
         </div>
-      </motion.div>
+      </div>
 
       {/* Calendar Widget */}
-      <motion.div
-        initial={{ opacity: 0, x: -20 }}
-        animate={{ opacity: 1, x: 0 }}
-        transition={{ duration: 0.5, delay: 0.2 }}
+      <div
         className="w-full min-w-0"
       >
         <Card className="w-full min-w-0 border border-borderSoft rounded-xl overflow-hidden">
@@ -652,266 +647,121 @@ const AdminDashboard: React.FC = () => {
                 </h3>
 
                 <div className="max-h-[280px] min-w-0 flex-1 space-y-3 overflow-y-auto pr-1">
-                  <AnimatePresence mode="wait">
-                    <motion.div
-                      key={`${calendarView}-${selectedDate?.toISOString() || 'none'}`}
-                      initial={{ opacity: 0, y: 8 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: -8 }}
-                      transition={{ duration: 0.25, ease: [0.25, 0.46, 0.45, 0.94] }}
-                      className="space-y-3"
-                    >
-                      {selectedDateEvents.length > 0 ? (
-                        selectedDateEvents.map((event, index) => (
-                          <motion.div
-                            key={event.ids.join("-")}
-                            initial={{
-                              opacity: 0,
-                              y: 6,
-                            }}
-                            animate={{
-                              opacity: 1,
-                              y: 0,
-                            }}
-                            transition={{
-                              duration: 0.2,
-                              delay: index * 0.03,
-                            }}
-                            className="w-full min-w-0"
-                          >
-                            <Card className="w-full min-w-0 rounded-xl transition-colors">
-                              <CardContent className="p-3">
-                                <div className="flex min-w-0 items-start justify-between gap-2">
-                                  <div className="min-w-0 flex-1">
-                                    <div className="mb-1 break-words text-sm font-semibold text-textPrimary">
-                                      {event.bookingName}
-                                    </div>
-
-                                    {event.eventName &&
-                                      event.eventName !== event.bookingName && (
-                                        <div className="mb-1.5 break-words text-xs font-medium text-textMuted">
-                                          Linked Event: {event.eventName}
-                                        </div>
-                                      )}
+                  <div
+                    className="space-y-3"
+                  >
+                    {selectedDateEvents.length > 0 ? (
+                      selectedDateEvents.map((event) => (
+                        <div
+                          key={event.ids.join("-")}
+                          className="w-full min-w-0"
+                        >
+                          <Card className="w-full min-w-0 rounded-xl transition-colors">
+                            <CardContent className="p-3">
+                              <div className="flex min-w-0 items-start justify-between gap-2">
+                                <div className="min-w-0 flex-1">
+                                  <div className="mb-1 break-words text-sm font-semibold text-textPrimary">
+                                    {event.bookingName}
                                   </div>
 
-                                  <Badge
-                                    variant={
-                                      event.status === "approved"
-                                        ? "success"
-                                        : event.status === "pending"
-                                          ? "pending"
-                                          : "destructive"
-                                    }
-                                    className="h-5 shrink-0 px-1.5 py-0 text-[10px]"
-                                  >
-                                    {event.status}
+                                  {event.eventName &&
+                                    event.eventName !== event.bookingName && (
+                                      <div className="mb-1.5 break-words text-xs font-medium text-textMuted">
+                                        Linked Event: {event.eventName}
+                                      </div>
+                                    )}
+                                </div>
+
+                                <Badge
+                                  variant={
+                                    event.status === "approved"
+                                      ? "success"
+                                      : event.status === "pending"
+                                        ? "pending"
+                                        : "destructive"
+                                  }
+                                  className="h-5 shrink-0 px-1.5 py-0 text-[10px]"
+                                >
+                                  {event.status}
+                                </Badge>
+                              </div>
+
+                              {/* Club & Event Type */}
+                              <div className="mb-2 mt-0.5 flex flex-wrap items-center gap-2">
+                                <span className="text-xs font-medium text-brand">{event.clubName}</span>
+                                {event.eventType && (
+                                  <Badge variant="outline" className="text-[10px] h-5">
+                                    {formatEventType(event.eventType)}
                                   </Badge>
-                                </div>
-
-                                {/* Club & Event Type */}
-                                <div className="mb-2 mt-0.5 flex flex-wrap items-center gap-2">
-                                  <span className="text-xs font-medium text-brand">{event.clubName}</span>
-                                  {event.eventType && (
-                                    <Badge variant="outline" className="text-[10px] h-5">
-                                      {formatEventType(event.eventType)}
-                                    </Badge>
-                                  )}
-                                </div>
-
-                                {/* Permissions */}
-                                {event.permissionsLink && (
-                                  <div className="mb-3 mt-2">
-                                    <a
-                                      href={
-                                        event.permissionsLink.match(/^https?:\/\//)
-                                          ? event.permissionsLink
-                                          : `https://${event.permissionsLink}`
-                                      }
-                                      target="_blank"
-                                      rel="noopener noreferrer"
-                                      className="
-                                  inline-flex
-                                  w-fit
-                                  items-center
-                                  justify-center
-                                  gap-1
-                                  rounded-[2rem]
-                                  border
-                                  border-brand/30
-                                  px-2
-                                  text-[10px]
-                                  font-medium
-                                  text-brand
-                                  transition-colors
-                                  hover:bg-brand/10
-                                  sm:gap-1.5
-                                  sm:text-[13px]
-                                "
-                                    >
-                                      <ExternalLink className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
-                                      View Permissions
-                                    </a>
-                                  </div>
                                 )}
+                              </div>
 
-                                {/* Time */}
-                                <div className="mt-2 text-xs text-textMuted">
-                                  {event.startTime} - {event.endTime}
+                              {/* Permissions */}
+                              {event.permissionsLink && (
+                                <div className="mb-3 mt-2">
+                                  <a
+                                    href={
+                                      event.permissionsLink.match(/^https?:\/\//)
+                                        ? event.permissionsLink
+                                        : `https://${event.permissionsLink}`
+                                    }
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="
+                                inline-flex
+                                w-fit
+                                items-center
+                                justify-center
+                                gap-1
+                                rounded-[2rem]
+                                border
+                                border-brand/30
+                                px-2
+                                text-[10px]
+                                font-medium
+                                text-brand
+                                transition-colors
+                                hover:bg-brand/10
+                                sm:gap-1.5
+                                sm:text-[13px]
+                              "
+                                  >
+                                    <ExternalLink className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
+                                    View Permissions
+                                  </a>
                                 </div>
+                              )}
 
-                                {/* Venue */}
-                                {event.venueName && (
-                                  <div className="mt-1 break-words text-xs text-textMuted">
-                                    {event.venueName}
-                                  </div>
-                                )}
-                              </CardContent>
-                            </Card>
-                          </motion.div>
-                        ))
-                      ) : (
-                        <div className="py-8 text-center text-sm text-textMuted">
-                          No events found for this day.
+                              {/* Time */}
+                              <div className="mt-2 text-xs text-textMuted">
+                                {event.startTime} - {event.endTime}
+                              </div>
+
+                              {/* Venue */}
+                              {event.venueName && (
+                                <div className="mt-1 break-words text-xs text-textMuted">
+                                  {event.venueName}
+                                </div>
+                              )}
+                            </CardContent>
+                          </Card>
                         </div>
-                      )}
-                    </motion.div>
-                  </AnimatePresence>
+                      ))
+                    ) : (
+                      <div className="py-8 text-center text-sm text-textMuted">
+                        No events found for this day.
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
             </div>
           </CardContent>
         </Card>
-      </motion.div>
-
-      {/* All Events List (visible to admin) */}
-      {/* <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, delay: 0.45 }}
-      >
-        <Card className="border border-borderSoft rounded-xl">
-          <CardHeader className="border-b border-borderSoft">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-              <div>
-                <CardTitle className="text-lg sm:text-xl">All Events</CardTitle>
-                <CardDescription className="mt-1">Complete list of bookings visible to admin</CardDescription>
-              </div>
-              <div className="flex gap-2">
-                <Button variant="outline" size="sm" asChild className="hidden sm:flex whitespace-nowrap border-[1.5px]">
-                  <Link to="/admin/requests?status=pending" aria-label="View all booking requests">View All</Link>
-                </Button>
-              </div>
-            </div>
-            <div className="sm:hidden px-4 pt-4 pb-2">
-              <Button variant="outline" size="sm" asChild className="w-full border-[1.5px]">
-                <Link to="/admin/requests?status=pending" aria-label="View all booking requests">View All</Link>
-              </Button>
-            </div>
-          </CardHeader>
-
-          <CardContent className="p-0">
-            {isLoading ? (
-              <div className="p-6">
-                <Skeleton className="h-12 w-full mb-4" />
-                <Skeleton className="h-12 w-full mb-4" />
-                <Skeleton className="h-12 w-full" />
-              </div>
-            ) : calendarEvents.length === 0 ? (
-              <div className="p-12 text-center">
-                <p className="text-textMuted">No events available.</p>
-              </div>
-            ) : (
-              <div className="overflow-x-auto w-full">
-                <table className="w-full min-w-[600px] sm:min-w-0 text-left text-sm">
-                  <thead className="bg-hoverSoft border-b border-borderSoft uppercase tracking-wider text-xs font-semibold text-textMuted">
-                    <tr>
-                      <th className="px-4 sm:px-6 py-4">Club / Event</th>
-                      <th className="px-4 sm:px-6 py-4 hidden sm:table-cell">Venue</th>
-                      <th className="px-4 sm:px-6 py-4">Date & Time</th>
-                      <th className="px-4 sm:px-6 py-4">Status</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-border/40">
-                    {[...calendarEvents]
-                      .sort((a, b) => new Date(a.startTimeISO || a.date).getTime() - new Date(b.startTimeISO || b.date).getTime())
-                      .slice(0, 5)
-                      .map((evt, index) => (
-                      <motion.tr
-                        key={evt.batchId || evt.ids[0]}
-                        initial={{ opacity: 0, x: -20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ duration: 0.3, delay: index * 0.05 }}
-                        className="hover:bg-hoverSoft transition-colors"
-                      >
-                        <td className="px-4 sm:px-6 py-4">
-                          <div className="font-semibold text-textPrimary">{evt.bookingName}</div>
-                          {evt.eventName && evt.eventName !== evt.bookingName && (
-                            <div className="text-xs text-textMuted mt-0.5 font-medium">Linked Event: {evt.eventName}</div>
-                          )}
-                          <div className="text-xs text-textMuted mt-0.5">{evt.clubName}</div>
-                          {evt.permissionsLink && (
-                            <a href={evt.permissionsLink} target="_blank" rel="noopener noreferrer" className="text-[10px] text-brand hover:underline mt-1 inline-block font-medium">
-                              🔗 View Permissions
-                            </a>
-                          )}
-                          <div className="text-xs text-textMuted mt-1 sm:hidden flex flex-col gap-1">
-                            <div className="flex items-center gap-1">
-                              <CalendarIcon size={12} className="shrink-0" />
-                              <div className="flex flex-col">
-                                <span className="whitespace-nowrap">{new Date(evt.date).toLocaleDateString('en-US', { timeZone: 'Asia/Kolkata', month: 'short', day: 'numeric' })} {evt.startTime}</span>
-                                <span className="text-[10px] text-textMuted">to</span>
-                                <span className="whitespace-nowrap">{new Date(evt.endDate || evt.date).toLocaleDateString('en-US', { timeZone: 'Asia/Kolkata', month: 'short', day: 'numeric' })} {evt.endTime}</span>
-                              </div>
-                            </div>
-                            <div className="flex items-center gap-1">
-                              <MapPin size={12} className="shrink-0" />
-                              <span>{evt.venueName}</span>
-                            </div>
-                          </div>
-                        </td>
-                        <td className="px-4 sm:px-6 py-4 hidden sm:table-cell">
-                          <div className="flex items-center gap-1.5 text-textPrimary">
-                            {evt.venueName}
-                          </div>
-                        </td>
-                        <td className="px-4 sm:px-6 py-4">
-                          <div className="flex items-start gap-1.5">
-                            <CalendarIcon size={14} className="text-textMuted shrink-0 mt-0.5" />
-                            <div className="flex flex-col text-xs space-y-0.5">
-                              <span className="whitespace-nowrap">{new Date(evt.date).toLocaleDateString('en-US', { timeZone: 'Asia/Kolkata', month: 'short', day: 'numeric', year: 'numeric' })} {evt.startTime}</span>
-                              <span className="text-textMuted text-[10px]">to</span>
-                              <span className="whitespace-nowrap">{new Date(evt.endDate || evt.date).toLocaleDateString('en-US', { timeZone: 'Asia/Kolkata', month: 'short', day: 'numeric', year: 'numeric' })} {evt.endTime}</span>
-                            </div>
-                          </div>
-                        </td>
-                        <td className="px-4 sm:px-6 py-4">
-                          <Badge
-                            variant={
-                              evt.status === 'approved' ? 'success' :
-                                evt.status === 'rejected' ? 'destructive' :
-                                  'pending'
-                            }
-                          >
-                            {evt.status.charAt(0).toUpperCase() + evt.status.slice(1)}
-                          </Badge>
-                        </td>
-                      </motion.tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            )}
-          </CardContent>
-        </Card>
-      </motion.div> */}
+      </div>
 
       {/* Pending Requests Section */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, delay: 0.4 }}
-      >
+      <div>
         <Card className="border border-borderSoft rounded-xl">
           <CardHeader className="border-b border-borderSoft">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -958,12 +808,9 @@ const AdminDashboard: React.FC = () => {
                   <p className="text-textMuted">No pending requests.</p>
                 </div>
               ) : (
-                pendingRequests.slice(0, 5).map((req, index) => (
-                  <motion.div
-                    key={req.ids?.join("-") || index}
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ duration: 0.3, delay: index * 0.1 }}
+                pendingRequests.slice(0, 5).map((req) => (
+                  <div
+                    key={req.ids?.join("-")}
                     className="p-3 hover:bg-hoverSoft transition-colors"
                   >
                     <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 sm:gap-6">
@@ -1174,20 +1021,16 @@ const AdminDashboard: React.FC = () => {
                         </Button>
                       </div>
                     </div>
-                  </motion.div>
+                  </div>
                 ))
               )}
             </div>
           </CardContent>
         </Card>
-      </motion.div>
+      </div>
 
       {/* Pending Events Section */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, delay: 0.35 }}
-      >
+      <div>
         <Card className="border border-borderSoft rounded-xl mb-6">
           <CardHeader className="border-b border-borderSoft">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -1237,12 +1080,9 @@ const AdminDashboard: React.FC = () => {
                   </p>
                 </div>
               ) : (
-                pendingEvents.slice(0, 5).map((evt, index) => (
-                  <motion.div
-                    key={evt.id || index}
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ duration: 0.3, delay: index * 0.1 }}
+                pendingEvents.slice(0, 5).map((evt) => (
+                  <div
+                    key={evt.id}
                     className="p-3 hover:bg-hoverSoft transition-colors"
                   >
                     <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 sm:gap-6">
@@ -1368,14 +1208,14 @@ const AdminDashboard: React.FC = () => {
                         );
                       })()}
                     </div>
-                  </motion.div>
+                  </div>
                 ))
               )}
             </div>
           </CardContent>
         </Card>
-      </motion.div>
-      </>
+      </div>
+        </>
       )}
 
       <AddBookingDialog
