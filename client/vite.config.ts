@@ -126,20 +126,28 @@ export default defineConfig(({ mode }) => {
           output: {
             manualChunks(id) {
               if (id.includes('node_modules')) {
-                // Core React & scheduler
+                // Calendar and date libraries (heavy, only on calendar pages)
                 if (
-                  id.includes('/react/') ||
-                  id.includes('react-dom') ||
-                  id.includes('scheduler')
+                  id.includes('react-big-calendar') ||
+                  id.includes('react-day-picker') ||
+                  id.includes('date-fns')
                 ) {
-                  return 'vendor-react';
+                  return 'vendor-calendar';
                 }
-                // Routing
-                if (
-                  id.includes('react-router') ||
-                  id.includes('@remix-run/router')
-                ) {
-                  return 'vendor-router';
+                // Animation library
+                if (id.includes('framer-motion')) {
+                  return 'vendor-framer';
+                }
+                // Icons
+                if (id.includes('lucide-react') || id.includes('react-icons')) {
+                  return 'vendor-icons';
+                }
+                // Heavy standalone utilities
+                if (id.includes('xlsx')) {
+                  return 'vendor-xlsx';
+                }
+                if (id.includes('socket.io-client') || id.includes('engine.io-client')) {
+                  return 'vendor-socket';
                 }
                 // Form validation & schemas
                 if (
@@ -153,28 +161,14 @@ export default defineConfig(({ mode }) => {
                 if (id.includes('@radix-ui') || id.includes('@floating-ui')) {
                   return 'vendor-ui';
                 }
-                // Icons
-                if (id.includes('lucide-react') || id.includes('react-icons')) {
-                  return 'vendor-icons';
-                }
-                // Animation library
-                if (id.includes('framer-motion')) {
-                  return 'vendor-framer';
-                }
-                // Calendar and date libraries
+                // Core React & React Router runtime (must remain together to avoid TDZ circular execution)
                 if (
-                  id.includes('react-big-calendar') ||
-                  id.includes('react-day-picker') ||
-                  id.includes('date-fns')
+                  id.includes('react') ||
+                  id.includes('react-dom') ||
+                  id.includes('scheduler') ||
+                  id.includes('@remix-run')
                 ) {
-                  return 'vendor-calendar';
-                }
-                // Heavy standalone utilities deferred until explicitly needed
-                if (id.includes('xlsx')) {
-                  return 'vendor-xlsx';
-                }
-                if (id.includes('socket.io-client') || id.includes('engine.io-client')) {
-                  return 'vendor-socket';
+                  return 'vendor-react';
                 }
               }
             },
