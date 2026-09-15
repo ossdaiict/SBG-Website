@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.3.0](https://github.com/ossdaiict/SBG-Website/compare/v2.2.0...v2.3.0) (2026-09-15)
+
+
+### Features
+
+* Full-platform Lighthouse optimization, responsive Analytics dashboard, and archived member management ([#42](https://github.com/ossdaiict/SBG-Website/issues/42)) ([707f175](https://github.com/ossdaiict/SBG-Website/commit/707f17529f3d4536624b6162b4c03ebb39330f25))
+
 ## [2.2.0](https://github.com/ossdaiict/SBG-Website/compare/v2.1.0...v2.2.0) (2026-09-11)
 
 
