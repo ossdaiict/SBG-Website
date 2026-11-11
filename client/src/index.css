@@ -476,3 +476,72 @@
   /* Reduce visual weight on mobile */
   h1, .h1 { font-size: 1.75rem; }
 }
+
+/* ================================================================
+   Stitch Luxury Neumorphic & Tactile Kinematics System
+   ================================================================ */
+.font-bodoni {
+  font-family: 'Bodoni Moda', serif, Georgia, Cambria;
+}
+.font-manrope {
+  font-family: 'Manrope', sans-serif;
+}
+
+/* Light Mode Neumorphism */
+.neu-convex {
+  background-color: #f7f9ff;
+  box-shadow: 8px 8px 18px #c4c9d4, -8px -8px 18px #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.85);
+}
+.neu-concave {
+  background-color: #ebeef3;
+  box-shadow: inset 4px 4px 8px #c4c9d4, inset -4px -4px 8px #ffffff;
+}
+.neu-pressed {
+  box-shadow: inset 2px 2px 5px #b0b6c2, inset -2px -2px 5px #ffffff !important;
+}
+.neu-floating {
+  background-color: #f7f9ff;
+  box-shadow: 14px 14px 28px #bac0cb, -14px -14px 28px #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.95);
+}
+
+/* Dark Mode Neumorphism */
+.dark .neu-convex {
+  background-color: #12141a;
+  box-shadow: 8px 8px 20px rgba(0, 0, 0, 0.9), -4px -4px 16px rgba(255, 255, 255, 0.035);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+.dark .neu-concave {
+  background-color: #0b0d11;
+  box-shadow: inset 4px 4px 10px rgba(0, 0, 0, 0.92), inset -3px -3px 8px rgba(255, 255, 255, 0.025);
+  border: 1px solid rgba(255, 255, 255, 0.03);
+}
+.dark .neu-pressed {
+  box-shadow: inset 3px 3px 7px rgba(0, 0, 0, 0.95), inset -2px -2px 6px rgba(255, 255, 255, 0.02) !important;
+}
+.dark .neu-floating {
+  background-color: #141720;
+  box-shadow: 14px 14px 32px rgba(0, 0, 0, 0.95), -6px -6px 20px rgba(255, 255, 255, 0.035);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+/* Real-World Tactile Kinematics: Transitioning seamlessly from floating to pressed */
+.tactile-kinematic {
+  transition: transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.22s cubic-bezier(0.34, 1.56, 0.64, 1);
+  will-change: transform, box-shadow;
+  cursor: pointer;
+}
+.tactile-kinematic:hover {
+  transform: translateY(-2px);
+}
+.tactile-kinematic:active,
+.tactile-kinematic.pressed {
+  transform: translateY(1.5px) scale(0.985);
+  box-shadow: inset 3px 3px 6px #b0b6c2, inset -3px -3px 6px #ffffff !important;
+}
+.dark .tactile-kinematic:active,
+.dark .tactile-kinematic.pressed {
+  box-shadow: inset 3px 3px 8px rgba(0, 0, 0, 0.95), inset -2px -2px 6px rgba(255, 255, 255, 0.025) !important;
+}
+

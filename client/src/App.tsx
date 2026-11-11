@@ -7,7 +7,9 @@ import { apiRequest } from './lib/api';
 import { getSocket, reconnectSocket, SOCKET_EVENTS } from './lib/socket';
 import { useDocumentTitle } from './lib/useDocumentTitle';
 import { User } from './types';
-const LandingPage = React.lazy(() => import('./pages/LandingPage'));
+// Landing page is imported eagerly so the cinematic logo loader mounts immediately
+// on every refresh (no Suspense fallback swap / reset in between).
+import LandingPage from './pages/LandingPage';
 const Layout = React.lazy(() => import('./pages/Layout'));
 const Login = React.lazy(() => import('./pages/Login'));
 const AboutSBG = React.lazy(() => import('./pages/AboutSBG'));

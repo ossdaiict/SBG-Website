@@ -1,5 +1,5 @@
 import React from 'react';
-import { Outlet } from 'react-router-dom';
+import { Outlet, useLocation } from 'react-router-dom';
 import { PublicNavbar } from './PublicNavbar';
 
 interface PublicLayoutProps {
@@ -7,9 +7,12 @@ interface PublicLayoutProps {
 }
 
 export const PublicLayout: React.FC<PublicLayoutProps> = ({ onGoToLogin }) => {
+    const location = useLocation();
+    const isRoot = location.pathname === '/';
+
     return (
         <div className="flex flex-col min-h-dvh bg-bgMain">
-            <PublicNavbar onGoToLogin={onGoToLogin} />
+            {!isRoot && <PublicNavbar onGoToLogin={onGoToLogin} />}
             <div className="flex-1">
                 <Outlet />
             </div>

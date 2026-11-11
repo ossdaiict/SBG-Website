@@ -1,49 +1,36 @@
+import React from 'react';
 
-export const LoadingScreen = () => {
+export const LoadingScreen: React.FC = () => {
   return (
-    <div className="w-full flex-1 flex flex-col items-center justify-center min-h-[70dvh] p-4 relative z-50">
+    <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-[#f7f9ff] dark:bg-[#060709] transition-colors duration-300 select-none overflow-hidden">
+      {/* Background ambient radial glow matching the SBG theme */}
+      <div className="absolute w-[500px] h-[500px] rounded-full bg-gradient-to-tr from-[#755a21]/10 via-[#d4af37]/15 to-[#1a3026]/10 dark:from-[#d4af37]/10 dark:via-[#f59e0b]/10 dark:to-[#52b788]/10 blur-[120px] pointer-events-none" />
 
-      {/* Background ambient aurora glows - heavily blurred and subtle */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] h-[300px] bg-brand/10 blur-[80px] rounded-full animate-pulse"></div>
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[200px] h-[200px] bg-[#E84E36]/5 blur-[60px] rounded-full animate-pulse" style={{ animationDelay: '1s' }}></div>
+      {/* Center SBG Logo (Exact match to LandingPage initial loader size & centering) */}
+      <div className="relative w-28 h-28 sm:w-36 sm:h-36 md:w-40 md:h-40 flex items-center justify-center">
+        <img
+          src="/sbg_logo.png"
+          alt="Student Body Government"
+          className="w-full h-full object-contain drop-shadow-md"
+          width={400}
+          height={430}
+          loading="eager"
+          decoding="sync"
+        />
+      </div>
 
-      {/* Central Glass Card matching the premium theme */}
-      <div className="glass-card p-10 flex flex-col items-center justify-center gap-8 min-w-[280px] relative z-10 border-white/20 dark:border-white/5">
-
-        {/* Logo Container */}
-        <div className="relative w-28 h-28 flex items-center justify-center">
-          {/* Subtle spinning dashed rings around logo using brand colors */}
-          <div className="absolute inset-0 rounded-full border border-dashed border-brand/40 animate-[spin_8s_linear_infinite]"></div>
-          <div className="absolute inset-2 rounded-full border border-dashed border-[#E84E36]/30 animate-[spin_12s_linear_infinite_reverse]"></div>
-
-          <img
-            src="/sbg_logo.webp"
-            alt="SBG Logo"
-            width="80"
-            height="80"
-            fetchPriority="high"
-            decoding="async"
-            className="w-20 h-20 object-contain drop-shadow-md"
-          />
+      {/* Sleek Loading Bar */}
+      <div className="absolute top-[calc(50%+80px)] sm:top-[calc(50%+100px)] md:top-[calc(50%+108px)] left-1/2 -translate-x-1/2 flex flex-col items-center gap-2.5 w-56 sm:w-64 pointer-events-none">
+        <div className="w-full h-1 sm:h-1.5 rounded-full bg-[#051b12]/10 dark:bg-white/10 overflow-hidden relative shadow-inner">
+          <div className="h-full w-2/5 bg-gradient-to-r from-[#755a21] via-[#d4af37] to-[#10b981] dark:from-[#d4af37] dark:via-[#fde047] dark:to-[#52b788] rounded-full animate-pulse shadow-[0_0_8px_rgba(212,175,55,0.6)]" />
         </div>
-
-        <div className="flex flex-col items-center gap-4 w-full">
-          {/* Text Gradient Title */}
-          <h2 className="text-xl font-extrabold tracking-widest text-gradient uppercase">
-            SBG DAU
-          </h2>
-
-          {/* Thematic Progress Bar */}
-          <div className="w-full h-1 bg-borderSoft rounded-full overflow-hidden relative">
-            <div className="absolute top-0 left-0 h-full w-full bg-linear-to-r from-brand to-[#E84E36] rounded-full opacity-70 animate-pulse"></div>
-          </div>
-
-          <div className="text-xs font-semibold tracking-widest text-textMuted uppercase mt-1">
-            Loading Resources...
-          </div>
+        <div className="w-full flex items-center justify-between text-[10px] font-bold tracking-[0.2em] uppercase text-[#727974] dark:text-[#94a3b8] px-0.5">
+          <span>Initializing...</span>
+          <span className="font-mono text-[#755a21] dark:text-[#d4af37]">SBG</span>
         </div>
-
       </div>
     </div>
   );
 };
+
+export default LoadingScreen;
