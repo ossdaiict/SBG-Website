@@ -100,18 +100,18 @@ export const PublicNavbar: React.FC<PublicNavbarProps> = ({ onGoToLogin }) => {
               Home
             </Link>
             <Link
-              to="/about-sbg"
-              onClick={() => setIsMobileMenuOpen(false)}
-              className={navItemClass("/about-sbg")}
-            >
-              About SBG
-            </Link>
-            <Link
               to="/clubs-committees"
               onClick={() => setIsMobileMenuOpen(false)}
               className={navItemClass("/clubs-committees")}
             >
               Clubs & Committees
+            </Link>
+            <Link
+              to="/about-sbg"
+              onClick={() => setIsMobileMenuOpen(false)}
+              className={navItemClass("/about-sbg")}
+            >
+              About SBG
             </Link>
           </nav>
         </div>
@@ -165,18 +165,18 @@ export const PublicNavbar: React.FC<PublicNavbarProps> = ({ onGoToLogin }) => {
                 Home
               </Link>
               <Link
-                to="/about-sbg"
-                onClick={() => setIsMobileMenuOpen(false)}
-                className={mobileNavItemClass("/about-sbg")}
-              >
-                About SBG
-              </Link>
-              <Link
                 to="/clubs-committees"
                 onClick={() => setIsMobileMenuOpen(false)}
                 className={mobileNavItemClass("/clubs-committees")}
               >
                 Clubs & Committees
+              </Link>
+              <Link
+                to="/about-sbg"
+                onClick={() => setIsMobileMenuOpen(false)}
+                className={mobileNavItemClass("/about-sbg")}
+              >
+                About SBG
               </Link>
               <Button
                 onClick={() => {
