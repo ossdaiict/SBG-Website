@@ -1,9 +1,11 @@
 import { AnimatePresence, motion } from 'framer-motion';
 import {
     Calendar as CalendarIcon,
+    CalendarPlus,
     ChevronLeft,
     ChevronRight,
     Clock,
+    Download,
     MapPin,
     Sparkles,
     Users,
@@ -65,6 +67,85 @@ function formatDayLabel(date: Date) {
 
 function isSameDay(a: Date, b: Date) {
     return a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
+}
+
+/** Formats a date strictly in Asia/Kolkata (IST) compact string: YYYYMMDDTHHmmss */
+function formatISTCompact(date: Date): string {
+    const parts = new Intl.DateTimeFormat('en-US', {
+        timeZone: 'Asia/Kolkata',
+        year: 'numeric', month: '2-digit', day: '2-digit',
+        hour: '2-digit', minute: '2-digit', second: '2-digit',
+        hour12: false
+    }).formatToParts(new Date(date));
+    const get = (type: string) => parts.find(p => p.type === type)?.value || '';
+    const pad = (v: string) => v.padStart(2, '0');
+    const year = get('year');
+    const month = pad(get('month'));
+    const day = pad(get('day'));
+    let hour = get('hour');
+    if (hour === '24') hour = '00';
+    hour = pad(hour);
+    const minute = pad(get('minute'));
+    const second = pad(get('second'));
+    return `${year}${month}${day}T${hour}${minute}${second}`;
+}
+
+function handleAddToGoogleCalendar(event: PublicEvent) {
+    const startIST = formatISTCompact(event.startTime);
+    const endIST = formatISTCompact(event.endTime);
+    const text = encodeURIComponent(event.eventName);
+    const details = encodeURIComponent(
+        `Organized by: ${event.clubName}\nVenue: ${event.venueName}${event.eventType ? `\nEvent Type: ${formatEventType(event.eventType)}` : ''}`
+    );
+    const location = encodeURIComponent(event.venueName);
+    const url = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${text}&dates=${startIST}/${endIST}&ctz=Asia/Kolkata&details=${details}&location=${location}`;
+    window.open(url, '_blank', 'noopener,noreferrer');
+}
+
+function handleDownloadICS(event: PublicEvent) {
+    const startIST = formatISTCompact(event.startTime);
+    const endIST = formatISTCompact(event.endTime);
+    const nowUTC = new Date().toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
+    const sanitizeIcsText = (str: string) => str.replace(/\\/g, '\\\\').replace(/;/g, '\\;').replace(/,/g, '\\,').replace(/\n/g, '\\n');
+
+    const icsLines = [
+        'BEGIN:VCALENDAR',
+        'VERSION:2.0',
+        'PRODID:-//SBG DAU//Event Portal//EN',
+        'CALSCALE:GREGORIAN',
+        'METHOD:PUBLISH',
+        'BEGIN:VTIMEZONE',
+        'TZID:Asia/Kolkata',
+        'X-LIC-LOCATION:Asia/Kolkata',
+        'BEGIN:STANDARD',
+        'TZOFFSETFROM:+0530',
+        'TZOFFSETTO:+0530',
+        'TZNAME:IST',
+        'DTSTART:19700101T000000',
+        'END:STANDARD',
+        'END:VTIMEZONE',
+        'BEGIN:VEVENT',
+        `UID:${event.id || Date.now()}-${event.startTime.getTime()}@sbg.daiict.ac.in`,
+        `DTSTAMP:${nowUTC}`,
+        `DTSTART;TZID=Asia/Kolkata:${startIST}`,
+        `DTEND;TZID=Asia/Kolkata:${endIST}`,
+        `SUMMARY:${sanitizeIcsText(event.eventName)}`,
+        `DESCRIPTION:${sanitizeIcsText(`Organized by ${event.clubName} at ${event.venueName}${event.eventType ? ` (${formatEventType(event.eventType)})` : ''}`)}`,
+        `LOCATION:${sanitizeIcsText(event.venueName)}`,
+        'STATUS:CONFIRMED',
+        'END:VEVENT',
+        'END:VCALENDAR'
+    ];
+
+    const blob = new Blob([icsLines.join('\r\n')], { type: 'text/calendar;charset=utf-8' });
+    const downloadUrl = window.URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = downloadUrl;
+    link.setAttribute('download', `${event.eventName.trim().replace(/[^a-zA-Z0-9_-]/g, '_')}.ics`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    window.URL.revokeObjectURL(downloadUrl);
 }
 
 const LandingPage: React.FC = () => {
@@ -759,6 +840,30 @@ const LandingPage: React.FC = () => {
                                                 </div>
                                             </div>
                                         )}
+
+                                        {/* Add to Calendar actions */}
+                                        <div className="pt-2 border-t border-borderSoft/60 flex flex-col sm:flex-row gap-2">
+                                            <Button
+                                                type="button"
+                                                variant="outline"
+                                                size="sm"
+                                                onClick={() => handleAddToGoogleCalendar(selectedEvent)}
+                                                className="flex-1 flex items-center justify-center gap-2 h-9 rounded-xl font-semibold text-xs border-borderSoft hover:bg-hoverSoft active:scale-[0.99] transition-all cursor-pointer"
+                                            >
+                                                <CalendarPlus size={15} className="text-brand" />
+                                                <span>Google Calendar</span>
+                                            </Button>
+                                            <Button
+                                                type="button"
+                                                variant="outline"
+                                                size="sm"
+                                                onClick={() => handleDownloadICS(selectedEvent)}
+                                                className="flex-1 flex items-center justify-center gap-2 h-9 rounded-xl font-semibold text-xs border-borderSoft hover:bg-hoverSoft active:scale-[0.99] transition-all cursor-pointer"
+                                            >
+                                                <Download size={15} className="text-textSecondary" />
+                                                <span>Download .ics</span>
+                                            </Button>
+                                        </div>
                                     </div>
                                 </div>
 
