@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.4.0](https://github.com/ossdaiict/SBG-Website/compare/v2.3.0...v2.4.0) (2026-11-22)
+
+
+### Features
+
+* **calendar:** add Google Calendar and iCal export to event details modal ([#47](https://github.com/ossdaiict/SBG-Website/issues/47)) ([#50](https://github.com/ossdaiict/SBG-Website/issues/50)) ([e771f5b](https://github.com/ossdaiict/SBG-Website/commit/e771f5b54d57033e5a1275debfb908e1241abad8))
+
 ## [2.3.0](https://github.com/ossdaiict/SBG-Website/compare/v2.2.0...v2.3.0) (2026-09-15)
 
 
