@@ -79,6 +79,8 @@ export default defineConfig(({ mode }) => {
             'apple-touch-icon.png',
             'icons/android-chrome-192x192.png',
             'icons/android-chrome-512x512.png',
+            'sbg_logo.png',
+            'sbg_logo_optimized.png',
             'sbg_logo.webp',
             'gdg-logo.webp',
             'robots.txt',
@@ -89,6 +91,23 @@ export default defineConfig(({ mode }) => {
             globPatterns: ['**/*.{js,css,html,ico,png,svg,woff,woff2}'],
             cleanupOutdatedCaches: true,
             runtimeCaching: [
+              {
+                urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,
+                handler: 'StaleWhileRevalidate',
+                options: {
+                  cacheName: 'google-fonts-stylesheets',
+                  expiration: { maxEntries: 10, maxAgeSeconds: 60 * 60 * 24 * 30 }
+                }
+              },
+              {
+                urlPattern: /^https:\/\/fonts\.gstatic\.com\/.*/i,
+                handler: 'CacheFirst',
+                options: {
+                  cacheName: 'google-fonts-webfonts',
+                  expiration: { maxEntries: 30, maxAgeSeconds: 60 * 60 * 24 * 365 },
+                  cacheableResponse: { statuses: [0, 200] }
+                }
+              },
               {
                 urlPattern: /^https:\/\/sbg\.dau\.ac\.in\/api\/.*/i,
                 handler: 'NetworkFirst',

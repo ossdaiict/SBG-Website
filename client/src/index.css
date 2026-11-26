@@ -261,14 +261,16 @@
     box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3), inset 0 1px 0 0 rgba(255, 255, 255, 0.05);
   }
 
-  .glass-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
-    border-color: var(--brand-glow);
-  }
+  @media (hover: hover) and (pointer: fine) {
+    .glass-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
+      border-color: var(--brand-glow);
+    }
 
-  .dark .glass-card:hover {
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4), inset 0 1px 0 0 rgba(255, 255, 255, 0.1);
+    .dark .glass-card:hover {
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4), inset 0 1px 0 0 rgba(255, 255, 255, 0.1);
+    }
   }
 
   .scrollbar-hide::-webkit-scrollbar { display: none; }
@@ -532,8 +534,10 @@
   will-change: transform, box-shadow;
   cursor: pointer;
 }
-.tactile-kinematic:hover {
-  transform: translateY(-2px);
+@media (hover: hover) and (pointer: fine) {
+  .tactile-kinematic:hover {
+    transform: translateY(-2px);
+  }
 }
 .tactile-kinematic:active,
 .tactile-kinematic.pressed {
